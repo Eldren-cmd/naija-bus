@@ -130,7 +130,15 @@ Status: complete. Live checks confirm:
 - admin delete -> `200`
 - get deleted route -> `404`
 
+### Task 2.4
+- Implement `GET /stops?near=lng,lat&radius=500`
+
+Status: complete. Live checks confirm:
+- valid near/radius -> `200` with nearby stops
+- missing `near` -> `400`
+- invalid `near` -> `400`
+- invalid `radius` -> `400`
+
 ### Next Tasks
-- 2.4 Implement `GET /stops?near=lng,lat&radius=500`
 - 2.5 Implement fare engine service for estimate endpoint
 - 2.6 Implement `GET /fare/estimate` using fare engine

@@ -49,6 +49,20 @@ const parseBbox = (bboxRaw: string): [number, number, number, number] | null => 
   return [minLng, minLat, maxLng, maxLat];
 };
 
+const parseNear = (nearRaw: string): [number, number] | null => {
+  const parts = nearRaw.split(",").map((part) => Number(part.trim()));
+  if (parts.length !== 2 || parts.some((n) => !Number.isFinite(n))) {
+    return null;
+  }
+
+  const [lng, lat] = parts;
+  if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
+    return null;
+  }
+
+  return [lng, lat];
+};
+
 const TRANSPORT_TYPES = ["danfo", "brt", "keke", "bus", "ferry", "mixed"] as const;
 type TransportType = (typeof TRANSPORT_TYPES)[number];
 
@@ -348,6 +362,54 @@ app.delete(
 app.post("/routes", authMiddleware, requireRoles(["admin"]), createRouteHandler);
 app.put("/routes/:routeId", authMiddleware, requireRoles(["admin"]), updateRouteHandler);
 app.delete("/routes/:routeId", authMiddleware, requireRoles(["admin"]), deleteRouteHandler);
+
+const getStopsNearHandler = async (req: Request, res: Response) => {
+  try {
+    const near = typeof req.query.near === "string" ? req.query.near.trim() : "";
+    if (!near) {
+      return res.status(400).json({ error: "near query is required in format lng,lat" });
+    }
+
+    const parsedNear = parseNear(near);
+    if (!parsedNear) {
+      return res.status(400).json({
+        error: "near must be in format lng,lat with valid WGS84 coordinates",
+      });
+    }
+
+    let radius = 500;
+    if (req.query.radius !== undefined) {
+      const parsedRadius = Number(req.query.radius);
+      if (!Number.isFinite(parsedRadius) || parsedRadius <= 0) {
+        return res.status(400).json({ error: "radius must be a positive number in meters" });
+      }
+      radius = Math.min(parsedRadius, 20000);
+    }
+
+    const [lng, lat] = parsedNear;
+    const stops = await Stop.find({
+      coords: {
+        $nearSphere: {
+          $geometry: {
+            type: "Point",
+            coordinates: [lng, lat],
+          },
+          $maxDistance: radius,
+        },
+      },
+    })
+      .limit(100)
+      .populate("routeId", "name origin destination transportType")
+      .lean();
+
+    return res.status(200).json(stops);
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to fetch nearby stops" });
+  }
+};
+
+app.get("/api/v1/stops", getStopsNearHandler);
+app.get("/stops", getStopsNearHandler);
 
 const startServer = async (): Promise<void> => {
   try {
