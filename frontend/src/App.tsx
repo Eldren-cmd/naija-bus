@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Navigate, Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { FareEstimate } from "./components/FareEstimate";
 import { ReportFarePanel } from "./components/ReportFarePanel";
 import { RouteView } from "./components/RouteView";
@@ -7,18 +8,27 @@ import { getRouteById, getRoutes } from "./lib/api";
 import type { RouteDetail, RouteSummary } from "./types";
 import "./App.css";
 
-function App() {
+function RouteFinderPage() {
+  const navigate = useNavigate();
+  const { routeId } = useParams<{ routeId: string }>();
+
   const [searchInput, setSearchInput] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
   const [routes, setRoutes] = useState<RouteSummary[]>([]);
   const [routesLoading, setRoutesLoading] = useState(false);
   const [routesError, setRoutesError] = useState<string | null>(null);
 
-  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(routeId ?? null);
   const [selectedRoute, setSelectedRoute] = useState<RouteDetail | null>(null);
   const [routeLoading, setRouteLoading] = useState(false);
   const [routeError, setRouteError] = useState<string | null>(null);
   const [fareRefreshNonce, setFareRefreshNonce] = useState(0);
+
+  useEffect(() => {
+    if (routeId) {
+      setSelectedRouteId(routeId);
+    }
+  }, [routeId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -35,6 +45,7 @@ function App() {
           setSelectedRoute(null);
           return;
         }
+
         setSelectedRouteId((previous) =>
           previous && data.some((item) => item._id === previous) ? previous : data[0]._id,
         );
@@ -83,14 +94,30 @@ function App() {
     };
   }, [selectedRouteId]);
 
+  useEffect(() => {
+    if (!routeId) return;
+    if (!selectedRouteId) return;
+    if (routeId === selectedRouteId) return;
+    navigate(`/route/${selectedRouteId}`, { replace: true });
+  }, [navigate, routeId, selectedRouteId]);
+
   const onSearch = (query: string) => {
     setActiveQuery(query);
+    if (!query.trim()) {
+      navigate("/", { replace: true });
+    }
   };
 
   const onSelectRouteFromSearch = (routeId: string, nextQuery: string) => {
     setSearchInput(nextQuery);
     setActiveQuery(nextQuery.trim());
     setSelectedRouteId(routeId);
+    navigate(`/route/${routeId}`);
+  };
+
+  const onSelectRouteFromList = (routeId: string) => {
+    setSelectedRouteId(routeId);
+    navigate(`/route/${routeId}`);
   };
 
   return (
@@ -122,7 +149,7 @@ function App() {
                 <button
                   type="button"
                   className={route._id === selectedRouteId ? "active" : ""}
-                  onClick={() => setSelectedRouteId(route._id)}
+                  onClick={() => onSelectRouteFromList(route._id)}
                 >
                   <strong>{route.name}</strong>
                   <span>
@@ -151,6 +178,16 @@ function App() {
         </section>
       </section>
     </main>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<RouteFinderPage />} />
+      <Route path="/route/:routeId" element={<RouteFinderPage />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 

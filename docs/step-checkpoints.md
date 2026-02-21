@@ -218,6 +218,21 @@ Status: complete. Implemented:
 - added shared search response types in `frontend/src/types.ts`
 - added search dropdown/focus-ring styles in `frontend/src/App.css`
 
+### Task 2.15
+- Wire Home flow: `SearchInput` -> navigate to `/route/:routeId` -> `RouteView`
+
+Status: complete. Implemented:
+- added React Router integration:
+  - wrapped app with `BrowserRouter` in `frontend/src/main.tsx`
+  - configured routes in `frontend/src/App.tsx`:
+    - `/`
+    - `/route/:routeId`
+- wired route selection events to URL navigation (`/route/:routeId`) from:
+  - typeahead suggestion clicks
+  - route list item clicks
+- added route-param synchronization so direct route URLs load and render RouteView flow
+- added fallback redirect for unknown frontend paths to `/`
+
 ### Phase 2 Frontend MVP View
 - Build RouteView page section showing selected route + ordered stops
 - Build FareEstimate component calling `GET /fare/estimate`
@@ -366,5 +381,5 @@ Status: complete. Implemented:
 - saves JWT token locally in browser storage for repeated report submissions
 
 ### Next Tasks
-- DevPlan alignment backlog from Phase 2: `2.15` (see `docs/devplan-audit-phase1-3.md`)
+- DevPlan alignment backlog from Phase 2: cleared
 - 3.8 Build traffic report modal: type, severity, description, auto-fill location

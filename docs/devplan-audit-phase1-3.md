@@ -44,7 +44,7 @@ Status labels:
 | 2.12 | complete | RouteView fetches detail and draws polyline + stops. |
 | 2.13 | complete | FareEstimate component wired to API with breakdown/confidence. |
 | 2.14 | complete | Ordered stops list exists in RouteView. |
-| 2.15 | partial | Search-select flow works, but no `/route/:routeId` navigation route. |
+| 2.15 | complete | Home flow now navigates to `/route/:routeId` and renders RouteView by route URL. |
 | 2.16 | complete | Supertest integration tests exist for login/routes/fare estimate. |
 
 ## Phase 3
@@ -67,5 +67,5 @@ Status labels:
 
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Finish remaining Phase 2 tasks first: `2.15`.
+1. Phase 2 backlog is cleared.
 2. Continue with remaining Phase 3 tasks: `3.8`, `3.9`, `3.10`, `3.11`, `3.13`.
