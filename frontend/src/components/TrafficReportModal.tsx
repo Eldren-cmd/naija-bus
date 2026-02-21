@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { reportIncident } from "../lib/api";
+import type { ToastTone } from "./ToastStack";
 import type { FormEvent } from "react";
 import type { ReportSeverity, ReportType } from "../types";
 
 type TrafficReportModalProps = {
   routeId: string | null;
   routeName?: string;
+  onToast?: (tone: ToastTone, message: string) => void;
 };
 
 const TOKEN_STORAGE_KEY = "naija_transport_jwt";
@@ -23,7 +25,7 @@ const REPORT_SEVERITY_OPTIONS: ReportSeverity[] = ["low", "medium", "high"];
 
 const formatTypeLabel = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
-export function TrafficReportModal({ routeId, routeName }: TrafficReportModalProps) {
+export function TrafficReportModal({ routeId, routeName, onToast }: TrafficReportModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [token, setToken] = useState("");
   const [type, setType] = useState<ReportType>("traffic");
@@ -34,8 +36,6 @@ export function TrafficReportModal({ routeId, routeName }: TrafficReportModalPro
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(TOKEN_STORAGE_KEY);
@@ -92,9 +92,7 @@ export function TrafficReportModal({ routeId, routeName }: TrafficReportModalPro
     setType("traffic");
     setSeverity("medium");
     setDescription("");
-    setError(null);
     setLocationError(null);
-    setSuccess(null);
   };
 
   const openModal = () => {
@@ -109,12 +107,10 @@ export function TrafficReportModal({ routeId, routeName }: TrafficReportModalPro
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError(null);
-    setSuccess(null);
 
     const authToken = token.trim();
     if (!authToken) {
-      setError("JWT is required. Login first, then paste your token.");
+      onToast?.("error", "JWT is required. Login first, then paste your token.");
       return;
     }
 
@@ -128,7 +124,7 @@ export function TrafficReportModal({ routeId, routeName }: TrafficReportModalPro
       parsedLat < -90 ||
       parsedLat > 90
     ) {
-      setError("Valid lng/lat coordinates are required.");
+      onToast?.("error", "Valid lng/lat coordinates are required.");
       return;
     }
 
@@ -148,11 +144,11 @@ export function TrafficReportModal({ routeId, routeName }: TrafficReportModalPro
         authToken,
       );
 
-      setSuccess("Incident report submitted successfully.");
+      onToast?.("success", "Incident report submitted successfully.");
       setIsOpen(false);
     } catch (requestError) {
       const message = requestError instanceof Error ? requestError.message : "Failed to submit report";
-      setError(message);
+      onToast?.("error", message);
     } finally {
       setSubmitting(false);
     }
@@ -169,8 +165,6 @@ export function TrafficReportModal({ routeId, routeName }: TrafficReportModalPro
       <button type="button" className="estimate-btn report-open-btn" onClick={openModal}>
         Open Traffic Report Modal
       </button>
-      {success && <p className="success-text report-status">{success}</p>}
-      {error && <p className="error-text report-status">{error}</p>}
 
       {isOpen && (
         <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Traffic report modal">

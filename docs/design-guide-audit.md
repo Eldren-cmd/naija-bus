@@ -24,7 +24,7 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Route cards do not yet apply the recommended hover lift + shadow motion.
 
 3. Feedback interactions
-- Guide recommends toast feedback for submissions; current report success uses inline message text.
+- Guide-recommended toast feedback for submissions is now implemented.
 
 4. Realtime map signals
 - Severity-based report marker colors are now present on the map.
@@ -32,5 +32,6 @@ Reference: `NaijaTransport_DesignGuide.docx`
 
 ## Implementation Note
 
-These design items align directly with pending DevPlan tasks:
-- `3.11`
+Remaining design-only polish still open:
+- Route map visual style (`navigation-night-v1` + stronger route glow)
+- Route card hover lift + shadow motion

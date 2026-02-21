@@ -420,9 +420,23 @@ Status: complete. Implemented:
   - subscribe/unsubscribe to current route viewport bbox (`viewport:subscribe`)
   - subscribe/unsubscribe current route channel (`route:subscribe`)
   - handle `report:created` events and upsert markers without page reload
-  - show realtime connection state under map
+- show realtime connection state under map
 - kept initial `GET /reports?bbox=` fetch as baseline data load before live stream updates
+
+### Task 3.11
+- Add toast feedback component for report submissions
+
+Status: complete. Implemented:
+- added reusable `ToastStack` component (`frontend/src/components/ToastStack.tsx`)
+- added app-level toast state management in `frontend/src/App.tsx`:
+  - timed auto-dismiss
+  - manual dismiss action
+- wired report submission feedback to toast notifications:
+  - `frontend/src/components/ReportFarePanel.tsx`
+  - `frontend/src/components/TrafficReportModal.tsx`
+- replaced prior inline submission success/error messaging with toasts
+- added toast UI styles + mobile behavior in `frontend/src/App.css`
 
 ### Next Tasks
 - DevPlan alignment backlog from Phase 2: cleared
-- 3.11 Add toast feedback component for report submissions
+- 3.13 Validate two-browser realtime marker demo flow

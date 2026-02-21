@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate, Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { FareEstimate } from "./components/FareEstimate";
 import { ReportFarePanel } from "./components/ReportFarePanel";
 import { RouteView } from "./components/RouteView";
 import { SearchInput } from "./components/SearchInput";
+import { ToastStack } from "./components/ToastStack";
 import { TrafficReportModal } from "./components/TrafficReportModal";
 import { getRouteById, getRoutes } from "./lib/api";
 import type { RouteDetail, RouteSummary } from "./types";
+import type { ToastItem, ToastTone } from "./components/ToastStack";
 import "./App.css";
 
 function RouteFinderPage() {
@@ -24,6 +26,15 @@ function RouteFinderPage() {
   const [routeLoading, setRouteLoading] = useState(false);
   const [routeError, setRouteError] = useState<string | null>(null);
   const [fareRefreshNonce, setFareRefreshNonce] = useState(0);
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const toastTimersRef = useRef<number[]>([]);
+
+  useEffect(() => {
+    return () => {
+      toastTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+      toastTimersRef.current = [];
+    };
+  }, []);
 
   useEffect(() => {
     if (routeId) {
@@ -121,6 +132,22 @@ function RouteFinderPage() {
     navigate(`/route/${routeId}`);
   };
 
+  const dismissToast = (id: number) => {
+    setToasts((previous) => previous.filter((toast) => toast.id !== id));
+  };
+
+  const notify = (tone: ToastTone, message: string) => {
+    const id = Date.now() + Math.floor(Math.random() * 10000);
+    setToasts((previous) => [...previous, { id, tone, message }]);
+
+    const timer = window.setTimeout(() => {
+      setToasts((previous) => previous.filter((toast) => toast.id !== id));
+      toastTimersRef.current = toastTimersRef.current.filter((activeTimer) => activeTimer !== timer);
+    }, 4500);
+
+    toastTimersRef.current.push(timer);
+  };
+
   return (
     <main className="app-shell">
       <header className="hero card">
@@ -175,10 +202,12 @@ function RouteFinderPage() {
             routeId={selectedRouteId}
             routeName={selectedRoute?.name}
             onSubmitted={() => setFareRefreshNonce((previous) => previous + 1)}
+            onToast={notify}
           />
-          <TrafficReportModal routeId={selectedRouteId} routeName={selectedRoute?.name} />
+          <TrafficReportModal routeId={selectedRouteId} routeName={selectedRoute?.name} onToast={notify} />
         </section>
       </section>
+      <ToastStack toasts={toasts} onDismiss={dismissToast} />
     </main>
   );
 }

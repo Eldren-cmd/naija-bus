@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { reportFare } from "../lib/api";
+import type { ToastTone } from "./ToastStack";
 import type { TrafficLevel } from "../types";
 import type { FormEvent } from "react";
 
@@ -7,18 +8,17 @@ type ReportFarePanelProps = {
   routeId: string | null;
   routeName?: string;
   onSubmitted?: () => void;
+  onToast?: (tone: ToastTone, message: string) => void;
 };
 
 const TOKEN_STORAGE_KEY = "naija_transport_jwt";
 
-export function ReportFarePanel({ routeId, routeName, onSubmitted }: ReportFarePanelProps) {
+export function ReportFarePanel({ routeId, routeName, onSubmitted, onToast }: ReportFarePanelProps) {
   const [token, setToken] = useState("");
   const [reportedFare, setReportedFare] = useState("");
   const [trafficLevel, setTrafficLevel] = useState<TrafficLevel>("medium");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(TOKEN_STORAGE_KEY);
@@ -39,23 +39,21 @@ export function ReportFarePanel({ routeId, routeName, onSubmitted }: ReportFareP
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError(null);
-    setSuccess(null);
 
     if (!routeId) {
-      setError("Select a route before submitting a fare report.");
+      onToast?.("error", "Select a route before submitting a fare report.");
       return;
     }
 
     const authToken = token.trim();
     if (!authToken) {
-      setError("JWT is required. Login first, then paste your token.");
+      onToast?.("error", "JWT is required. Login first, then paste your token.");
       return;
     }
 
     const fareAmount = Number(reportedFare);
     if (!Number.isFinite(fareAmount) || fareAmount <= 0) {
-      setError("Enter a valid fare amount greater than zero.");
+      onToast?.("error", "Enter a valid fare amount greater than zero.");
       return;
     }
 
@@ -73,11 +71,11 @@ export function ReportFarePanel({ routeId, routeName, onSubmitted }: ReportFareP
 
       setReportedFare("");
       setNotes("");
-      setSuccess(`Fare report saved at NGN ${response.amount.toFixed(0)}.`);
+      onToast?.("success", `Fare report saved at NGN ${response.amount.toFixed(0)}.`);
       onSubmitted?.();
     } catch (requestError) {
       const message = requestError instanceof Error ? requestError.message : "Failed to submit fare report";
-      setError(message);
+      onToast?.("error", message);
     } finally {
       setSubmitting(false);
     }
@@ -142,9 +140,6 @@ export function ReportFarePanel({ routeId, routeName, onSubmitted }: ReportFareP
           {submitting ? "Submitting..." : "Submit Fare Report"}
         </button>
       </form>
-
-      {error && <p className="error-text">{error}</p>}
-      {success && <p className="success-text">{success}</p>}
     </section>
   );
 }
