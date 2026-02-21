@@ -5,6 +5,7 @@ import {
   validateRegisterBody,
   validateRouteCreateBody,
   validateRouteUpdateBody,
+  validateTripCreateBody,
 } from "../src/validation/requestSchemas";
 
 describe("request schema validation (zod)", () => {
@@ -65,6 +66,32 @@ describe("request schema validation (zod)", () => {
     });
 
     expect(result.success).toBe(true);
+  });
+
+  it("validates trip create payload", () => {
+    const result = validateTripCreateBody({
+      routeId: "699935ccba2963016871bba6",
+      checkpoints: [
+        {
+          coords: { type: "Point", coordinates: [3.37, 6.52] },
+          recordedAt: "2026-02-21T10:00:00.000Z",
+        },
+        {
+          coords: { type: "Point", coordinates: [3.4, 6.53] },
+          recordedAt: "2026-02-21T10:01:00.000Z",
+        },
+      ],
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects trip create payload with fewer than 2 checkpoints", () => {
+    const result = validateTripCreateBody({
+      checkpoints: [{ coords: { type: "Point", coordinates: [3.37, 6.52] } }],
+    });
+
+    expect(result.success).toBe(false);
   });
 
   it("rejects missing login fields", () => {

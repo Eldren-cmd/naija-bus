@@ -5,7 +5,7 @@ import { rateLimit } from "express-rate-limit";
 import { createServer } from "http";
 import { isValidObjectId } from "mongoose";
 import { connectToDatabase, ensureCoreIndexes, getDatabaseStatus } from "./config/db";
-import { Fare, Report, Route, Stop } from "./models";
+import { Fare, Report, Route, Stop, TripRecord } from "./models";
 import { authMiddleware, requireRoles } from "./middleware/authMiddleware";
 import { emitFareReported, emitReportCreated, initRealtimeServer } from "./realtime/reportsSocket";
 import { authRouter } from "./routes/auth";
@@ -15,6 +15,7 @@ import {
   validateIncidentReportBody,
   validateRouteCreateBody,
   validateRouteUpdateBody,
+  validateTripCreateBody,
 } from "./validation/requestSchemas";
 
 dotenv.config();
@@ -188,6 +189,61 @@ const isPointCoordsPayload = (value: unknown): value is { type: "Point"; coordin
   const [lng, lat] = value.coordinates;
   if (!Number.isFinite(lng) || !Number.isFinite(lat)) return false;
   return lng >= -180 && lng <= 180 && lat >= -90 && lat <= 90;
+};
+
+const toRadians = (degrees: number): number => (degrees * Math.PI) / 180;
+
+const haversineDistanceMeters = (from: [number, number], to: [number, number]): number => {
+  const EARTH_RADIUS_METERS = 6_371_000;
+  const [fromLng, fromLat] = from;
+  const [toLng, toLat] = to;
+
+  const latDelta = toRadians(toLat - fromLat);
+  const lngDelta = toRadians(toLng - fromLng);
+  const fromLatRad = toRadians(fromLat);
+  const toLatRad = toRadians(toLat);
+
+  const a =
+    Math.sin(latDelta / 2) ** 2 +
+    Math.cos(fromLatRad) * Math.cos(toLatRad) * Math.sin(lngDelta / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return EARTH_RADIUS_METERS * c;
+};
+
+const computePathDistanceMeters = (coordinates: [number, number][]): number => {
+  if (coordinates.length < 2) return 0;
+  let total = 0;
+  for (let i = 1; i < coordinates.length; i += 1) {
+    total += haversineDistanceMeters(coordinates[i - 1], coordinates[i]);
+  }
+  return Math.round(total);
+};
+
+const simplifyPathCoordinates = (coordinates: [number, number][]): [number, number][] => {
+  if (coordinates.length <= 2) return coordinates;
+
+  const SIMPLIFY_MIN_DELTA_METERS = 8;
+  const simplified: [number, number][] = [coordinates[0]];
+  let lastKept = coordinates[0];
+
+  for (let i = 1; i < coordinates.length - 1; i += 1) {
+    const current = coordinates[i];
+    if (haversineDistanceMeters(lastKept, current) >= SIMPLIFY_MIN_DELTA_METERS) {
+      simplified.push(current);
+      lastKept = current;
+    }
+  }
+
+  const finalPoint = coordinates[coordinates.length - 1];
+  if (simplified[simplified.length - 1] !== finalPoint) {
+    simplified.push(finalPoint);
+  }
+
+  if (simplified.length < 2) {
+    return [coordinates[0], coordinates[coordinates.length - 1]];
+  }
+
+  return simplified;
 };
 
 const validateIncidentReportPayload = (body: unknown): string | null => {
@@ -676,6 +732,74 @@ const createIncidentReportHandler = async (req: Request, res: Response) => {
 
 app.post("/api/v1/reports", authMiddleware, createIncidentReportHandler);
 app.post("/reports", authMiddleware, createIncidentReportHandler);
+
+const createTripRecordHandler = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "authentication required" });
+    }
+
+    const validated = validateTripCreateBody(req.body);
+    if (!validated.success) {
+      return res.status(400).json({ error: validated.error });
+    }
+
+    const { routeId, checkpoints, startedAt, endedAt } = validated.data;
+
+    if (routeId) {
+      const route = await Route.findOne({ _id: routeId, isActive: true }).select("_id").lean();
+      if (!route) {
+        return res.status(404).json({ error: "route not found" });
+      }
+    }
+
+    const normalizedCheckpoints = checkpoints
+      .map((checkpoint) => ({
+        coords: checkpoint.coords,
+        recordedAt: checkpoint.recordedAt || new Date(),
+      }))
+      .sort((a, b) => a.recordedAt.getTime() - b.recordedAt.getTime());
+
+    if (normalizedCheckpoints.length < 2) {
+      return res.status(400).json({ error: "at least 2 checkpoints are required to record a trip" });
+    }
+
+    const tripStartedAt = startedAt || normalizedCheckpoints[0].recordedAt;
+    const tripEndedAt = endedAt || normalizedCheckpoints[normalizedCheckpoints.length - 1].recordedAt;
+
+    if (tripEndedAt.getTime() < tripStartedAt.getTime()) {
+      return res.status(400).json({ error: "endedAt must be after startedAt" });
+    }
+
+    const rawCoordinates = normalizedCheckpoints.map(
+      (checkpoint) => checkpoint.coords.coordinates as [number, number],
+    );
+    const simplifiedCoordinates = simplifyPathCoordinates(rawCoordinates);
+    const distanceMeters = computePathDistanceMeters(rawCoordinates);
+    const durationSeconds = Math.max(0, Math.round((tripEndedAt.getTime() - tripStartedAt.getTime()) / 1000));
+
+    const created = await TripRecord.create({
+      userId: req.user.id,
+      routeId: routeId || undefined,
+      checkpoints: normalizedCheckpoints,
+      polyline: {
+        type: "LineString",
+        coordinates: simplifiedCoordinates,
+      },
+      distanceMeters,
+      durationSeconds,
+      startedAt: tripStartedAt,
+      endedAt: tripEndedAt,
+    });
+
+    return res.status(201).json(created);
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to save trip record" });
+  }
+};
+
+app.post("/api/v1/trips", authMiddleware, createTripRecordHandler);
+app.post("/trips", authMiddleware, createTripRecordHandler);
 
 const startServer = async (): Promise<void> => {
   try {

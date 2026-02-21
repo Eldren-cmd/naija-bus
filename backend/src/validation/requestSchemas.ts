@@ -123,6 +123,24 @@ const incidentReportSchema = z.object({
   coords: pointSchema,
 });
 
+const tripCheckpointSchema = z.object({
+  coords: pointSchema,
+  recordedAt: z.coerce.date().optional(),
+});
+
+const tripCreateSchema = z.object({
+  routeId: z
+    .string()
+    .trim()
+    .refine((value) => isValidObjectId(value), "routeId must be a valid id when provided")
+    .optional(),
+  checkpoints: z
+    .array(tripCheckpointSchema)
+    .min(2, "at least 2 checkpoints are required to record a trip"),
+  startedAt: z.coerce.date().optional(),
+  endedAt: z.coerce.date().optional(),
+});
+
 const registerRequiredSchema = z.object({
   fullName: z.string(),
   email: z.string(),
@@ -187,6 +205,16 @@ export const validateIncidentReportBody = (
   if (!isObject(body)) return fail("request body must be an object");
 
   const parsed = incidentReportSchema.safeParse(body);
+  if (!parsed.success) return fail(getFirstIssueMessage(parsed.error));
+  return { success: true, data: parsed.data };
+};
+
+export const validateTripCreateBody = (
+  body: unknown,
+): ValidationResult<z.infer<typeof tripCreateSchema>> => {
+  if (!isObject(body)) return fail("request body must be an object");
+
+  const parsed = tripCreateSchema.safeParse(body);
   if (!parsed.success) return fail(getFirstIssueMessage(parsed.error));
   return { success: true, data: parsed.data };
 };

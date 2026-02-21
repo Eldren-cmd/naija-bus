@@ -453,6 +453,38 @@ Status: complete. Implemented:
   - `docs/phase3-step313-validation.md`
 - latest execution result: `pass: true`
 
+## Phase 4 - Trip Recording
+
+### Task 4.1
+- Implement `POST /trips` (auth required); compute simplified polyline + distance from checkpoints
+
+Status: complete. Implemented:
+- added trip create request validation (`validateTripCreateBody`) in:
+  - `backend/src/validation/requestSchemas.ts`
+- added backend trip recording endpoint:
+  - `POST /api/v1/trips`
+  - `POST /trips`
+- route-level checks:
+  - auth required (`401` when missing)
+  - payload validation (`400` on invalid trip payload)
+  - optional `routeId` existence check (`404` when provided route is missing)
+- computation implemented in `backend/src/server.ts`:
+  - haversine distance accumulation from ordered checkpoints
+  - simplified polyline generation for stored trip path
+  - duration calculation from checkpoint/start/end timestamps
+- trip persisted via `TripRecord` model with:
+  - `checkpoints`
+  - computed `polyline`
+  - `distanceMeters`
+  - `durationSeconds`
+  - `startedAt` / `endedAt`
+- added integration tests:
+  - `backend/tests/trips.integration.test.ts`
+- expanded schema tests:
+  - `backend/tests/requestSchemas.test.ts`
+- validation checks passed:
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+
 ### Next Tasks
-- DevPlan Phase 3 backlog: cleared
-- Proceed to next phase tasks per `NaijaTransport_DevPlan.docx`
+- Continue Phase 4 in strict order: `4.2` (`GET /trips?userId=` trip history)
