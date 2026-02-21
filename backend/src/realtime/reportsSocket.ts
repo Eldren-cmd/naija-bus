@@ -27,6 +27,18 @@ type ReportCreatedEvent = {
   createdAt?: Date;
 };
 
+type TripRecordedEvent = {
+  id: string;
+  userId: string;
+  routeId?: string;
+  distanceMeters: number;
+  durationSeconds: number;
+  checkpointsCount: number;
+  startedAt: Date;
+  endedAt: Date;
+  createdAt?: Date;
+};
+
 type ReportsSocketState = {
   viewportBbox?: Bbox;
   routeSubscriptions?: string[];
@@ -244,5 +256,29 @@ export const emitReportCreated = (payload: ReportCreatedEvent): void => {
     if (isPointInsideBbox(coords, state.viewportBbox)) {
       socket.emit("report:created", payload);
     }
+  }
+};
+
+export const emitTripRecorded = (payload: TripRecordedEvent): void => {
+  if (!reportsNamespace) return;
+
+  if (!payload.routeId) {
+    reportsNamespace.emit("trip:recorded", payload);
+    return;
+  }
+
+  const sockets = [...reportsNamespace.sockets.values()];
+  const routeSubscribers = sockets.filter((socket) => {
+    const state = getSocketState(socket);
+    return (state.routeSubscriptions || []).includes(payload.routeId as string);
+  });
+
+  if (routeSubscribers.length === 0) {
+    reportsNamespace.emit("trip:recorded", payload);
+    return;
+  }
+
+  for (const socket of routeSubscribers) {
+    socket.emit("trip:recorded", payload);
   }
 };

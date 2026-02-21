@@ -638,5 +638,40 @@ Status: complete. Implemented:
   - `npm --prefix frontend run lint`
   - `npm --prefix frontend run build`
 
+### Task 4.9
+- Emit `trip:recorded` realtime event after successful trip upload
+
+Status: complete. Implemented:
+- updated realtime socket module `backend/src/realtime/reportsSocket.ts`:
+  - added `emitTripRecorded` emitter
+  - event name: `trip:recorded`
+  - emits to route-subscribed sockets when `routeId` is present
+  - falls back to namespace broadcast when no route subscriptions exist
+- updated trip create flow in `backend/src/server.ts`:
+  - after `TripRecord.create`, backend now emits `trip:recorded` payload with:
+    - trip id
+    - user id
+    - route id (when available)
+    - distance, duration, checkpoints count
+    - start/end/create timestamps
+- updated backend integration tests:
+  - `backend/tests/trips.integration.test.ts` now asserts `emitTripRecorded` call on successful `POST /api/v1/trips`
+  - updated other socket-module mocks in:
+    - `backend/tests/fareReport.integration.test.ts`
+    - `backend/tests/reports.integration.test.ts`
+- validation checks passed:
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
+### Milestone Gate 4
+- Record a real walk/drive with GPS, stop recording, upload trip, verify on MyTrips and map replay.
+
+Status: pending user-run manual validation.
+Notes:
+- Engineering implementation for `4.1` through `4.9` is complete.
+- Manual gate verification requires real-device/location interaction.
+
 ### Next Tasks
-- Continue Phase 4 in strict order: `4.9` (`trip:recorded` socket emit integration)
+- Continue to Phase 5 in strict order starting with `5.1`.

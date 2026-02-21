@@ -4,6 +4,7 @@ import { signAccessToken } from "../src/lib/auth";
 jest.mock("../src/realtime/reportsSocket", () => ({
   emitFareReported: jest.fn(),
   emitReportCreated: jest.fn(),
+  emitTripRecorded: jest.fn(),
   initRealtimeServer: jest.fn(),
 }));
 
@@ -47,6 +48,7 @@ jest.mock("../src/models", () => {
 });
 
 import { Route, TripRecord, User } from "../src/models";
+import { emitTripRecorded } from "../src/realtime/reportsSocket";
 import { app } from "../src/server";
 
 const createUserToken = (
@@ -298,5 +300,14 @@ describe("trip record endpoint", () => {
     };
     expect(createPayload.distanceMeters).toBeGreaterThan(0);
     expect(createPayload.polyline.coordinates.length).toBeGreaterThanOrEqual(2);
+    expect(emitTripRecorded).toHaveBeenCalledTimes(1);
+    expect(emitTripRecorded).toHaveBeenCalledWith(
+      expect.objectContaining({
+        routeId,
+        distanceMeters: expect.any(Number),
+        durationSeconds: 120,
+        checkpointsCount: 3,
+      }),
+    );
   });
 });

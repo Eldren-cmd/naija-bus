@@ -19,9 +19,14 @@ Status labels:
 | 4.6 | complete | `MyTrips` page added with authenticated trip history fetch and trip cards. |
 | 4.7 | complete | MyTrips now supports card-click selection and redraws stored checkpoint path on a replay map using GeoJSON line data. |
 | 4.8 | complete | TripRecorder now handles blocked location permissions with explicit UX messaging, retry flow, and cleaner error behavior. |
-| 4.9 | missing | `trip:recorded` socket emit not implemented yet. |
+| 4.9 | complete | Backend now emits `trip:recorded` after successful trip creation with route-aware socket targeting and integration test coverage. |
 
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `4.9` next.
-2. Keep progressing sequentially through Phase 4 tasks.
+1. Phase 4 is now complete (`4.1` through `4.9`).
+2. Continue with Phase 5 starting at `5.1`.
+
+## Gate 4 Validation Note
+
+Milestone Gate 4 includes a manual real-device GPS recording flow.  
+Implementation is complete in code, but final gate confirmation remains a user-run validation step.

@@ -4,6 +4,7 @@ import { signAccessToken } from "../src/lib/auth";
 jest.mock("../src/realtime/reportsSocket", () => ({
   emitFareReported: jest.fn(),
   emitReportCreated: jest.fn(),
+  emitTripRecorded: jest.fn(),
   initRealtimeServer: jest.fn(),
 }));
 

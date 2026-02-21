@@ -7,7 +7,12 @@ import { isValidObjectId } from "mongoose";
 import { connectToDatabase, ensureCoreIndexes, getDatabaseStatus } from "./config/db";
 import { Fare, Report, Route, Stop, TripRecord } from "./models";
 import { authMiddleware, requireRoles } from "./middleware/authMiddleware";
-import { emitFareReported, emitReportCreated, initRealtimeServer } from "./realtime/reportsSocket";
+import {
+  emitFareReported,
+  emitReportCreated,
+  emitTripRecorded,
+  initRealtimeServer,
+} from "./realtime/reportsSocket";
 import { authRouter } from "./routes/auth";
 import { FareServiceError, estimateRouteFare } from "./services/fareService";
 import {
@@ -790,6 +795,18 @@ const createTripRecordHandler = async (req: Request, res: Response) => {
       durationSeconds,
       startedAt: tripStartedAt,
       endedAt: tripEndedAt,
+    });
+
+    emitTripRecorded({
+      id: String(created._id),
+      userId: String(created.userId),
+      routeId: created.routeId ? String(created.routeId) : undefined,
+      distanceMeters: created.distanceMeters,
+      durationSeconds: created.durationSeconds,
+      checkpointsCount: created.checkpoints.length,
+      startedAt: created.startedAt,
+      endedAt: created.endedAt,
+      createdAt: created.createdAt,
     });
 
     return res.status(201).json(created);
