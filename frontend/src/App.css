@@ -1228,12 +1228,43 @@
 }
 
 @media (max-width: 1020px) {
+  .app-shell {
+    padding: 1rem;
+  }
+
+  .hero {
+    padding: 1rem;
+  }
+
+  .top-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .top-nav-user {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
   .layout {
     grid-template-columns: 1fr;
+    gap: 0.8rem;
   }
 
   .mytrips-layout {
     grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .left-panel,
+  .route-view,
+  .fare-card,
+  .report-card,
+  .trip-recorder-card,
+  .mytrips-toolbar,
+  .mytrips-map-panel {
+    padding: 0.85rem;
   }
 
   .fare-controls {
@@ -1260,6 +1291,28 @@
     grid-template-columns: 1fr;
   }
 
+  .route-save-btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .search-box button,
+  .estimate-btn,
+  .route-list button,
+  .saved-route-list button,
+  .route-save-btn,
+  .top-nav-link {
+    min-height: 44px;
+  }
+
+  .route-map-canvas {
+    height: 250px;
+  }
+
+  .mytrips-map-canvas {
+    height: 300px;
+  }
+
   .admin-create-grid {
     grid-template-columns: 1fr;
   }
@@ -1268,5 +1321,130 @@
     left: 1rem;
     right: 1rem;
     width: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    padding: 0.8rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.5rem, 8vw, 2rem);
+  }
+
+  .top-nav-link,
+  .top-nav-user {
+    font-size: 0.74rem;
+    padding: 0.38rem 0.62rem;
+  }
+
+  .route-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .route-name {
+    font-size: 1.3rem;
+  }
+
+  .route-meta {
+    gap: 0.38rem;
+  }
+
+  .route-map-canvas {
+    height: 220px;
+  }
+
+  .mytrips-map-canvas {
+    height: 250px;
+  }
+
+  .trip-card-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+
+  .trip-card-head span {
+    align-self: flex-start;
+  }
+
+  .modal-card {
+    padding: 0.85rem;
+  }
+
+  .modal-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .modal-actions button,
+  .modal-actions .estimate-btn,
+  .modal-actions .secondary-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .top-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .top-nav-link {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .top-nav-user {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+
+  .route-list button strong {
+    font-size: 0.95rem;
+  }
+
+  .route-list button span,
+  .saved-route-list button span {
+    font-size: 0.78rem;
+  }
+
+  .stops-list li {
+    grid-template-columns: 1.8rem 1fr;
+  }
+
+  .route-map-canvas {
+    height: 200px;
+  }
+
+  .mytrips-map-canvas {
+    height: 220px;
+  }
+
+  .trip-card {
+    padding: 0.78rem;
+  }
+
+  .trip-card-meta {
+    gap: 0.35rem;
+  }
+
+  .trip-card-meta span {
+    font-size: 0.7rem;
+  }
+
+  .toast-stack {
+    left: 0.65rem;
+    right: 0.65rem;
+    bottom: 0.65rem;
+  }
+
+  .toast-item {
+    padding: 0.58rem 0.62rem;
   }
 }

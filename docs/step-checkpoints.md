@@ -959,3 +959,42 @@ Status: complete. Implemented:
   - `npm --prefix backend run build`
   - `npm --prefix frontend run lint`
   - `npm --prefix frontend run build`
+
+### Task 5.9
+- Run mobile responsive audit and apply fixes to Home, RouteView, and MyTrips
+
+Status: complete. Implemented:
+- mobile layout + spacing refinements in `frontend/src/App.css`:
+  - stronger breakpoint tuning at `1020px`, `768px`, and `560px`
+  - reduced shell/card padding for small screens
+  - stacked `top-nav` behavior with better wrap handling
+  - improved touch targets for key controls (`44px` minimum across primary actions)
+- Route Finder (Home) mobile fixes:
+  - route/saved-route button readability and touch behavior improved
+  - save button now scales better on narrow widths
+  - map canvas height reduced progressively for smaller screens
+- RouteView mobile fixes:
+  - route heading stacks cleanly on small widths
+  - modal/action areas better fit narrow devices
+  - legend/content spacing adjusted for readability
+- MyTrips mobile fixes:
+  - trip card header stacks cleanly on narrow widths
+  - replay map height scales down for mobile viewports
+  - trip metadata chip density improved for small screens
+- runtime hygiene:
+  - added WhatsApp bot runtime folders to root `.gitignore`:
+    - `backend/.wwebjs_auth/`
+    - `backend/.wwebjs_cache/`
+- Design Guide applicability check:
+  - applied responsive polish consistent with existing typography/color/motion direction
+  - no new unresolved high-impact design gaps introduced for completed scope
+- Engagement Guide applicability check:
+  - mobile usability improvements were applied to engagement-critical flows:
+    - report interaction surfaces
+    - saved-route retention surface on Home
+- validation checks passed:
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
+### Next Tasks
+- Continue Phase 5 in strict order: `5.10` (loading skeleton states).

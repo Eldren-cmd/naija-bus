@@ -25,3 +25,5 @@ yarn-error.log*
 
 # Backend runtime
 backend/.tmp/
+backend/.wwebjs_auth/
+backend/.wwebjs_cache/

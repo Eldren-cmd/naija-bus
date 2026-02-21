@@ -46,15 +46,17 @@ Reference: `NaijaTransport_EngagementGuide.docx`
 ### Phase 4
 - Trip recording and history improve retention signals but do not yet include rewards/gamification loops.
 
-### Phase 5 (through Task 5.8)
+### Phase 5 (through Task 5.9)
 - Added saved routes retention loop:
   - authenticated save/unsave route actions
   - saved routes surfaced directly on Home
+- Added mobile usability hardening for engagement-critical surfaces:
+  - report interaction controls
+  - saved-routes interaction flow on smaller screens
 
 ## Future Compliance Plan
 
 ### Remaining Phase 5
-- `5.9`: include engagement-oriented mobile usability checks for reporting and saved routes.
 - `5.10`: loading skeletons should cover high-frequency engagement actions.
 - `5.11`: empty saved-routes UX should include clear call-to-action copy.
 - `5.12`: global error boundary should preserve trust with clear recovery messaging.
