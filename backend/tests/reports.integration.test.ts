@@ -1,6 +1,12 @@
 import request from "supertest";
 import { signAccessToken } from "../src/lib/auth";
 
+jest.mock("../src/realtime/reportsSocket", () => ({
+  emitFareReported: jest.fn(),
+  emitReportCreated: jest.fn(),
+  initRealtimeServer: jest.fn(),
+}));
+
 jest.mock("../src/models", () => {
   const Route = {
     findOne: jest.fn(),
@@ -39,6 +45,7 @@ jest.mock("../src/models", () => {
 });
 
 import { Report, Route, User } from "../src/models";
+import { emitReportCreated } from "../src/realtime/reportsSocket";
 import { app } from "../src/server";
 
 const createUserToken = (): string =>
@@ -151,5 +158,13 @@ describe("incident reports endpoint", () => {
       coords: { type: "Point", coordinates: [3.37, 6.52] },
       isActive: true,
     });
+    expect(emitReportCreated).toHaveBeenCalledTimes(1);
+    expect(emitReportCreated).toHaveBeenCalledWith(
+      expect.objectContaining({
+        routeId,
+        type: "traffic",
+        severity: "high",
+      }),
+    );
   });
 });

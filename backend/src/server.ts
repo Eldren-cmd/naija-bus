@@ -1,10 +1,12 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
+import { createServer } from "http";
 import { isValidObjectId } from "mongoose";
 import { connectToDatabase, ensureCoreIndexes, getDatabaseStatus } from "./config/db";
 import { Fare, Report, Route, Stop } from "./models";
 import { authMiddleware, requireRoles } from "./middleware/authMiddleware";
+import { emitFareReported, emitReportCreated, initRealtimeServer } from "./realtime/reportsSocket";
 import { authRouter } from "./routes/auth";
 import { FareServiceError, estimateRouteFare } from "./services/fareService";
 
@@ -530,6 +532,15 @@ const createFareReportHandler = async (req: Request, res: Response) => {
       notes: typeof body.notes === "string" ? body.notes.trim() : "",
     });
 
+    emitFareReported({
+      id: String(created._id),
+      routeId: String(created.routeId),
+      amount: created.amount,
+      trafficLevel: created.trafficLevel,
+      reportedBy: String(created.reportedBy),
+      createdAt: created.createdAt,
+    });
+
     return res.status(201).json(created);
   } catch (_error) {
     return res.status(500).json({ error: "failed to save fare report" });
@@ -573,6 +584,17 @@ const createIncidentReportHandler = async (req: Request, res: Response) => {
       isActive: true,
     });
 
+    emitReportCreated({
+      id: String(created._id),
+      routeId: created.routeId ? String(created.routeId) : undefined,
+      userId: String(created.userId),
+      type: created.type,
+      severity: created.severity,
+      description: created.description,
+      coords: created.coords,
+      createdAt: created.createdAt,
+    });
+
     return res.status(201).json(created);
   } catch (_error) {
     return res.status(500).json({ error: "failed to save report" });
@@ -586,7 +608,9 @@ const startServer = async (): Promise<void> => {
   try {
     await connectToDatabase();
     await ensureCoreIndexes();
-    app.listen(port, () => {
+    const httpServer = createServer(app);
+    initRealtimeServer(httpServer, corsOrigin);
+    httpServer.listen(port, () => {
       console.log(`Backend listening on http://localhost:${port}`);
     });
   } catch (error) {

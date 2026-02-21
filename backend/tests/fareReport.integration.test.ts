@@ -1,6 +1,12 @@
 import request from "supertest";
 import { signAccessToken } from "../src/lib/auth";
 
+jest.mock("../src/realtime/reportsSocket", () => ({
+  emitFareReported: jest.fn(),
+  emitReportCreated: jest.fn(),
+  initRealtimeServer: jest.fn(),
+}));
+
 jest.mock("../src/models", () => {
   const Route = {
     findOne: jest.fn(),
@@ -38,6 +44,7 @@ jest.mock("../src/models", () => {
 });
 
 import { Fare, Route, User } from "../src/models";
+import { emitFareReported } from "../src/realtime/reportsSocket";
 import { app } from "../src/server";
 
 const createUserToken = (): string =>
@@ -125,5 +132,13 @@ describe("fare report endpoint", () => {
       reportedBy: "699935ccba2963016871bba6",
       notes: "rush hour",
     });
+    expect(emitFareReported).toHaveBeenCalledTimes(1);
+    expect(emitFareReported).toHaveBeenCalledWith(
+      expect.objectContaining({
+        routeId,
+        amount: 300,
+        trafficLevel: "high",
+      }),
+    );
   });
 });

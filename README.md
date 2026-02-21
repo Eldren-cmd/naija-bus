@@ -33,6 +33,7 @@ This repository is being built strictly from:
 - [x] Milestone Gate 2 / Visual Check: Browser recording confirms `Ojota` search, route load, map render, stops list, and fare panel
 - [x] Phase 3 / Task 3.1: Authenticated `POST /fare/report` endpoint implemented with payload validation and route existence check
 - [x] Phase 3 / Task 3.2: Authenticated `POST /reports` endpoint implemented for traffic/police/roadblock style incident reporting
+- [x] Phase 3 / Task 3.3: Socket.IO realtime channel initialized on `/reports` with `fare:reported` and `report:created` emits
 
 ## Working Rules for This Build
 - Move step-by-step in task order.

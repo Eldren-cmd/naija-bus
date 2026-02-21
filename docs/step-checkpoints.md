@@ -242,5 +242,15 @@ Status: complete. Implemented:
   - no auth -> `401`
   - valid auth + payload -> `201`
 
+### Task 3.3
+- Set up Socket.IO server (`/reports`) and emit `report:created` + `fare:reported`
+
+Status: complete. Implemented:
+- added realtime module: `backend/src/realtime/reportsSocket.ts`
+- initialized Socket.IO server with `/reports` namespace during backend startup
+- emit `fare:reported` after successful `POST /fare/report`
+- emit `report:created` after successful `POST /reports`
+- integration tests now assert emit calls on successful submissions
+
 ### Next Tasks
-- 3.3 Set up Socket.IO server (`/reports`) and emit `report:created` + `fare:reported`
+- 3.4 Update fare estimate logic to incorporate recent crowdsourced fare reports
