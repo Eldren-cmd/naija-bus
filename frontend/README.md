@@ -33,6 +33,7 @@ React + TypeScript + Vite frontend for Naija Transport.
 - Mobile responsiveness pass completed for Home, RouteView, and MyTrips (optimized breakpoints: 1020px, 768px, 560px)
 - Loading skeleton states added for high-frequency views (search suggestions, route list, route detail, fare card, and MyTrips history)
 - MyTrips now includes engagement panel (points, level progress, trip streak, badges, and leaderboard)
+- Global React error boundary now wraps app root with fallback recovery actions (try again, route finder, reload)
 
 ## Environment
 Create `frontend/.env` with:

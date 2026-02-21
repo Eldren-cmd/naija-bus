@@ -20,6 +20,7 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Loading skeleton states added across Route Finder, RouteView, Fare Estimate, Search typeahead, and MyTrips to reduce abrupt layout shifts.
 - MyTrips engagement panel added with styled level/progress, badges, and leaderboard card components aligned to existing palette and typography.
 - Saved-routes empty state card now includes clear guidance copy and action buttons, improving first-time usability.
+- Global error fallback screen now matches existing typography/card styling and keeps primary/secondary action hierarchy consistent.
 
 ## High-Impact Gaps To Implement Next
 

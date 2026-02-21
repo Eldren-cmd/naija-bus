@@ -1089,5 +1089,29 @@ Status: complete. Implemented:
   - `npm --prefix frontend run lint`
   - `npm --prefix frontend run build`
 
+### Task 5.12
+- Add global error boundary with user-friendly fallback and recovery controls
+
+Status: complete. Implemented:
+- added root error boundary component:
+  - `frontend/src/components/GlobalErrorBoundary.tsx`
+  - catches uncaught render/lifecycle errors under app root
+  - logs diagnostic context to console and generates incident id
+- wired boundary at app entrypoint:
+  - `frontend/src/main.tsx` now wraps router/app tree with `GlobalErrorBoundary`
+- added fallback UX styling:
+  - `frontend/src/App.css` now includes boundary fallback shell/card/action styles
+  - fallback actions: try again, go to route finder, full reload
+  - mobile CTA sizing and layout maintained
+- Design Guide applicability check:
+  - fallback screen uses existing card typography/palette direction
+  - primary/secondary action hierarchy is explicit and consistent
+- Engagement Guide applicability check:
+  - unexpected errors now fail into a trust-preserving recovery flow instead of blank screen
+  - user has clear path to continue route discovery immediately
+- validation checks passed:
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
 ### Next Tasks
-- Continue Phase 5 in strict order: `5.12` (global error boundary).
+- Continue Phase 5 in strict order: `5.13` (Playwright E2E coverage).

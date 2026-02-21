@@ -51,7 +51,7 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - level progression + airtime accrual are computed from engagement points
   - MyTrips now surfaces points/level progress, badges, and leaderboard preview
 
-### Phase 5 (through Task 5.11)
+### Phase 5 (through Task 5.12)
 - Added saved routes retention loop:
   - authenticated save/unsave route actions
   - saved routes surfaced directly on Home
@@ -66,11 +66,13 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - explicit guidance copy for first-time savers
   - immediate CTA to save currently selected route
   - fallback CTA to browse full route list
+- Added global trust fallback for unexpected UI failures:
+  - root error boundary now presents recovery actions instead of blank-screen failure
+  - fallback copy keeps user informed with safe reset path
 
 ## Future Compliance Plan
 
 ### Remaining Phase 5
-- `5.12`: global error boundary should preserve trust with clear recovery messaging.
 - `5.13`: E2E flows should include auth + save route + report actions.
 - `5.14`: UAT should include engagement acceptance checks (repeat-use loop and report loop).
 

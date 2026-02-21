@@ -1491,6 +1491,34 @@
   border-color: #b7cee7;
 }
 
+.error-boundary-shell {
+  display: grid;
+  place-items: center;
+}
+
+.error-boundary-card {
+  width: min(680px, 100%);
+  padding: 1.1rem;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.error-boundary-card h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+}
+
+.error-boundary-card p {
+  margin: 0;
+}
+
+.error-boundary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 @keyframes slideInRight {
   from {
     transform: translateX(20px);
@@ -1678,6 +1706,16 @@
   .modal-actions .estimate-btn,
   .modal-actions .secondary-btn {
     width: 100%;
+  }
+
+  .error-boundary-actions {
+    flex-direction: column;
+  }
+
+  .error-boundary-actions .estimate-btn,
+  .error-boundary-actions .secondary-btn {
+    width: 100%;
+    min-height: 44px;
   }
 }
 
