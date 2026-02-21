@@ -59,7 +59,16 @@ Status: complete. Live checks confirm:
 - Deferred feature-level engagement work to the planned phases
 - Full mapping documented in `docs/engagement-guide-mapping.md`
 
+## Task 1.8
+- Add JWT middleware for protected routes
+- Validate protected route behavior with and without token
+
+Status: complete. Live checks confirm:
+- no token on protected route returns `401`
+- valid bearer token returns `200`
+- invalid token returns `401`
+
 ## Next Tasks
-- 1.8 Add JWT middleware for protected routes
 - 1.9 Create `.env.example` files and document required keys
 - 1.10 Write seed script for 5 Lagos corridors
+- 1.11 Run seed script and verify seeded routes

@@ -1,7 +1,9 @@
 import bcrypt from "bcryptjs";
 import { Request, Response, Router } from "express";
+import { authMiddleware } from "../middleware/authMiddleware";
 import { User } from "../models";
 import { signAccessToken } from "../lib/auth";
+import { AppUserRole } from "../types/auth";
 
 const authRouter = Router();
 
@@ -11,7 +13,7 @@ const sanitizeUser = (user: {
   _id: unknown;
   fullName: string;
   email: string;
-  role: "user" | "champion" | "conductor" | "admin";
+  role: AppUserRole;
 }) => ({
   id: String(user._id),
   fullName: user.fullName,
@@ -106,6 +108,23 @@ authRouter.post("/login", async (req: Request, res: Response) => {
     return res.status(200).json({ token, user: sanitizeUser(user) });
   } catch (error) {
     return res.status(500).json({ error: "failed to login user" });
+  }
+});
+
+authRouter.get("/me", authMiddleware, async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "authentication required" });
+    }
+
+    const user = await User.findById(req.user.id).select("_id fullName email role");
+    if (!user) {
+      return res.status(404).json({ error: "user not found" });
+    }
+
+    return res.status(200).json({ user: sanitizeUser(user) });
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to fetch profile" });
   }
 });
 
