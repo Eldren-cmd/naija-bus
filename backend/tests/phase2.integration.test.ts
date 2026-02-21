@@ -58,6 +58,7 @@ jest.mock("../src/services/fareService", () => {
 import { Route, Stop, User } from "../src/models";
 import { app } from "../src/server";
 import { estimateRouteFare, FareServiceError } from "../src/services/fareService";
+import { signRefreshToken } from "../src/lib/auth";
 
 describe("Phase 2 integration endpoints", () => {
   beforeEach(() => {
@@ -116,6 +117,40 @@ describe("Phase 2 integration endpoints", () => {
       expect.arrayContaining([expect.stringMatching(/^naija_refresh_token=/)]),
     );
     expect(save).toHaveBeenCalledTimes(1);
+  });
+
+  it("POST /api/v1/auth/refresh returns new access token when refresh cookie is valid", async () => {
+    const refreshToken = signRefreshToken({
+      sub: "699935ccba2963016871bba6",
+      email: "rider@example.com",
+      role: "user",
+    });
+
+    const select = jest.fn().mockResolvedValue({
+      _id: "699935ccba2963016871bba6",
+      fullName: "Test Rider",
+      email: "rider@example.com",
+      role: "user",
+      isActive: true,
+    });
+    (User.findById as unknown as jest.Mock).mockReturnValue({ select });
+
+    const response = await request(app)
+      .post("/api/v1/auth/refresh")
+      .set("Cookie", [`naija_refresh_token=${refreshToken}`]);
+
+    expect(response.status).toBe(200);
+    expect(response.body.accessToken).toEqual(expect.any(String));
+    expect(response.body.user.email).toBe("rider@example.com");
+    expect(response.headers["set-cookie"]).toEqual(
+      expect.arrayContaining([expect.stringMatching(/^naija_refresh_token=/)]),
+    );
+  });
+
+  it("POST /api/v1/auth/refresh returns 401 when refresh cookie is missing", async () => {
+    const response = await request(app).post("/api/v1/auth/refresh");
+    expect(response.status).toBe(401);
+    expect(response.body.error).toBe("refresh token missing");
   });
 
   it("GET /api/v1/routes returns route list", async () => {

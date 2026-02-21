@@ -14,51 +14,37 @@ import type {
   TripRecordInput,
   TripRecordResponse,
 } from "../types";
+import axios from "axios";
+import { httpClient } from "./http";
 
-const API_BASE = (import.meta.env.VITE_API_BASE || "http://localhost:5000").replace(/\/+$/, "");
-
-const parseErrorMessage = async (response: Response): Promise<string> => {
-  try {
-    const data = (await response.json()) as { error?: string };
-    if (data.error) return data.error;
-  } catch {
-    // no-op
+const parseApiError = (error: unknown): string => {
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data as { error?: string } | undefined;
+    if (data?.error) return data.error;
+    if (error.response?.status) return `request failed with status ${error.response.status}`;
+    if (error.message) return error.message;
   }
-  return `request failed with status ${response.status}`;
+  return "request failed";
 };
 
 const apiGet = async <T>(path: string, token?: string): Promise<T> => {
-  const headers: Record<string, string> = {};
-  if (token?.trim()) {
-    headers.Authorization = `Bearer ${token.trim()}`;
+  try {
+    const headers = token?.trim() ? { Authorization: `Bearer ${token.trim()}` } : undefined;
+    const response = await httpClient.get<T>(path, { headers });
+    return response.data;
+  } catch (error) {
+    throw new Error(parseApiError(error));
   }
-
-  const response = await fetch(`${API_BASE}${path}`, { headers });
-  if (!response.ok) {
-    throw new Error(await parseErrorMessage(response));
-  }
-  return (await response.json()) as T;
 };
 
 const apiPost = async <T>(path: string, body: unknown, token?: string): Promise<T> => {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-  if (token?.trim()) {
-    headers.Authorization = `Bearer ${token.trim()}`;
+  try {
+    const headers = token?.trim() ? { Authorization: `Bearer ${token.trim()}` } : undefined;
+    const response = await httpClient.post<T>(path, body, { headers });
+    return response.data;
+  } catch (error) {
+    throw new Error(parseApiError(error));
   }
-
-  const response = await fetch(`${API_BASE}${path}`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-  });
-
-  if (!response.ok) {
-    throw new Error(await parseErrorMessage(response));
-  }
-
-  return (await response.json()) as T;
 };
 
 export const getRoutes = async (query?: string): Promise<RouteSummary[]> => {
@@ -135,20 +121,12 @@ type LoginInput = {
 };
 
 export const loginUser = async (input: LoginInput): Promise<AuthLoginResponse> => {
-  const response = await fetch(`${API_BASE}/api/v1/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(input),
-  });
-
-  if (!response.ok) {
-    throw new Error(await parseErrorMessage(response));
+  try {
+    const response = await httpClient.post<AuthLoginResponse>("/api/v1/auth/login", input);
+    return response.data;
+  } catch (error) {
+    throw new Error(parseApiError(error));
   }
-
-  return (await response.json()) as AuthLoginResponse;
 };
 
 type RegisterInput = {
@@ -158,18 +136,19 @@ type RegisterInput = {
 };
 
 export const registerUser = async (input: RegisterInput): Promise<AuthLoginResponse> => {
-  const response = await fetch(`${API_BASE}/api/v1/auth/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(input),
-  });
-
-  if (!response.ok) {
-    throw new Error(await parseErrorMessage(response));
+  try {
+    const response = await httpClient.post<AuthLoginResponse>("/api/v1/auth/register", input);
+    return response.data;
+  } catch (error) {
+    throw new Error(parseApiError(error));
   }
+};
 
-  return (await response.json()) as AuthLoginResponse;
+export const refreshSession = async (): Promise<AuthLoginResponse> => {
+  try {
+    const response = await httpClient.post<AuthLoginResponse>("/api/v1/auth/refresh");
+    return response.data;
+  } catch (error) {
+    throw new Error(parseApiError(error));
+  }
 };

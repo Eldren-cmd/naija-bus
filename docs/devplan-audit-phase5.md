@@ -13,7 +13,7 @@ Status labels:
 | --- | --- | --- |
 | 5.1 | complete | Login page implemented; access token moved to in-memory session state; backend login now sets refresh token via httpOnly cookie. |
 | 5.2 | complete | Signup page now calls register endpoint and auto-logs in via auth context; backend register also sets refresh token cookie. |
-| 5.3 | missing | `POST /auth/refresh` + auto-refresh interceptor not implemented yet. |
+| 5.3 | complete | Added `POST /auth/refresh` endpoint and axios interceptor-based 401 refresh/retry flow wired to in-memory auth provider session. |
 | 5.4 | missing | ProtectedRoute redirect to `/login` is not implemented yet. |
 | 5.5 | missing | AdminPanel route table/edit/delete UI not implemented yet. |
 | 5.6 | missing | Route creation form in AdminPanel not implemented yet. |
@@ -28,5 +28,5 @@ Status labels:
 
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `5.3` next.
+1. Continue with `5.4` next.
 2. Progress sequentially through Phase 5 tasks.

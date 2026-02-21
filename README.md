@@ -59,6 +59,7 @@ This repository is being built strictly from:
 - [x] Phase 4 / Task 4.9: Backend now emits realtime `trip:recorded` event after successful trip upload
 - [x] Phase 5 / Task 5.1: Login page added; access token now held in memory; backend login sets refresh token in httpOnly cookie
 - [x] Phase 5 / Task 5.2: Signup page added with auto-login after successful registration
+- [x] Phase 5 / Task 5.3: `POST /auth/refresh` added and frontend now auto-refreshes session on `401` via axios interceptor
 
 ## Working Rules for This Build
 - Move step-by-step in task order.

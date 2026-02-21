@@ -1,4 +1,5 @@
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import { rateLimit } from "express-rate-limit";
@@ -36,6 +37,7 @@ app.use(
   }),
 );
 app.use(express.json());
+app.use(cookieParser());
 app.use("/auth", authRouter);
 app.use("/api/v1/auth", authRouter);
 

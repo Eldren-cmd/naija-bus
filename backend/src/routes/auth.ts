@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { Request, Response, Router } from "express";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { User } from "../models";
-import { signAccessToken, signRefreshToken } from "../lib/auth";
+import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../lib/auth";
 import { AppUserRole } from "../types/auth";
 import { validateLoginBody, validateRegisterBody } from "../validation/requestSchemas";
 
@@ -113,6 +113,44 @@ authRouter.post("/login", async (req: Request, res: Response) => {
     return res.status(200).json({ token: accessToken, accessToken, user: sanitizeUser(user) });
   } catch (error) {
     return res.status(500).json({ error: "failed to login user" });
+  }
+});
+
+authRouter.post("/refresh", async (req: Request, res: Response) => {
+  try {
+    const refreshTokenRaw = req.cookies?.[REFRESH_TOKEN_COOKIE_NAME];
+    const refreshToken = typeof refreshTokenRaw === "string" ? refreshTokenRaw.trim() : "";
+    if (!refreshToken) {
+      return res.status(401).json({ error: "refresh token missing" });
+    }
+
+    let payload;
+    try {
+      payload = verifyRefreshToken(refreshToken);
+    } catch {
+      return res.status(401).json({ error: "invalid refresh token" });
+    }
+
+    const user = await User.findById(payload.sub).select("_id fullName email role isActive");
+    if (!user || user.isActive === false) {
+      return res.status(401).json({ error: "user not found or inactive" });
+    }
+
+    const accessToken = signAccessToken({
+      sub: String(user._id),
+      email: user.email,
+      role: user.role,
+    });
+    const nextRefreshToken = signRefreshToken({
+      sub: String(user._id),
+      email: user.email,
+      role: user.role,
+    });
+    setRefreshCookie(res, nextRefreshToken);
+
+    return res.status(200).json({ token: accessToken, accessToken, user: sanitizeUser(user) });
+  } catch {
+    return res.status(500).json({ error: "failed to refresh token" });
   }
 });
 

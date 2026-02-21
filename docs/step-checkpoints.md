@@ -742,3 +742,44 @@ Status: complete. Implemented:
 
 ### Next Tasks
 - Continue Phase 5 in strict order: `5.3` (`POST /auth/refresh` + auto-refresh interceptor on 401).
+
+### Task 5.3
+- Implement `POST /auth/refresh`; add axios interceptor to auto-refresh on 401
+
+Status: complete. Implemented:
+- backend refresh endpoint:
+  - added `POST /api/v1/auth/refresh` in `backend/src/routes/auth.ts`
+  - reads refresh token from httpOnly cookie
+  - verifies refresh token and active user
+  - rotates refresh cookie and issues new access token
+- backend middleware/session plumbing:
+  - added `cookie-parser` middleware in `backend/src/server.ts`
+  - added refresh token utilities in `backend/src/lib/auth.ts`:
+    - `signRefreshToken`
+    - `verifyRefreshToken`
+- frontend HTTP client/interceptor:
+  - added axios client wrapper in `frontend/src/lib/http.ts`
+  - request interceptor injects in-memory access token
+  - response interceptor handles `401` by calling refresh handler once, then retries original request
+- frontend auth provider integration:
+  - `frontend/src/auth/AuthProvider.tsx` now syncs token into HTTP layer
+  - provider registers refresh handler using `refreshSession` API
+  - failed refresh clears session state
+- API layer updates:
+  - migrated API calls to axios-backed helpers in `frontend/src/lib/api.ts`
+  - added `refreshSession` helper (`POST /api/v1/auth/refresh`)
+- backend integration tests:
+  - `backend/tests/phase2.integration.test.ts` now includes:
+    - refresh success with valid cookie
+    - refresh failure when cookie is missing
+- dependency updates:
+  - backend: `cookie-parser`, `@types/cookie-parser`
+  - frontend: `axios`
+- validation checks passed:
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
+### Next Tasks
+- Continue Phase 5 in strict order: `5.4` (ProtectedRoute redirect to `/login` when unauthenticated).
