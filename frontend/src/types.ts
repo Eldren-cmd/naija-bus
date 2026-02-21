@@ -68,3 +68,34 @@ export type FareReportResponse = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type SearchRouteHit = {
+  _id: string;
+  name: string;
+  origin: string;
+  destination: string;
+  transportType: TransportType;
+};
+
+export type SearchStopHit = {
+  _id: string;
+  name: string;
+  order: number;
+  isMajor: boolean;
+  coords: {
+    type: "Point";
+    coordinates: [number, number];
+  };
+  route: SearchRouteHit;
+};
+
+export type SearchResponse = {
+  query: string;
+  routes: SearchRouteHit[];
+  stops: SearchStopHit[];
+  counts: {
+    routes: number;
+    stops: number;
+    total: number;
+  };
+};

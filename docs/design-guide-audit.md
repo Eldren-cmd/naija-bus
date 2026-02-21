@@ -20,7 +20,7 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Route glow + stronger line styling not yet implemented.
 
 2. Search and card interaction polish
-- Search focus ring behavior from guide is not fully implemented.
+- Search focus ring + typeahead dropdown behavior now implemented.
 - Route cards do not yet apply the recommended hover lift + shadow motion.
 
 3. Feedback interactions

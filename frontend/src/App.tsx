@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { FareEstimate } from "./components/FareEstimate";
 import { ReportFarePanel } from "./components/ReportFarePanel";
 import { RouteView } from "./components/RouteView";
+import { SearchInput } from "./components/SearchInput";
 import { getRouteById, getRoutes } from "./lib/api";
-import type { FormEvent } from "react";
 import type { RouteDetail, RouteSummary } from "./types";
 import "./App.css";
 
@@ -83,9 +83,14 @@ function App() {
     };
   }, [selectedRouteId]);
 
-  const onSearch = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setActiveQuery(searchInput.trim());
+  const onSearch = (query: string) => {
+    setActiveQuery(query);
+  };
+
+  const onSelectRouteFromSearch = (routeId: string, nextQuery: string) => {
+    setSearchInput(nextQuery);
+    setActiveQuery(nextQuery.trim());
+    setSelectedRouteId(routeId);
   };
 
   return (
@@ -101,15 +106,12 @@ function App() {
 
       <section className="layout">
         <aside className="left-panel card">
-          <form onSubmit={onSearch} className="search-box">
-            <input
-              type="search"
-              placeholder="Search route, origin, destination..."
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-            />
-            <button type="submit">Search</button>
-          </form>
+          <SearchInput
+            value={searchInput}
+            onChange={setSearchInput}
+            onSubmit={onSearch}
+            onSelectRoute={onSelectRouteFromSearch}
+          />
 
           {routesError && <p className="error-text">{routesError}</p>}
           {routesLoading && <p className="muted">Loading routes...</p>}

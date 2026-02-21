@@ -4,6 +4,7 @@ import type {
   FareReportResponse,
   RouteDetail,
   RouteSummary,
+  SearchResponse,
   TrafficLevel,
 } from "../types";
 
@@ -77,4 +78,8 @@ export const reportFare = async (
   authToken: string,
 ): Promise<FareReportResponse> => {
   return apiPost<FareReportResponse>("/api/v1/fare/report", input, authToken);
+};
+
+export const searchRoutesAndStops = async (query: string): Promise<SearchResponse> => {
+  return apiGet<SearchResponse>(`/api/v1/search?q=${encodeURIComponent(query.trim())}`);
 };

@@ -29,6 +29,7 @@ This repository is being built strictly from:
 - [x] Phase 2 / Task 2.7: `GET /search?q=` endpoint implemented to aggregate route + stop matches
 - [x] Phase 2 / Task 2.8: Added `express-rate-limit` protection on `/search` and `/routes`
 - [x] Phase 2 / Task 2.9: Added `zod` request body validation for backend POST/PUT schemas
+- [x] Phase 2 / Task 2.11: Added debounced frontend typeahead `SearchInput` wired to `GET /search`
 - [x] Phase 2 / Frontend MVP View: Route search + RouteView (ordered stops) + FareEstimate panel wired to backend API
 - [x] Phase 2 / Integration Tests: Supertest flow added for login, routes list, and fare estimate endpoints
 - [x] Phase 2 / Map Rendering: Selected route polyline + stop markers now render in RouteView (Mapbox)

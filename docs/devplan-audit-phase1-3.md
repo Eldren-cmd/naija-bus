@@ -40,7 +40,7 @@ Status labels:
 | 2.8 | complete | `express-rate-limit` applied on `/search` and `/routes` endpoints. |
 | 2.9 | complete | `zod` validation added for POST/PUT bodies (auth/routes/reports/fare report). |
 | 2.10 | complete | Route map component implemented with Mapbox line + stops. |
-| 2.11 | missing | Debounced typeahead `SearchInput` calling `/search` not implemented. |
+| 2.11 | complete | Debounced frontend `SearchInput` typeahead implemented on `GET /search`. |
 | 2.12 | complete | RouteView fetches detail and draws polyline + stops. |
 | 2.13 | complete | FareEstimate component wired to API with breakdown/confidence. |
 | 2.14 | complete | Ordered stops list exists in RouteView. |
@@ -67,5 +67,5 @@ Status labels:
 
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Finish remaining Phase 2 tasks first: `2.11`, `2.15`.
+1. Finish remaining Phase 2 tasks first: `2.15`.
 2. Continue with remaining Phase 3 tasks: `3.8`, `3.9`, `3.10`, `3.11`, `3.13`.

@@ -91,6 +91,26 @@
   margin-bottom: 0.8rem;
 }
 
+.search-wrapper {
+  position: relative;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(13, 27, 42, 0.08);
+  transition: box-shadow 0.2s ease;
+}
+
+.search-wrapper:focus-within {
+  box-shadow: 0 4px 20px rgba(13, 27, 42, 0.12), 0 0 0 3px rgba(255, 107, 0, 0.25);
+}
+
+.search-wrapper form {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.search-input {
+  padding: 0.82rem 0.85rem;
+}
+
 .search-box input,
 .fare-controls input,
 .fare-controls select,
@@ -119,6 +139,64 @@
 .search-box button:hover,
 .estimate-btn:hover {
   background: #142c44;
+}
+
+.search-dropdown {
+  border: 1px solid #e8d7c5;
+  border-radius: 0.85rem;
+  background: #fff;
+  padding: 0.55rem;
+  box-shadow: 0 10px 22px rgba(13, 27, 42, 0.1);
+}
+
+.search-group + .search-group {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f1e5d8;
+}
+
+.search-group-title {
+  margin: 0 0 0.35rem;
+  color: #5a6879;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.search-suggestion-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.search-suggestion-list button {
+  width: 100%;
+  border: 1px solid #eadcc9;
+  background: #fffdfb;
+  border-radius: 0.66rem;
+  padding: 0.45rem 0.55rem;
+  text-align: left;
+  display: grid;
+  gap: 0.16rem;
+  cursor: pointer;
+}
+
+.search-suggestion-list button:hover {
+  border-color: #d4a071;
+  background: #fff6ed;
+}
+
+.search-suggestion-list strong {
+  font-size: 0.9rem;
+  color: #102236;
+}
+
+.search-suggestion-list span {
+  color: #5c6c7d;
+  font-size: 0.76rem;
 }
 
 .route-list {

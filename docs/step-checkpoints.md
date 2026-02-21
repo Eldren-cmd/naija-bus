@@ -205,6 +205,19 @@ Status: complete. Implemented:
 - added schema unit tests:
   - `backend/tests/requestSchemas.test.ts`
 
+### Task 2.11
+- Build `SearchInput` with debounced typeahead calling `GET /search`
+
+Status: complete. Implemented:
+- added `frontend/src/components/SearchInput.tsx`
+- debounced query requests (~280ms) to `GET /api/v1/search`
+- renders grouped suggestions for route hits and stop hits
+- selecting a suggestion updates route query and loads selected route
+- integrated component into `frontend/src/App.tsx`
+- added frontend API method `searchRoutesAndStops` in `frontend/src/lib/api.ts`
+- added shared search response types in `frontend/src/types.ts`
+- added search dropdown/focus-ring styles in `frontend/src/App.css`
+
 ### Phase 2 Frontend MVP View
 - Build RouteView page section showing selected route + ordered stops
 - Build FareEstimate component calling `GET /fare/estimate`
@@ -353,5 +366,5 @@ Status: complete. Implemented:
 - saves JWT token locally in browser storage for repeated report submissions
 
 ### Next Tasks
-- DevPlan alignment backlog from Phase 2: `2.11`, `2.15` (see `docs/devplan-audit-phase1-3.md`)
+- DevPlan alignment backlog from Phase 2: `2.15` (see `docs/devplan-audit-phase1-3.md`)
 - 3.8 Build traffic report modal: type, severity, description, auto-fill location

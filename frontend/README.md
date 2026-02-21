@@ -4,6 +4,7 @@ React + TypeScript + Vite frontend for Naija Transport.
 
 ## Implemented in this phase
 - Route search list (`GET /api/v1/routes`)
+- Debounced typeahead search (`GET /api/v1/search`)
 - Route detail view with ordered stops (`GET /api/v1/routes/:routeId`)
 - Fare estimate panel (`GET /api/v1/fare/estimate`)
 - Authenticated fare report submission panel (`POST /api/v1/fare/report`)
