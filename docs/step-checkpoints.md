@@ -26,7 +26,13 @@ Status: complete. `npm run build` passes and backend responds on `/api/v1/health
 
 Status: complete. Backend health check now reports `"database":"connected"`.
 
+## Task 1.5
+- Create all 6 Mongoose models
+- `Route`, `Stop`, `Fare`, `Report`, `User`, `TripRecord`
+
+Status: complete. All 6 model files created and backend TypeScript build passes.
+
 ## Next Tasks
-- 1.5 Create all 6 Mongoose models
 - 1.6 Create 2dsphere + TTL indexes
 - 1.7 Implement auth routes with bcrypt + JWT
+- 1.8 Add JWT middleware for protected routes
