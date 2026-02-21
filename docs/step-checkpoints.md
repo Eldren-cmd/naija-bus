@@ -185,5 +185,16 @@ Status: complete. Implemented:
   - `GET /api/v1/fare/estimate` -> `200` with fare breakdown
   - unknown route on fare estimate -> `404`
 
+### Map Rendering Task
+- Draw selected route polyline in RouteView
+- Show stop markers on the rendered map
+
+Status: complete. Implemented:
+- Added `frontend/src/components/RouteMap.tsx`
+- Integrated Mapbox map with route polyline + stop marker layers
+- Wired RouteView to render map component
+- Added fallback message when `VITE_MAPBOX_KEY` is missing
+- Verified frontend build and lint pass
+
 ### Next Tasks
-- Map rendering task: draw selected route polyline in RouteView
+- Gate 2 flow check: search "Ojota", open route, confirm map + fare panel UX

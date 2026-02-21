@@ -220,6 +220,19 @@
   color: #59677a;
 }
 
+.map-warning {
+  margin-bottom: 0.95rem;
+}
+
+.route-map-canvas {
+  width: 100%;
+  height: 280px;
+  border-radius: 0.9rem;
+  margin-bottom: 0.95rem;
+  border: 1px solid #ddc4a8;
+  overflow: hidden;
+}
+
 .panel-title {
   margin: 0 0 0.5rem;
   font-size: 1.05rem;

@@ -1,4 +1,5 @@
 import type { RouteDetail } from "../types";
+import { RouteMap } from "./RouteMap";
 
 type RouteViewProps = {
   route: RouteDetail | null;
@@ -48,10 +49,7 @@ export function RouteView({ route, loading, error }: RouteViewProps) {
         <span>Stops: {route.stops.length}</span>
         <span>Path points: {route.polyline.coordinates.length}</span>
       </div>
-      <div className="map-placeholder">
-        <p>Map preview slot</p>
-        <small>Polyline is available from backend and ready for Mapbox rendering in the next map task.</small>
-      </div>
+      <RouteMap route={route} />
       <h3 className="panel-title">Stops</h3>
       <ol className="stops-list">
         {route.stops.map((stop) => (

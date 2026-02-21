@@ -6,6 +6,7 @@ React + TypeScript + Vite frontend for Naija Transport.
 - Route search list (`GET /api/v1/routes`)
 - Route detail view with ordered stops (`GET /api/v1/routes/:routeId`)
 - Fare estimate panel (`GET /api/v1/fare/estimate`)
+- Route map rendering with Mapbox (polyline + stop markers)
 
 ## Environment
 Create `frontend/.env` with:
