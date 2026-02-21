@@ -437,6 +437,22 @@ Status: complete. Implemented:
 - replaced prior inline submission success/error messaging with toasts
 - added toast UI styles + mobile behavior in `frontend/src/App.css`
 
+### Task 3.13
+- Validate two-browser realtime marker demo flow
+
+Status: complete. Implemented:
+- added automated validation script:
+  - `frontend/scripts/phase3-step313-realtime-check.mjs`
+- script validates realtime `report:created` behavior by running:
+  - two subscribed socket clients inside route viewport bbox
+  - one subscribed socket client outside viewport bbox
+- script submits a live incident report and asserts:
+  - in-viewport clients receive event
+  - out-of-viewport client does not receive event
+- validation record stored in:
+  - `docs/phase3-step313-validation.md`
+- latest execution result: `pass: true`
+
 ### Next Tasks
-- DevPlan alignment backlog from Phase 2: cleared
-- 3.13 Validate two-browser realtime marker demo flow
+- DevPlan Phase 3 backlog: cleared
+- Proceed to next phase tasks per `NaijaTransport_DevPlan.docx`

@@ -26,6 +26,7 @@ VITE_MAPBOX_KEY=replace_with_mapbox_token_when_phase2_starts
 ## Commands
 - `npm run dev`
 - `npm run build`
+- `node scripts/phase3-step313-realtime-check.mjs` (Task 3.13 realtime demo validation)
 
 ## Report Fare UI Note
 - The report panel requires a valid JWT from backend login/register.

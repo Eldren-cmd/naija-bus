@@ -63,9 +63,9 @@ Status labels:
 | 3.10 | complete | Frontend Socket.IO client now applies `report:created` events to map markers in real time. |
 | 3.11 | complete | Reusable toast notifications now handle report submission success/error feedback. |
 | 3.12 | complete | TTL index on `reports.createdAt` already configured. |
-| 3.13 | missing | Two-browser real-time marker demo validation not yet completed. |
+| 3.13 | complete | Two-browser realtime marker flow validated; evidence documented in `docs/phase3-step313-validation.md`. |
 
 ## Recovery Order (Strict DevPlan Alignment)
 
 1. Phase 2 backlog is cleared.
-2. Continue with remaining Phase 3 tasks: `3.13`.
+2. Phase 3 tasks are complete (`3.1` through `3.13`).
