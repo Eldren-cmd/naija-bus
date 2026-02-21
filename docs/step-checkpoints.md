@@ -32,7 +32,17 @@ Status: complete. Backend health check now reports `"database":"connected"`.
 
 Status: complete. All 6 model files created and backend TypeScript build passes.
 
+## Task 1.6
+- Create geospatial indexes:
+  - `routes.polyline` (2dsphere)
+  - `stops.coords` (2dsphere)
+  - `reports.coords` (2dsphere)
+- Create TTL index:
+  - `reports.createdAt` (7 days)
+
+Status: complete. Indexes are present in Atlas and TTL seconds verified as `604800`.
+
 ## Next Tasks
-- 1.6 Create 2dsphere + TTL indexes
 - 1.7 Implement auth routes with bcrypt + JWT
 - 1.8 Add JWT middleware for protected routes
+- 1.9 Create `.env.example` files and document required keys

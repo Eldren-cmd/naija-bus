@@ -71,6 +71,8 @@ const routeSchema = new Schema(
   { timestamps: true },
 );
 
+routeSchema.index({ polyline: "2dsphere" });
+
 export type RouteDocument = InferSchemaType<typeof routeSchema>;
 
 export const Route =

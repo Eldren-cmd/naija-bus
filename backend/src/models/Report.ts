@@ -60,6 +60,9 @@ const reportSchema = new Schema(
   { timestamps: true },
 );
 
+reportSchema.index({ coords: "2dsphere" });
+reportSchema.index({ createdAt: 1 }, { expireAfterSeconds: 60 * 60 * 24 * 7 });
+
 export type ReportDocument = InferSchemaType<typeof reportSchema>;
 
 export const Report =

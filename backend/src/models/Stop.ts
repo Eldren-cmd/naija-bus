@@ -49,6 +49,8 @@ const stopSchema = new Schema(
   { timestamps: true },
 );
 
+stopSchema.index({ coords: "2dsphere" });
+
 export type StopDocument = InferSchemaType<typeof stopSchema>;
 
 export const Stop =

@@ -1,7 +1,7 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import { connectToDatabase, getDatabaseStatus } from "./config/db";
+import { connectToDatabase, ensureCoreIndexes, getDatabaseStatus } from "./config/db";
 
 dotenv.config();
 
@@ -27,6 +27,7 @@ app.get("/api/v1/routes", (_req, res) => {
 const startServer = async (): Promise<void> => {
   try {
     await connectToDatabase();
+    await ensureCoreIndexes();
     app.listen(port, () => {
       console.log(`Backend listening on http://localhost:${port}`);
     });
