@@ -570,5 +570,32 @@ Status: complete. Implemented:
   - `npm --prefix frontend run lint`
   - `npm --prefix frontend run build`
 
+### Task 4.6
+- Build MyTrips page: fetch `GET /trips`, display trip cards with date + distance + duration
+
+Status: complete. Implemented:
+- added new frontend route:
+  - `/my-trips` in `frontend/src/App.tsx`
+- built MyTrips page UI and data flow:
+  - token input + load action
+  - profile resolution via `GET /api/v1/auth/me`
+  - trip history fetch via `GET /api/v1/trips?userId=...`
+  - rendered trip cards with:
+    - date/time
+    - distance
+    - duration
+    - route summary metadata
+- added frontend API helpers in `frontend/src/lib/api.ts`:
+  - `getAuthProfile`
+  - `getTripsByUser`
+- added shared types in `frontend/src/types.ts`:
+  - `AuthProfileResponse`
+  - `TripRecordResponse` (with populated route shape support)
+- added navigation links for Route Finder and MyTrips in `frontend/src/App.tsx`
+- added MyTrips layout/card styles in `frontend/src/App.css`
+- validation checks passed:
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
 ### Next Tasks
-- Continue Phase 4 in strict order: `4.6` (`MyTrips` page list view)
+- Continue Phase 4 in strict order: `4.7` (MyTrips card click -> show stored trip polyline on map)

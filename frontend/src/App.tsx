@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Navigate, Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { FareEstimate } from "./components/FareEstimate";
 import { ReportFarePanel } from "./components/ReportFarePanel";
 import { RouteView } from "./components/RouteView";
@@ -7,10 +7,41 @@ import { SearchInput } from "./components/SearchInput";
 import { ToastStack } from "./components/ToastStack";
 import { TrafficReportModal } from "./components/TrafficReportModal";
 import { TripRecorder } from "./components/TripRecorder";
-import { getRouteById, getRoutes } from "./lib/api";
-import type { RouteDetail, RouteSummary, TripCheckpoint } from "./types";
+import { getAuthProfile, getRouteById, getRoutes, getTripsByUser } from "./lib/api";
+import type { RouteDetail, RouteSummary, TripCheckpoint, TripRecordResponse } from "./types";
 import type { ToastItem, ToastTone } from "./components/ToastStack";
 import "./App.css";
+
+const TOKEN_STORAGE_KEY = "naija_transport_jwt";
+
+const formatDistance = (meters: number): string => {
+  if (meters >= 1000) return `${(meters / 1000).toFixed(2)} km`;
+  return `${meters} m`;
+};
+
+const formatDuration = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}m ${secs}s`;
+};
+
+const formatDateTime = (value: string): string => {
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
+};
+
+function PrimaryNav({ active }: { active: "routes" | "my-trips" }) {
+  return (
+    <nav className="top-nav">
+      <Link to="/" className={`top-nav-link ${active === "routes" ? "active" : ""}`}>
+        Route Finder
+      </Link>
+      <Link to="/my-trips" className={`top-nav-link ${active === "my-trips" ? "active" : ""}`}>
+        My Trips
+      </Link>
+    </nav>
+  );
+}
 
 function RouteFinderPage() {
   const navigate = useNavigate();
@@ -159,6 +190,7 @@ function RouteFinderPage() {
           Search Lagos routes, inspect ordered stops, and pull a live fare estimate with multiplier breakdown.
         </p>
         <p className="brand-note">A VerityWave Solutions product</p>
+        <PrimaryNav active="routes" />
       </header>
 
       <section className="layout">
@@ -225,11 +257,132 @@ function RouteFinderPage() {
   );
 }
 
+function MyTripsPage() {
+  const [token, setToken] = useState("");
+  const [profileName, setProfileName] = useState<string | null>(null);
+  const [trips, setTrips] = useState<TripRecordResponse[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadTripsWithToken = async (authToken: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const profile = await getAuthProfile(authToken);
+      setProfileName(profile.user.fullName);
+      const data = await getTripsByUser(profile.user.id, authToken);
+      setTrips(data);
+    } catch (requestError) {
+      const message =
+        requestError instanceof Error ? requestError.message : "Failed to load trip history";
+      setError(message);
+      setTrips([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem(TOKEN_STORAGE_KEY);
+    if (!saved) return;
+    setToken(saved);
+    void loadTripsWithToken(saved);
+  }, []);
+
+  const handleTokenChange = (nextToken: string) => {
+    setToken(nextToken);
+    const normalized = nextToken.trim();
+    if (!normalized) {
+      window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+      return;
+    }
+    window.localStorage.setItem(TOKEN_STORAGE_KEY, normalized);
+  };
+
+  const onLoadTrips = () => {
+    const authToken = token.trim();
+    if (!authToken) {
+      setError("JWT is required. Login first, then paste your token.");
+      return;
+    }
+    void loadTripsWithToken(authToken);
+  };
+
+  return (
+    <main className="app-shell">
+      <header className="hero card">
+        <p className="kicker">Phase 4 Trip History</p>
+        <h1>My Recorded Trips</h1>
+        <p>Review uploaded trips with distance and duration history for route learning insights.</p>
+        <p className="brand-note">A VerityWave Solutions product</p>
+        <PrimaryNav active="my-trips" />
+      </header>
+
+      <section className="mytrips-layout">
+        <section className="mytrips-toolbar card">
+          <h3 className="panel-title">Trip History Loader</h3>
+          <p className="muted">
+            {profileName ? `Signed in as ${profileName}` : "Load your account profile and trip history."}
+          </p>
+          <label className="mytrips-token-field">
+            JWT token
+            <input
+              type="password"
+              placeholder="Paste Bearer token from login"
+              value={token}
+              onChange={(event) => handleTokenChange(event.target.value)}
+            />
+          </label>
+          <button type="button" className="estimate-btn" onClick={onLoadTrips} disabled={loading}>
+            {loading ? "Loading..." : "Load My Trips"}
+          </button>
+          {error && <p className="error-text">{error}</p>}
+        </section>
+
+        <section className="mytrips-list">
+          {loading && <p className="muted">Loading trip history...</p>}
+
+          {!loading && trips.length === 0 && (
+            <div className="mytrip-empty card">
+              <p className="muted">No uploaded trips yet. Record and upload your first trip from Route Finder.</p>
+            </div>
+          )}
+
+          <ul className="trip-card-list">
+            {trips.map((trip) => {
+              const routeSummary =
+                typeof trip.routeId === "object" && trip.routeId
+                  ? `${trip.routeId.name} (${trip.routeId.origin} to ${trip.routeId.destination})`
+                  : "Route not specified";
+
+              return (
+                <li key={trip._id} className="trip-card card">
+                  <div className="trip-card-head">
+                    <strong>{formatDateTime(trip.startedAt)}</strong>
+                    <span>{formatDistance(trip.distanceMeters)}</span>
+                  </div>
+                  <p className="trip-card-route">{routeSummary}</p>
+                  <div className="trip-card-meta">
+                    <span>Duration: {formatDuration(trip.durationSeconds)}</span>
+                    <span>Checkpoints: {trip.checkpoints.length}</span>
+                    <span>Ended: {formatDateTime(trip.endedAt)}</span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      </section>
+    </main>
+  );
+}
+
 function App() {
   return (
     <Routes>
       <Route path="/" element={<RouteFinderPage />} />
       <Route path="/route/:routeId" element={<RouteFinderPage />} />
+      <Route path="/my-trips" element={<MyTripsPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

@@ -72,12 +72,135 @@
   background: #fff8f1;
 }
 
+.top-nav {
+  margin-top: 0.75rem;
+  display: inline-flex;
+  gap: 0.45rem;
+}
+
+.top-nav-link {
+  text-decoration: none;
+  border: 1px solid #d8c3aa;
+  border-radius: 999px;
+  padding: 0.26rem 0.66rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #2f4359;
+  background: #fff8f1;
+}
+
+.top-nav-link.active {
+  background: #122f4b;
+  border-color: #122f4b;
+  color: #fff;
+}
+
 .layout {
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
   gap: 1rem;
   grid-template-columns: 320px minmax(0, 1fr);
+}
+
+.mytrips-layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 320px minmax(0, 1fr);
+}
+
+.mytrips-toolbar {
+  padding: 1rem;
+  height: fit-content;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.mytrips-token-field {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #36475b;
+}
+
+.mytrips-token-field input {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid #d7c6b2;
+  padding: 0.68rem 0.72rem;
+  font: inherit;
+  background: #fff;
+}
+
+.mytrips-list {
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+}
+
+.trip-card-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.trip-card {
+  padding: 0.9rem;
+  border: 1px solid #d9c8b4;
+  background: linear-gradient(165deg, #fff 0%, #f8fcff 100%);
+}
+
+.trip-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.trip-card-head strong {
+  font-size: 0.9rem;
+  color: #1d3248;
+}
+
+.trip-card-head span {
+  border: 1px solid #d6c5b0;
+  border-radius: 999px;
+  padding: 0.18rem 0.52rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  background: #fff6ec;
+  color: #12314f;
+}
+
+.trip-card-route {
+  margin: 0 0 0.45rem;
+  color: #415568;
+  font-size: 0.82rem;
+}
+
+.trip-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.trip-card-meta span {
+  border: 1px solid #d8e5f2;
+  border-radius: 999px;
+  background: #f5fbff;
+  padding: 0.2rem 0.52rem;
+  font-size: 0.73rem;
+  color: #2b4863;
+}
+
+.mytrip-empty {
+  padding: 1rem;
 }
 
 .left-panel {
@@ -779,6 +902,10 @@
 
 @media (max-width: 1020px) {
   .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .mytrips-layout {
     grid-template-columns: 1fr;
   }
 

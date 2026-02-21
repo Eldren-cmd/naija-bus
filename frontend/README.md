@@ -17,6 +17,7 @@ React + TypeScript + Vite frontend for Naija Transport.
 - TripRecorder component with geolocation checkpoint capture cadence (every 5 seconds)
 - Live in-progress trip polyline rendering on map from recorder checkpoints
 - Trip preview + upload modal flow (`POST /api/v1/trips`) from recorder stop action
+- MyTrips page with authenticated trip history cards (`GET /api/v1/trips?userId=...`)
 
 ## Environment
 Create `frontend/.env` with:

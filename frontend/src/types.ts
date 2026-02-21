@@ -151,7 +151,15 @@ export type TripRecordInput = {
 export type TripRecordResponse = {
   _id: string;
   userId: string;
-  routeId?: string;
+  routeId?:
+    | string
+    | {
+        _id: string;
+        name: string;
+        origin: string;
+        destination: string;
+        transportType: TransportType;
+      };
   checkpoints: TripCheckpoint[];
   polyline: {
     type: "LineString";
@@ -163,4 +171,13 @@ export type TripRecordResponse = {
   endedAt: string;
   createdAt: string;
   updatedAt: string;
+};
+
+export type AuthProfileResponse = {
+  user: {
+    id: string;
+    fullName: string;
+    email: string;
+    role: "user" | "champion" | "conductor" | "admin";
+  };
 };

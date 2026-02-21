@@ -1,4 +1,5 @@
 import type {
+  AuthProfileResponse,
   Bbox,
   FareEstimate,
   FareReportInput,
@@ -25,8 +26,13 @@ const parseErrorMessage = async (response: Response): Promise<string> => {
   return `request failed with status ${response.status}`;
 };
 
-const apiGet = async <T>(path: string): Promise<T> => {
-  const response = await fetch(`${API_BASE}${path}`);
+const apiGet = async <T>(path: string, token?: string): Promise<T> => {
+  const headers: Record<string, string> = {};
+  if (token?.trim()) {
+    headers.Authorization = `Bearer ${token.trim()}`;
+  }
+
+  const response = await fetch(`${API_BASE}${path}`, { headers });
   if (!response.ok) {
     throw new Error(await parseErrorMessage(response));
   }
@@ -106,4 +112,18 @@ export const createTripRecord = async (
   authToken: string,
 ): Promise<TripRecordResponse> => {
   return apiPost<TripRecordResponse>("/api/v1/trips", input, authToken);
+};
+
+export const getAuthProfile = async (authToken: string): Promise<AuthProfileResponse> => {
+  return apiGet<AuthProfileResponse>("/api/v1/auth/me", authToken);
+};
+
+export const getTripsByUser = async (
+  userId: string,
+  authToken: string,
+): Promise<TripRecordResponse[]> => {
+  return apiGet<TripRecordResponse[]>(
+    `/api/v1/trips?userId=${encodeURIComponent(userId)}`,
+    authToken,
+  );
 };
