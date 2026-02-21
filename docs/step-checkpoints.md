@@ -86,6 +86,11 @@ Status: complete. Seed dataset and script created; `--dry-run` validation passes
 
 Status: complete. Seed execution successful with `5` routes and `25` stops verified.
 
+## Task 1.12
+- Add first unit test for fare engine base logic
+- Run Jest test suite and ensure passing
+
+Status: complete. Jest suite added (`tests/fareEngine.test.ts`) and passes (`5/5` tests).
+
 ## Next Tasks
-- 1.12 Write first unit test (fare engine) and ensure CI-ready test pass
 - Gate 1 verification: register returns JWT, routes endpoint returns seeded routes

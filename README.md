@@ -17,8 +17,9 @@ This repository is being built strictly from:
 - [x] Phase 1 / Task 1.9: Added `.env.example` files and documented required env keys
 - [x] Phase 1 / Task 1.10: Added route seed dataset and seed script for 5 Lagos corridors
 - [x] Phase 1 / Task 1.11: Executed seed script and verified 5 routes in Atlas
+- [x] Phase 1 / Task 1.12: Added first unit test suite (fare engine base logic) with Jest
 - [x] Social post archive initialized (`social_posts/`)
-- [ ] Remaining Phase 1 tasks (1.12 only)
+- [ ] Remaining checklist: Milestone Gate 1 verification
 
 ## Working Rules for This Build
 - Move step-by-step in task order.
