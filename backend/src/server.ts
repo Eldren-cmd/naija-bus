@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import { isValidObjectId } from "mongoose";
 import { connectToDatabase, ensureCoreIndexes, getDatabaseStatus } from "./config/db";
-import { Fare, Route, Stop } from "./models";
+import { Fare, Report, Route, Stop } from "./models";
 import { authMiddleware, requireRoles } from "./middleware/authMiddleware";
 import { authRouter } from "./routes/auth";
 import { FareServiceError, estimateRouteFare } from "./services/fareService";
@@ -70,6 +70,10 @@ const TRAFFIC_LEVELS = ["low", "medium", "high"] as const;
 type TrafficLevel = (typeof TRAFFIC_LEVELS)[number];
 const FARE_REPORT_SOURCES = ["system", "user_report", "admin_update"] as const;
 type FareReportSource = (typeof FARE_REPORT_SOURCES)[number];
+const REPORT_TYPES = ["traffic", "police", "roadblock", "accident", "hazard", "other"] as const;
+type ReportType = (typeof REPORT_TYPES)[number];
+const REPORT_SEVERITIES = ["low", "medium", "high"] as const;
+type ReportSeverity = (typeof REPORT_SEVERITIES)[number];
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
@@ -93,6 +97,10 @@ const isTrafficLevel = (value: unknown): value is TrafficLevel =>
   typeof value === "string" && (TRAFFIC_LEVELS as readonly string[]).includes(value);
 const isFareReportSource = (value: unknown): value is FareReportSource =>
   typeof value === "string" && (FARE_REPORT_SOURCES as readonly string[]).includes(value);
+const isReportType = (value: unknown): value is ReportType =>
+  typeof value === "string" && (REPORT_TYPES as readonly string[]).includes(value);
+const isReportSeverity = (value: unknown): value is ReportSeverity =>
+  typeof value === "string" && (REPORT_SEVERITIES as readonly string[]).includes(value);
 
 const isPolylinePayload = (
   value: unknown,
@@ -206,6 +214,37 @@ const validateFareReportPayload = (body: unknown): string | null => {
   }
   if (body.source !== undefined && !isFareReportSource(body.source)) {
     return "source must be one of: system, user_report, admin_update";
+  }
+  return null;
+};
+
+const isPointCoordsPayload = (value: unknown): value is { type: "Point"; coordinates: [number, number] } => {
+  if (!isObject(value)) return false;
+  if (value.type !== "Point") return false;
+  if (!Array.isArray(value.coordinates) || value.coordinates.length !== 2) return false;
+  const [lng, lat] = value.coordinates;
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return false;
+  return lng >= -180 && lng <= 180 && lat >= -90 && lat <= 90;
+};
+
+const validateIncidentReportPayload = (body: unknown): string | null => {
+  if (!isObject(body)) return "request body must be an object";
+  if (body.routeId !== undefined) {
+    if (typeof body.routeId !== "string" || !isValidObjectId(body.routeId.trim())) {
+      return "routeId must be a valid id when provided";
+    }
+  }
+  if (!isReportType(body.type)) {
+    return "type must be one of: traffic, police, roadblock, accident, hazard, other";
+  }
+  if (body.severity !== undefined && !isReportSeverity(body.severity)) {
+    return "severity must be one of: low, medium, high";
+  }
+  if (!isPointCoordsPayload(body.coords)) {
+    return "coords must be GeoJSON Point with [lng, lat]";
+  }
+  if (body.description !== undefined && typeof body.description !== "string") {
+    return "description must be a string";
   }
   return null;
 };
@@ -499,6 +538,49 @@ const createFareReportHandler = async (req: Request, res: Response) => {
 
 app.post("/api/v1/fare/report", authMiddleware, createFareReportHandler);
 app.post("/fare/report", authMiddleware, createFareReportHandler);
+
+const createIncidentReportHandler = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "authentication required" });
+    }
+
+    const validationError = validateIncidentReportPayload(req.body);
+    if (validationError) {
+      return res.status(400).json({ error: validationError });
+    }
+
+    const body = req.body as Record<string, unknown>;
+    const routeId = typeof body.routeId === "string" ? body.routeId.trim() : undefined;
+    const reportType = body.type as ReportType;
+    const severity = isReportSeverity(body.severity) ? body.severity : ("medium" as const);
+    const description = typeof body.description === "string" ? body.description.trim() : "";
+    if (routeId) {
+      const route = await Route.findOne({ _id: routeId, isActive: true }).select("_id").lean();
+      if (!route) {
+        return res.status(404).json({ error: "route not found" });
+      }
+    }
+
+    const coords = body.coords as { type: "Point"; coordinates: [number, number] };
+    const created = await Report.create({
+      routeId: routeId || undefined,
+      userId: req.user.id,
+      type: reportType,
+      severity,
+      description,
+      coords,
+      isActive: true,
+    });
+
+    return res.status(201).json(created);
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to save report" });
+  }
+};
+
+app.post("/api/v1/reports", authMiddleware, createIncidentReportHandler);
+app.post("/reports", authMiddleware, createIncidentReportHandler);
 
 const startServer = async (): Promise<void> => {
   try {

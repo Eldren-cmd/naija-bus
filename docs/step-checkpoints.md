@@ -227,5 +227,20 @@ Status: complete. Implemented:
 - mapped payload `reportedFare` -> `Fare.amount`
 - added integration tests in `backend/tests/fareReport.integration.test.ts`
 
+### Task 3.2
+- Implement `POST /reports` for traffic/police/roadblock submissions
+
+Status: complete. Implemented:
+- `POST /api/v1/reports` and alias `POST /reports`
+- auth-protected incident reporting with payload validation
+- supported report types from model enum (`traffic`, `police`, `roadblock`, `accident`, `hazard`, `other`)
+- supported severity (`low`, `medium`, `high`) with default fallback
+- required GeoJSON Point coords validation (`[lng, lat]`)
+- optional routeId validation + existence check
+- added integration tests in `backend/tests/reports.integration.test.ts`
+- live checks confirm:
+  - no auth -> `401`
+  - valid auth + payload -> `201`
+
 ### Next Tasks
-- 3.2 Implement `POST /reports` for traffic/police/roadblock submissions
+- 3.3 Set up Socket.IO server (`/reports`) and emit `report:created` + `fare:reported`
