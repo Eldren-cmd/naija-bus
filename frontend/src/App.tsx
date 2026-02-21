@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ReactElement } from "react";
 import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "./auth/AuthContext";
+import { AdminPanel } from "./components/AdminPanel";
 import { FareEstimate } from "./components/FareEstimate";
 import { LoginPage } from "./components/LoginPage";
 import { ReportFarePanel } from "./components/ReportFarePanel";
@@ -33,7 +34,7 @@ const formatDateTime = (value: string): string => {
   return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
 };
 
-function PrimaryNav({ active }: { active: "routes" | "my-trips" }) {
+function PrimaryNav({ active }: { active: "routes" | "my-trips" | "admin" }) {
   const { isAuthenticated, user, clearSession } = useAuth();
 
   return (
@@ -44,6 +45,11 @@ function PrimaryNav({ active }: { active: "routes" | "my-trips" }) {
       <Link to="/my-trips" className={`top-nav-link ${active === "my-trips" ? "active" : ""}`}>
         My Trips
       </Link>
+      {isAuthenticated && user?.role === "admin" && (
+        <Link to="/admin" className={`top-nav-link ${active === "admin" ? "active" : ""}`}>
+          Admin
+        </Link>
+      )}
       {isAuthenticated ? (
         <>
           <span className="top-nav-user">Signed in: {user?.fullName || user?.email || "User"}</span>
@@ -71,6 +77,21 @@ function ProtectedRoute({ children }: { children: ReactElement }) {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  return children;
+}
+
+function AdminRoute({ children }: { children: ReactElement }) {
+  const { isAuthenticated, user } = useAuth();
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  if (user?.role !== "admin") {
+    return <Navigate to="/" replace />;
   }
 
   return children;
@@ -458,6 +479,14 @@ function App() {
           <ProtectedRoute>
             <MyTripsPage />
           </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminPanel />
+          </AdminRoute>
         }
       />
       <Route path="*" element={<Navigate to="/" replace />} />

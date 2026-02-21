@@ -804,3 +804,31 @@ Status: complete. Implemented:
 
 ### Next Tasks
 - Continue Phase 5 in strict order: `5.5` (AdminPanel page for admin route management).
+
+### Task 5.5
+- Build AdminPanel page (protected, role=admin): table of routes with Edit/Delete
+
+Status: complete. Implemented:
+- added admin route management UI:
+  - `frontend/src/components/AdminPanel.tsx`
+  - route table renders route name/origin/destination/corridor/baseFare
+  - inline edit controls for route metadata
+  - delete action with confirmation prompt
+- added admin route protection:
+  - `AdminRoute` wrapper in `frontend/src/App.tsx`
+  - `/admin` route now requires authenticated admin role
+  - non-admin users are redirected out of admin page
+- added admin API wiring in `frontend/src/lib/api.ts`:
+  - `updateRouteAdmin` -> `PUT /api/v1/routes/:routeId`
+  - `deleteRouteAdmin` -> `DELETE /api/v1/routes/:routeId`
+- updated top navigation:
+  - admin users now see `Admin` navigation entry
+- added admin-specific styling in `frontend/src/App.css`
+- validation checks passed:
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+
+### Next Tasks
+- Continue Phase 5 in strict order: `5.6` (route creation form in AdminPanel using `POST /routes`).

@@ -119,6 +119,69 @@
   gap: 0.75rem;
 }
 
+.admin-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.15rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.admin-toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.admin-table-wrap {
+  border: 1px solid #d8c5b0;
+  border-radius: 0.9rem;
+  overflow: auto;
+  background: #fff;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 780px;
+}
+
+.admin-table th,
+.admin-table td {
+  border-bottom: 1px solid #eee0ce;
+  padding: 0.58rem;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 0.82rem;
+}
+
+.admin-table th {
+  background: #fff6ec;
+  color: #20364f;
+  font-size: 0.77rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-table input {
+  width: 100%;
+  border-radius: 0.6rem;
+  border: 1px solid #d7c6b2;
+  padding: 0.42rem 0.48rem;
+  font: inherit;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 0.4rem;
+  min-width: 180px;
+}
+
+.admin-delete-btn {
+  border-color: #e7b1b1;
+  color: #7b2424;
+  background: #fff6f6;
+}
+
 .login-shell h1 {
   margin: 0;
   font-family: var(--font-display);

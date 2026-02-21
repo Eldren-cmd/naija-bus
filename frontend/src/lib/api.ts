@@ -47,6 +47,26 @@ const apiPost = async <T>(path: string, body: unknown, token?: string): Promise<
   }
 };
 
+const apiPut = async <T>(path: string, body: unknown, token?: string): Promise<T> => {
+  try {
+    const headers = token?.trim() ? { Authorization: `Bearer ${token.trim()}` } : undefined;
+    const response = await httpClient.put<T>(path, body, { headers });
+    return response.data;
+  } catch (error) {
+    throw new Error(parseApiError(error));
+  }
+};
+
+const apiDelete = async <T>(path: string, token?: string): Promise<T> => {
+  try {
+    const headers = token?.trim() ? { Authorization: `Bearer ${token.trim()}` } : undefined;
+    const response = await httpClient.delete<T>(path, { headers });
+    return response.data;
+  } catch (error) {
+    throw new Error(parseApiError(error));
+  }
+};
+
 export const getRoutes = async (query?: string): Promise<RouteSummary[]> => {
   const q = query?.trim();
   const suffix = q ? `/api/v1/routes?q=${encodeURIComponent(q)}` : "/api/v1/routes";
@@ -151,4 +171,30 @@ export const refreshSession = async (): Promise<AuthLoginResponse> => {
   } catch (error) {
     throw new Error(parseApiError(error));
   }
+};
+
+type RouteAdminUpdateInput = {
+  name?: string;
+  origin?: string;
+  destination?: string;
+  corridor?: string;
+  baseFare?: number;
+};
+
+export const updateRouteAdmin = async (
+  routeId: string,
+  input: RouteAdminUpdateInput,
+  authToken: string,
+): Promise<RouteDetail> => {
+  return apiPut<RouteDetail>(`/api/v1/routes/${encodeURIComponent(routeId)}`, input, authToken);
+};
+
+export const deleteRouteAdmin = async (
+  routeId: string,
+  authToken: string,
+): Promise<{ success: boolean; deletedRouteId: string }> => {
+  return apiDelete<{ success: boolean; deletedRouteId: string }>(
+    `/api/v1/routes/${encodeURIComponent(routeId)}`,
+    authToken,
+  );
 };

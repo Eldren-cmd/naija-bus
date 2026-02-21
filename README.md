@@ -61,6 +61,7 @@ This repository is being built strictly from:
 - [x] Phase 5 / Task 5.2: Signup page added with auto-login after successful registration
 - [x] Phase 5 / Task 5.3: `POST /auth/refresh` added and frontend now auto-refreshes session on `401` via axios interceptor
 - [x] Phase 5 / Task 5.4: Protected route wrapper added; unauthenticated users are redirected to `/login`
+- [x] Phase 5 / Task 5.5: Admin-only route management panel added with route table, edit, and delete actions
 
 ## Working Rules for This Build
 - Move step-by-step in task order.
