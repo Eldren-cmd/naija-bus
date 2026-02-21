@@ -64,6 +64,31 @@ describe("Phase 2 integration endpoints", () => {
     jest.clearAllMocks();
   });
 
+  it("POST /api/v1/auth/register returns JWT and refresh cookie", async () => {
+    const lean = jest.fn().mockResolvedValue(null);
+    (User.findOne as unknown as jest.Mock).mockReturnValue({ lean });
+    (User.create as unknown as jest.Mock).mockResolvedValue({
+      _id: "u-register-1",
+      fullName: "New Rider",
+      email: "newrider@example.com",
+      role: "user",
+    });
+
+    const response = await request(app).post("/api/v1/auth/register").send({
+      fullName: "New Rider",
+      email: "newrider@example.com",
+      password: "password123",
+    });
+
+    expect(response.status).toBe(201);
+    expect(response.body.token).toEqual(expect.any(String));
+    expect(response.body.accessToken).toEqual(expect.any(String));
+    expect(response.body.user.email).toBe("newrider@example.com");
+    expect(response.headers["set-cookie"]).toEqual(
+      expect.arrayContaining([expect.stringMatching(/^naija_refresh_token=/)]),
+    );
+  });
+
   it("POST /api/v1/auth/login returns JWT for valid credentials", async () => {
     const password = "password123";
     const passwordHash = await bcrypt.hash(password, 12);

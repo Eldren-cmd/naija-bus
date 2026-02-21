@@ -88,7 +88,11 @@ export function LoginPage() {
         </form>
 
         <p className="muted small">
-          No account yet? Signup page is next in Phase 5. Continue using route search while this flow is being built.
+          No account yet?{" "}
+          <Link to="/signup" className="inline-link">
+            Create one here
+          </Link>
+          .
         </p>
         <Link to="/" className="top-nav-link login-back-link">
           Back to Route Finder

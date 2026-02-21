@@ -22,6 +22,7 @@ React + TypeScript + Vite frontend for Naija Transport.
 - TripRecorder geolocation-denied UX: explicit blocked-permission warning with retry guidance
 - Login page (`/login`) wired to `POST /api/v1/auth/login` with in-memory access token session
 - Frontend auth context/provider added; token persistence in localStorage removed
+- Signup page (`/signup`) wired to `POST /api/v1/auth/register` with auto-login redirect flow
 
 ## Environment
 Create `frontend/.env` with:

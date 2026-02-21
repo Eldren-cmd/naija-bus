@@ -150,3 +150,26 @@ export const loginUser = async (input: LoginInput): Promise<AuthLoginResponse> =
 
   return (await response.json()) as AuthLoginResponse;
 };
+
+type RegisterInput = {
+  fullName: string;
+  email: string;
+  password: string;
+};
+
+export const registerUser = async (input: RegisterInput): Promise<AuthLoginResponse> => {
+  const response = await fetch(`${API_BASE}/api/v1/auth/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(input),
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseErrorMessage(response));
+  }
+
+  return (await response.json()) as AuthLoginResponse;
+};

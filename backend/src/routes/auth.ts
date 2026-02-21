@@ -63,6 +63,12 @@ authRouter.post("/register", async (req: Request, res: Response) => {
       email: created.email,
       role: created.role,
     });
+    const refreshToken = signRefreshToken({
+      sub: String(created._id),
+      email: created.email,
+      role: created.role,
+    });
+    setRefreshCookie(res, refreshToken);
 
     return res.status(201).json({ token, accessToken: token, user: sanitizeUser(created) });
   } catch (error) {

@@ -715,3 +715,30 @@ Status: complete. Implemented:
 
 ### Next Tasks
 - Continue Phase 5 in strict order: `5.2` (Signup page + auto-login after registration).
+
+### Task 5.2
+- Build Signup page (`POST /auth/register`); auto-login after registration
+
+Status: complete. Implemented:
+- frontend signup flow:
+  - added `frontend/src/components/SignupPage.tsx`
+  - added route `/signup` in `frontend/src/App.tsx`
+  - wired signup submit to backend `POST /api/v1/auth/register`
+  - on successful registration, session auto-login is applied via auth context and user is redirected to `/`
+- auth navigation updates:
+  - signed-out nav now exposes both `Login` and `Signup`
+  - login page now links directly to signup
+- backend register flow alignment:
+  - `POST /api/v1/auth/register` now also sets refresh token cookie (`httpOnly`) for consistent session behavior
+- API layer update:
+  - added `registerUser` helper in `frontend/src/lib/api.ts` with `credentials: "include"`
+- backend integration test coverage:
+  - updated `backend/tests/phase2.integration.test.ts` with register endpoint assertion for JWT + refresh cookie
+- validation checks passed:
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
+### Next Tasks
+- Continue Phase 5 in strict order: `5.3` (`POST /auth/refresh` + auto-refresh interceptor on 401).

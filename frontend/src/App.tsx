@@ -6,6 +6,7 @@ import { LoginPage } from "./components/LoginPage";
 import { ReportFarePanel } from "./components/ReportFarePanel";
 import { RouteView } from "./components/RouteView";
 import { SearchInput } from "./components/SearchInput";
+import { SignupPage } from "./components/SignupPage";
 import { ToastStack } from "./components/ToastStack";
 import { TrafficReportModal } from "./components/TrafficReportModal";
 import { TripRecorder } from "./components/TripRecorder";
@@ -50,9 +51,14 @@ function PrimaryNav({ active }: { active: "routes" | "my-trips" }) {
           </button>
         </>
       ) : (
-        <Link to="/login" className="top-nav-link">
-          Login
-        </Link>
+        <>
+          <Link to="/login" className="top-nav-link">
+            Login
+          </Link>
+          <Link to="/signup" className="top-nav-link">
+            Signup
+          </Link>
+        </>
       )}
     </nav>
   );
@@ -431,6 +437,7 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
       <Route path="/" element={<RouteFinderPage />} />
       <Route path="/route/:routeId" element={<RouteFinderPage />} />
       <Route path="/my-trips" element={<MyTripsPage />} />

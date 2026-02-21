@@ -141,6 +141,11 @@
   width: fit-content;
 }
 
+.inline-link {
+  color: #133a63;
+  font-weight: 700;
+}
+
 .layout {
   max-width: 1200px;
   margin: 0 auto;
