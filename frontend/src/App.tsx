@@ -147,6 +147,10 @@ function RouteFinderPage() {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const toastTimersRef = useRef<number[]>([]);
   const savedRouteIds = useMemo(() => new Set(savedRoutes.map((route) => route._id)), [savedRoutes]);
+  const selectedRouteSummary = useMemo(
+    () => routes.find((route) => route._id === selectedRouteId) ?? null,
+    [routes, selectedRouteId],
+  );
 
   useEffect(() => {
     return () => {
@@ -372,7 +376,37 @@ function RouteFinderPage() {
                   ))}
                 </ul>
               )}
-              {!savedRoutesLoading && savedRoutes.length === 0 && <p className="muted">No saved routes yet.</p>}
+              {!savedRoutesLoading && savedRoutes.length === 0 && (
+                <div className="saved-empty-state">
+                  <p className="saved-empty-title">No saved routes yet.</p>
+                  <p className="muted small">
+                    Save the routes you use most so you can open them instantly for fare checks and trip recording.
+                  </p>
+                  <div className="saved-empty-actions">
+                    {selectedRouteSummary && (
+                      <button
+                        type="button"
+                        className="estimate-btn"
+                        onClick={() => void onToggleSavedRoute(selectedRouteSummary)}
+                        disabled={savingRouteId === selectedRouteSummary._id}
+                      >
+                        {savingRouteId === selectedRouteSummary._id ? "Saving..." : "Save Selected Route"}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="secondary-btn"
+                      onClick={() => {
+                        setSearchInput("");
+                        setActiveQuery("");
+                        navigate("/", { replace: true });
+                      }}
+                    >
+                      Browse Routes
+                    </button>
+                  </div>
+                </div>
+              )}
               {!savedRoutesLoading && savedRoutes.length > 0 && (
                 <ul className="saved-route-list">
                   {savedRoutes.map((route) => (

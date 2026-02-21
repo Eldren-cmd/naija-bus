@@ -73,7 +73,7 @@ Status labels:
 ## Cross-Guide Overlay (Design + Engagement)
 
 - Design alignment for completed UI tasks in these phases is generally in place.
-- Engagement alignment is partial:
+- Engagement alignment for scoped phase-1 to phase-3 tasks is complete:
   - reporting loop features are implemented
   - bot-origin ingestion baseline is now implemented (`POST /api/v1/reports/bot` + `whatsapp-web.js` listener)
   - broader rewards/gamification systems were deferred beyond phase 3 and are now addressed at baseline level in phase-4 remediation

@@ -19,6 +19,7 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Mobile responsive pass completed for Home, RouteView, and MyTrips in `frontend/src/App.css` (1020/768/560 breakpoints).
 - Loading skeleton states added across Route Finder, RouteView, Fare Estimate, Search typeahead, and MyTrips to reduce abrupt layout shifts.
 - MyTrips engagement panel added with styled level/progress, badges, and leaderboard card components aligned to existing palette and typography.
+- Saved-routes empty state card now includes clear guidance copy and action buttons, improving first-time usability.
 
 ## High-Impact Gaps To Implement Next
 

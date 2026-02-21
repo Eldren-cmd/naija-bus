@@ -1067,5 +1067,27 @@ Status: complete. Implemented:
   - `npm --prefix frontend run lint`
   - `npm --prefix frontend run build`
 
+### Task 5.11
+- Implement saved-routes empty state UX with clear call-to-action guidance
+
+Status: complete. Implemented:
+- Home saved-routes empty state enhancement in `frontend/src/App.tsx`:
+  - added explicit onboarding copy when no saved routes exist
+  - added direct CTA to save currently selected route
+  - added fallback CTA to browse route list from clean state
+- saved-routes empty-state styling in `frontend/src/App.css`:
+  - dedicated empty-state card treatment
+  - action-row button layout for desktop and mobile
+  - touch-target parity preserved on small screens
+- Design Guide applicability check:
+  - empty-state layout aligns with existing card language and color system
+  - action hierarchy is visually clear with primary/secondary CTA separation
+- Engagement Guide applicability check:
+  - empty-state now actively supports retention by guiding first save action
+  - reduced dead-end state for signed-in users in Route Finder sidebar
+- validation checks passed:
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
 ### Next Tasks
-- Continue Phase 5 in strict order: `5.11` (saved-routes empty state UX polish).
+- Continue Phase 5 in strict order: `5.12` (global error boundary).

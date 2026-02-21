@@ -878,6 +878,32 @@
   background: #fff5ec;
 }
 
+.saved-empty-state {
+  border: 1px dashed #d7bf9f;
+  border-radius: 0.8rem;
+  padding: 0.62rem;
+  background: #fff;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.saved-empty-title {
+  margin: 0;
+  color: #1f3852;
+  font-weight: 700;
+}
+
+.saved-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.42rem;
+}
+
+.saved-empty-actions .estimate-btn,
+.saved-empty-actions .secondary-btn {
+  min-height: 40px;
+}
+
 .route-save-btn {
   border: 1px solid #d8c3aa;
   border-radius: 0.7rem;
@@ -1547,6 +1573,12 @@
   }
 
   .route-save-btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .saved-empty-actions .estimate-btn,
+  .saved-empty-actions .secondary-btn {
     width: 100%;
     min-height: 44px;
   }

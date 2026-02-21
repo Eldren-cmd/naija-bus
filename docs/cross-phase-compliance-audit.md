@@ -17,9 +17,9 @@ Status labels:
 | --- | --- | --- | --- | --- | --- |
 | 1 | complete | N/A (mostly backend/setup) | schema foundations implemented | aligned | roles + engagement fields implemented in user model. |
 | 2 | complete | major UI baseline implemented | N/A for core MVP | aligned | route search/map/fare UX established and refined. |
-| 3 | complete | realtime map/report UX implemented | report loop + bot-ingest baseline implemented | partial | `whatsapp-web.js` + bot token ingestion added; deeper automation/reward loops remain pending. |
+| 3 | complete | realtime map/report UX implemented | report loop + bot-ingest baseline implemented | aligned | phase-3 scoped requirements are compliant; deeper automation/reward expansion is tracked for later phases. |
 | 4 | complete | trip UX and replay implemented | retention + gamification baseline implemented | aligned | phase-4 engagement gap now closed with points/streaks/badges/leaderboard surface. |
-| 5 (through 5.10) | complete through 5.10 | major polish updates + mobile responsiveness + loading skeleton UX applied | saved-routes retention loop + mobile usability + loading-state engagement support implemented | partial | remaining engagement systems are tracked for later phase-5 tasks or phase 6. |
+| 5 (through 5.11) | complete through 5.11 | major polish updates + mobile responsiveness + loading skeleton + empty-state UX applied | saved-routes retention loop + mobile usability + loading-state + empty-state engagement support implemented | partial | remaining engagement systems are tracked for later phase-5 tasks or phase 6. |
 
 ## Compliance Recheck (Previous Phases)
 
@@ -31,7 +31,7 @@ Status labels:
 
 ## Forward Plan (Future Phases/Tasks)
 
-### Remaining Phase 5 (`5.11` to `5.14`)
+### Remaining Phase 5 (`5.12` to `5.14`)
 - Apply Design + Engagement checks in each completion entry.
 - Ensure no task is marked final without explicit cross-guide applicability note.
 
