@@ -34,6 +34,7 @@ This repository is being built strictly from:
 - [x] Phase 3 / Task 3.1: Authenticated `POST /fare/report` endpoint implemented with payload validation and route existence check
 - [x] Phase 3 / Task 3.2: Authenticated `POST /reports` endpoint implemented for traffic/police/roadblock style incident reporting
 - [x] Phase 3 / Task 3.3: Socket.IO realtime channel initialized on `/reports` with `fare:reported` and `report:created` emits
+- [x] Phase 3 / Task 3.4: Fare estimate logic now blends rule-based fare with recent crowdsourced fare reports
 
 ## Working Rules for This Build
 - Move step-by-step in task order.

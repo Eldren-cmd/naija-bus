@@ -1,8 +1,10 @@
 import { isValidObjectId } from "mongoose";
 import { estimateFare, TimeBand, TrafficLevel } from "../lib/fareEngine";
-import { Route } from "../models";
+import { Fare, Route } from "../models";
 
 const VALID_TRAFFIC_LEVELS: readonly TrafficLevel[] = ["low", "medium", "high"];
+const CROWDSOURCE_WINDOW_MINUTES = 120;
+const CROWDSOURCE_REPORT_LIMIT = 20;
 
 export class FareServiceError extends Error {
   statusCode: number;
@@ -32,7 +34,11 @@ export type EstimateRouteFareResult = {
   baseFare: number;
   trafficMultiplier: number;
   timeMultiplier: number;
+  ruleBasedFare: number;
   estimatedFare: number;
+  recentReportsCount: number;
+  crowdsourcedAverageFare: number | null;
+  crowdsourcedWeightApplied: number;
   computedAt: string;
 };
 
@@ -49,6 +55,13 @@ const parseIsoLikeTime = (value: string): number | null => {
   if (Number.isNaN(date.getTime())) return null;
   return date.getHours() * 60 + date.getMinutes();
 };
+
+const roundToNearestTen = (value: number): number => Math.round(value / 10) * 10;
+
+const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value));
+
+const average = (values: number[]): number =>
+  values.reduce((sum, current) => sum + current, 0) / values.length;
 
 export const resolveTimeBand = (time?: string): TimeBand => {
   let totalMinutes: number;
@@ -110,19 +123,50 @@ export const estimateRouteFare = async (
     timeBand,
   });
 
+  const recentCutoff = new Date(Date.now() - CROWDSOURCE_WINDOW_MINUTES * 60 * 1000);
+  const recentReports = (await Fare.find({
+    routeId: route._id,
+    source: { $in: ["user_report", "admin_update"] },
+    createdAt: { $gte: recentCutoff },
+    amount: { $gt: 0 },
+  })
+    .sort({ createdAt: -1 })
+    .limit(CROWDSOURCE_REPORT_LIMIT)
+    .select("amount")
+    .lean()) as Array<{ amount: number }>;
+
+  const recentAmounts = recentReports.map((report) => Number(report.amount)).filter(Number.isFinite);
+  const recentReportsCount = recentAmounts.length;
+  const crowdsourcedAverageFare = recentReportsCount > 0 ? roundToNearestTen(average(recentAmounts)) : null;
+  const crowdsourcedWeightApplied =
+    recentReportsCount > 0 ? clamp(0.15 + recentReportsCount * 0.05, 0.15, 0.5) : 0;
+
+  const ruleBasedFare = breakdown.estimatedFare;
+  const blendedEstimate =
+    crowdsourcedAverageFare === null
+      ? ruleBasedFare
+      : roundToNearestTen(ruleBasedFare * (1 - crowdsourcedWeightApplied) + crowdsourcedAverageFare * crowdsourcedWeightApplied);
+
+  const confidenceBoost = recentReportsCount > 0 ? Math.min(0.2, recentReportsCount * 0.02) : 0;
+  const confidence = clamp(route.confidenceScore + confidenceBoost, 0, 0.95);
+
   return {
     routeId: String(route._id),
     routeName: route.name,
     origin: route.origin,
     destination: route.destination,
     currency: "NGN",
-    confidence: route.confidenceScore,
+    confidence,
     trafficLevel,
     timeBand,
     baseFare: breakdown.baseFare,
     trafficMultiplier: breakdown.trafficMultiplier,
     timeMultiplier: breakdown.timeMultiplier,
-    estimatedFare: breakdown.estimatedFare,
+    ruleBasedFare,
+    estimatedFare: blendedEstimate,
+    recentReportsCount,
+    crowdsourcedAverageFare,
+    crowdsourcedWeightApplied,
     computedAt: new Date().toISOString(),
   };
 };

@@ -252,5 +252,22 @@ Status: complete. Implemented:
 - emit `report:created` after successful `POST /reports`
 - integration tests now assert emit calls on successful submissions
 
+### Task 3.4
+- Update fare estimate logic to incorporate recent crowdsourced fare reports
+
+Status: complete. Implemented:
+- updated `backend/src/services/fareService.ts` to query recent fare reports (last 2 hours)
+- added blended estimate model:
+  - rule-based fare from multipliers
+  - crowdsourced average fare influence with bounded weight
+- added response telemetry fields:
+  - `ruleBasedFare`
+  - `recentReportsCount`
+  - `crowdsourcedAverageFare`
+  - `crowdsourcedWeightApplied`
+- confidence now increases when recent reports exist (capped)
+- added tests in `backend/tests/fareServiceCrowdsource.test.ts`
+- live check confirmed blended output after submitting a new fare report
+
 ### Next Tasks
-- 3.4 Update fare estimate logic to incorporate recent crowdsourced fare reports
+- 3.5 Build Report Fare UI flow on RouteView and connect to `POST /fare/report`
