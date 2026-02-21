@@ -181,3 +181,9 @@ export type AuthProfileResponse = {
     role: "user" | "champion" | "conductor" | "admin";
   };
 };
+
+export type AuthLoginResponse = {
+  token?: string;
+  accessToken?: string;
+  user: AuthProfileResponse["user"];
+};

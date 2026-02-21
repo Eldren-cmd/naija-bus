@@ -6,6 +6,7 @@ import type { ToastTone } from "./ToastStack";
 type TripRecorderProps = {
   routeId?: string | null;
   routeName?: string;
+  authToken?: string | null;
   onCheckpointsChange?: (checkpoints: TripCheckpoint[]) => void;
   onToast?: (tone: ToastTone, message: string) => void;
 };
@@ -17,7 +18,6 @@ type StopRecordingOptions = {
 };
 
 const CAPTURE_INTERVAL_MS = 5000;
-const TOKEN_STORAGE_KEY = "naija_transport_jwt";
 const PREVIEW_WIDTH = 640;
 const PREVIEW_HEIGHT = 220;
 const PREVIEW_PADDING = 16;
@@ -130,10 +130,10 @@ const toPolylinePoints = (checkpoints: TripCheckpoint[]): string | null => {
 export function TripRecorder({
   routeId,
   routeName,
+  authToken,
   onCheckpointsChange,
   onToast,
 }: TripRecorderProps) {
-  const [token, setToken] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [checkpoints, setCheckpoints] = useState<TripCheckpoint[]>([]);
@@ -145,11 +145,6 @@ export function TripRecorder({
   const [permissionDenied, setPermissionDenied] = useState(false);
   const watchIdRef = useRef<number | null>(null);
   const lastCapturedAtRef = useRef<number>(0);
-
-  useEffect(() => {
-    const saved = window.localStorage.getItem(TOKEN_STORAGE_KEY);
-    if (saved) setToken(saved);
-  }, []);
 
   useEffect(() => {
     onCheckpointsChange?.(checkpoints);
@@ -189,16 +184,6 @@ export function TripRecorder({
       }
     };
   }, []);
-
-  const handleTokenChange = (nextToken: string) => {
-    setToken(nextToken);
-    const normalized = nextToken.trim();
-    if (!normalized) {
-      window.localStorage.removeItem(TOKEN_STORAGE_KEY);
-      return;
-    }
-    window.localStorage.setItem(TOKEN_STORAGE_KEY, normalized);
-  };
 
   const stopRecording = (options: StopRecordingOptions = {}) => {
     if (watchIdRef.current !== null) {
@@ -302,9 +287,9 @@ export function TripRecorder({
       return;
     }
 
-    const authToken = token.trim();
-    if (!authToken) {
-      const message = "JWT is required. Login first, then paste your token.";
+    const normalizedToken = authToken?.trim();
+    if (!normalizedToken) {
+      const message = "Sign in first to upload trip records.";
       setError(message);
       onToast?.("error", message);
       return;
@@ -322,7 +307,7 @@ export function TripRecorder({
           startedAt,
           endedAt,
         },
-        authToken,
+        normalizedToken,
       );
 
       onToast?.(
@@ -360,6 +345,9 @@ export function TripRecorder({
           ? `Record your live movement for ${routeName}. Checkpoints are sampled every 5 seconds.`
           : "Start a trip recording session. Checkpoints are sampled every 5 seconds."}
       </p>
+      {!authToken?.trim() && (
+        <p className="muted small">Sign in from `/login` before uploading recorded trips.</p>
+      )}
       <p className="muted small">Location permission: {formatPermissionState(geoPermissionState)}</p>
 
       {(permissionDenied || geoPermissionState === "denied") && (
@@ -428,16 +416,6 @@ export function TripRecorder({
                 <p className="muted">Trip path preview requires at least 2 checkpoints.</p>
               )}
             </div>
-
-            <label className="trip-token-field">
-              JWT token
-              <input
-                type="password"
-                value={token}
-                placeholder="Paste Bearer token from login"
-                onChange={(event) => handleTokenChange(event.target.value)}
-              />
-            </label>
 
             <div className="modal-actions">
               <button type="button" className="secondary-btn" onClick={() => setIsPreviewOpen(false)}>

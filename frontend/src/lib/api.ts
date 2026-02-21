@@ -1,4 +1,5 @@
 import type {
+  AuthLoginResponse,
   AuthProfileResponse,
   Bbox,
   FareEstimate,
@@ -126,4 +127,26 @@ export const getTripsByUser = async (
     `/api/v1/trips?userId=${encodeURIComponent(userId)}`,
     authToken,
   );
+};
+
+type LoginInput = {
+  email: string;
+  password: string;
+};
+
+export const loginUser = async (input: LoginInput): Promise<AuthLoginResponse> => {
+  const response = await fetch(`${API_BASE}/api/v1/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(input),
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseErrorMessage(response));
+  }
+
+  return (await response.json()) as AuthLoginResponse;
 };

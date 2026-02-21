@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { reportFare } from "../lib/api";
 import type { ToastTone } from "./ToastStack";
 import type { TrafficLevel } from "../types";
@@ -7,35 +7,22 @@ import type { FormEvent } from "react";
 type ReportFarePanelProps = {
   routeId: string | null;
   routeName?: string;
+  authToken?: string | null;
   onSubmitted?: () => void;
   onToast?: (tone: ToastTone, message: string) => void;
 };
 
-const TOKEN_STORAGE_KEY = "naija_transport_jwt";
-
-export function ReportFarePanel({ routeId, routeName, onSubmitted, onToast }: ReportFarePanelProps) {
-  const [token, setToken] = useState("");
+export function ReportFarePanel({
+  routeId,
+  routeName,
+  authToken,
+  onSubmitted,
+  onToast,
+}: ReportFarePanelProps) {
   const [reportedFare, setReportedFare] = useState("");
   const [trafficLevel, setTrafficLevel] = useState<TrafficLevel>("medium");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    const saved = window.localStorage.getItem(TOKEN_STORAGE_KEY);
-    if (saved) {
-      setToken(saved);
-    }
-  }, []);
-
-  const handleTokenChange = (nextToken: string) => {
-    setToken(nextToken);
-    const normalized = nextToken.trim();
-    if (!normalized) {
-      window.localStorage.removeItem(TOKEN_STORAGE_KEY);
-      return;
-    }
-    window.localStorage.setItem(TOKEN_STORAGE_KEY, normalized);
-  };
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -45,9 +32,9 @@ export function ReportFarePanel({ routeId, routeName, onSubmitted, onToast }: Re
       return;
     }
 
-    const authToken = token.trim();
-    if (!authToken) {
-      onToast?.("error", "JWT is required. Login first, then paste your token.");
+    const normalizedToken = authToken?.trim();
+    if (!normalizedToken) {
+      onToast?.("error", "Sign in first to submit fare reports.");
       return;
     }
 
@@ -66,7 +53,7 @@ export function ReportFarePanel({ routeId, routeName, onSubmitted, onToast }: Re
           trafficLevel,
           notes: notes.trim() || undefined,
         },
-        authToken,
+        normalizedToken,
       );
 
       setReportedFare("");
@@ -87,18 +74,11 @@ export function ReportFarePanel({ routeId, routeName, onSubmitted, onToast }: Re
       <p className="muted">
         {routeName ? `Submit your latest fare for ${routeName}.` : "Select a route to submit your latest fare."}
       </p>
+      {!authToken?.trim() && (
+        <p className="muted small">Sign in from `/login` to enable fare report submission.</p>
+      )}
 
       <form className="report-form" onSubmit={onSubmit}>
-        <label>
-          JWT token
-          <input
-            type="password"
-            placeholder="Paste Bearer token from login"
-            value={token}
-            onChange={(event) => handleTokenChange(event.target.value)}
-          />
-        </label>
-
         <div className="report-grid">
           <label>
             Reported fare (NGN)

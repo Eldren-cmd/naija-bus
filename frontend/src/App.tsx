@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "./auth/AuthContext";
 import { FareEstimate } from "./components/FareEstimate";
+import { LoginPage } from "./components/LoginPage";
 import { ReportFarePanel } from "./components/ReportFarePanel";
 import { RouteView } from "./components/RouteView";
 import { SearchInput } from "./components/SearchInput";
@@ -12,8 +14,6 @@ import { getAuthProfile, getRouteById, getRoutes, getTripsByUser } from "./lib/a
 import type { RouteDetail, RouteSummary, TripCheckpoint, TripRecordResponse } from "./types";
 import type { ToastItem, ToastTone } from "./components/ToastStack";
 import "./App.css";
-
-const TOKEN_STORAGE_KEY = "naija_transport_jwt";
 
 const formatDistance = (meters: number): string => {
   if (meters >= 1000) return `${(meters / 1000).toFixed(2)} km`;
@@ -32,6 +32,8 @@ const formatDateTime = (value: string): string => {
 };
 
 function PrimaryNav({ active }: { active: "routes" | "my-trips" }) {
+  const { isAuthenticated, user, clearSession } = useAuth();
+
   return (
     <nav className="top-nav">
       <Link to="/" className={`top-nav-link ${active === "routes" ? "active" : ""}`}>
@@ -40,6 +42,18 @@ function PrimaryNav({ active }: { active: "routes" | "my-trips" }) {
       <Link to="/my-trips" className={`top-nav-link ${active === "my-trips" ? "active" : ""}`}>
         My Trips
       </Link>
+      {isAuthenticated ? (
+        <>
+          <span className="top-nav-user">Signed in: {user?.fullName || user?.email || "User"}</span>
+          <button type="button" className="top-nav-link top-nav-logout" onClick={clearSession}>
+            Logout
+          </button>
+        </>
+      ) : (
+        <Link to="/login" className="top-nav-link">
+          Login
+        </Link>
+      )}
     </nav>
   );
 }
@@ -47,6 +61,7 @@ function PrimaryNav({ active }: { active: "routes" | "my-trips" }) {
 function RouteFinderPage() {
   const navigate = useNavigate();
   const { routeId } = useParams<{ routeId: string }>();
+  const { accessToken } = useAuth();
 
   const [searchInput, setSearchInput] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
@@ -236,6 +251,7 @@ function RouteFinderPage() {
           <TripRecorder
             routeId={selectedRouteId}
             routeName={selectedRoute?.name}
+            authToken={accessToken}
             onCheckpointsChange={setTripCheckpoints}
             onToast={notify}
           />
@@ -247,10 +263,16 @@ function RouteFinderPage() {
           <ReportFarePanel
             routeId={selectedRouteId}
             routeName={selectedRoute?.name}
+            authToken={accessToken}
             onSubmitted={() => setFareRefreshNonce((previous) => previous + 1)}
             onToast={notify}
           />
-          <TrafficReportModal routeId={selectedRouteId} routeName={selectedRoute?.name} onToast={notify} />
+          <TrafficReportModal
+            routeId={selectedRouteId}
+            routeName={selectedRoute?.name}
+            authToken={accessToken}
+            onToast={notify}
+          />
         </section>
       </section>
       <ToastStack toasts={toasts} onDismiss={dismissToast} />
@@ -259,20 +281,20 @@ function RouteFinderPage() {
 }
 
 function MyTripsPage() {
-  const [token, setToken] = useState("");
+  const { accessToken, isAuthenticated, user } = useAuth();
   const [profileName, setProfileName] = useState<string | null>(null);
   const [trips, setTrips] = useState<TripRecordResponse[]>([]);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadTripsWithToken = async (authToken: string) => {
+  const loadTripsWithToken = async (token: string) => {
     setLoading(true);
     setError(null);
     try {
-      const profile = await getAuthProfile(authToken);
+      const profile = await getAuthProfile(token);
       setProfileName(profile.user.fullName);
-      const data = await getTripsByUser(profile.user.id, authToken);
+      const data = await getTripsByUser(profile.user.id, token);
       setTrips(data);
       setSelectedTripId((previous) => {
         if (previous && data.some((trip) => trip._id === previous)) return previous;
@@ -290,30 +312,16 @@ function MyTripsPage() {
   };
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(TOKEN_STORAGE_KEY);
-    if (!saved) return;
-    setToken(saved);
-    void loadTripsWithToken(saved);
-  }, []);
-
-  const handleTokenChange = (nextToken: string) => {
-    setToken(nextToken);
-    const normalized = nextToken.trim();
-    if (!normalized) {
-      window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+    const normalizedToken = accessToken?.trim();
+    if (!normalizedToken) {
+      setTrips([]);
+      setSelectedTripId(null);
+      setProfileName(null);
+      setError(null);
       return;
     }
-    window.localStorage.setItem(TOKEN_STORAGE_KEY, normalized);
-  };
-
-  const onLoadTrips = () => {
-    const authToken = token.trim();
-    if (!authToken) {
-      setError("JWT is required. Login first, then paste your token.");
-      return;
-    }
-    void loadTripsWithToken(authToken);
-  };
+    void loadTripsWithToken(normalizedToken);
+  }, [accessToken]);
 
   const selectedTrip =
     selectedTripId && trips.length > 0 ? trips.find((trip) => trip._id === selectedTripId) ?? null : null;
@@ -332,28 +340,41 @@ function MyTripsPage() {
         <section className="mytrips-toolbar card">
           <h3 className="panel-title">Trip History Loader</h3>
           <p className="muted">
-            {profileName ? `Signed in as ${profileName}` : "Load your account profile and trip history."}
+            {profileName || user?.fullName
+              ? `Signed in as ${profileName || user?.fullName}`
+              : "Sign in to load your account profile and trip history."}
           </p>
-          <label className="mytrips-token-field">
-            JWT token
-            <input
-              type="password"
-              placeholder="Paste Bearer token from login"
-              value={token}
-              onChange={(event) => handleTokenChange(event.target.value)}
-            />
-          </label>
-          <button type="button" className="estimate-btn" onClick={onLoadTrips} disabled={loading}>
-            {loading ? "Loading..." : "Load My Trips"}
-          </button>
+          {!isAuthenticated && (
+            <Link to="/login" className="estimate-btn mytrips-login-link">
+              Login to Continue
+            </Link>
+          )}
+          {isAuthenticated && (
+            <button
+              type="button"
+              className="estimate-btn"
+              onClick={() => {
+                if (!accessToken) return;
+                void loadTripsWithToken(accessToken);
+              }}
+              disabled={loading}
+            >
+              {loading ? "Loading..." : "Reload My Trips"}
+            </button>
+          )}
           {error && <p className="error-text">{error}</p>}
         </section>
 
         <section className="mytrips-main">
           <section className="mytrips-list">
+            {!isAuthenticated && (
+              <div className="mytrip-empty card">
+                <p className="muted">You are signed out. Login first to view your trip history.</p>
+              </div>
+            )}
             {loading && <p className="muted">Loading trip history...</p>}
 
-            {!loading && trips.length === 0 && (
+            {isAuthenticated && !loading && trips.length === 0 && (
               <div className="mytrip-empty card">
                 <p className="muted">No uploaded trips yet. Record and upload your first trip from Route Finder.</p>
               </div>
@@ -409,6 +430,7 @@ function MyTripsPage() {
 function App() {
   return (
     <Routes>
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<RouteFinderPage />} />
       <Route path="/route/:routeId" element={<RouteFinderPage />} />
       <Route path="/my-trips" element={<MyTripsPage />} />

@@ -675,3 +675,43 @@ Notes:
 
 ### Next Tasks
 - Continue to Phase 5 in strict order starting with `5.1`.
+
+## Phase 5 - Auth, Admin & UX Polish
+
+### Task 5.1
+- Build Login page (`POST /auth/login`); store access token in memory; refresh token in httpOnly cookie
+
+Status: complete. Implemented:
+- backend auth updates:
+  - `POST /api/v1/auth/login` now sets refresh token cookie (`httpOnly`) and returns access token payload
+  - added refresh token helpers in `backend/src/lib/auth.ts` (`signRefreshToken`, `verifyRefreshToken`) for upcoming `5.3`
+  - enabled credentialed CORS in `backend/src/server.ts` (`credentials: true`)
+  - added refresh token env placeholders in `backend/.env.example`:
+    - `JWT_REFRESH_SECRET`
+    - `JWT_REFRESH_EXPIRES_IN`
+    - `REFRESH_TOKEN_COOKIE_NAME`
+- frontend auth/session updates:
+  - added auth context/provider:
+    - `frontend/src/auth/AuthContext.ts`
+    - `frontend/src/auth/AuthProvider.tsx`
+  - access token is now held in memory (React state), not localStorage
+  - added login API helper with `credentials: "include"`:
+    - `loginUser` in `frontend/src/lib/api.ts`
+  - added login page UI:
+    - `frontend/src/components/LoginPage.tsx`
+    - route `/login` in `frontend/src/App.tsx`
+  - app nav now shows login/logout session state and signed-in identity
+  - refactored token-gated actions to consume in-memory auth token via props/context:
+    - `TripRecorder`
+    - `ReportFarePanel`
+    - `TrafficReportModal`
+    - `MyTripsPage`
+  - removed frontend localStorage JWT persistence flow (`naija_transport_jwt`)
+- validation checks passed:
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
+### Next Tasks
+- Continue Phase 5 in strict order: `5.2` (Signup page + auto-login after registration).

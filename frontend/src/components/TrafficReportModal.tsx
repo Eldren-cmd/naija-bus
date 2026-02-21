@@ -7,10 +7,9 @@ import type { ReportSeverity, ReportType } from "../types";
 type TrafficReportModalProps = {
   routeId: string | null;
   routeName?: string;
+  authToken?: string | null;
   onToast?: (tone: ToastTone, message: string) => void;
 };
-
-const TOKEN_STORAGE_KEY = "naija_transport_jwt";
 
 const REPORT_TYPE_OPTIONS: ReportType[] = [
   "traffic",
@@ -25,9 +24,8 @@ const REPORT_SEVERITY_OPTIONS: ReportSeverity[] = ["low", "medium", "high"];
 
 const formatTypeLabel = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
-export function TrafficReportModal({ routeId, routeName, onToast }: TrafficReportModalProps) {
+export function TrafficReportModal({ routeId, routeName, authToken, onToast }: TrafficReportModalProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [token, setToken] = useState("");
   const [type, setType] = useState<ReportType>("traffic");
   const [severity, setSeverity] = useState<ReportSeverity>("medium");
   const [description, setDescription] = useState("");
@@ -38,28 +36,11 @@ export function TrafficReportModal({ routeId, routeName, onToast }: TrafficRepor
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(TOKEN_STORAGE_KEY);
-    if (saved) {
-      setToken(saved);
-    }
-  }, []);
-
-  useEffect(() => {
     if (!isOpen) return;
     if (lng && lat) return;
     void requestLocation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
-
-  const handleTokenChange = (nextToken: string) => {
-    setToken(nextToken);
-    const normalized = nextToken.trim();
-    if (!normalized) {
-      window.localStorage.removeItem(TOKEN_STORAGE_KEY);
-      return;
-    }
-    window.localStorage.setItem(TOKEN_STORAGE_KEY, normalized);
-  };
 
   const requestLocation = async () => {
     if (!window.navigator.geolocation) {
@@ -96,6 +77,10 @@ export function TrafficReportModal({ routeId, routeName, onToast }: TrafficRepor
   };
 
   const openModal = () => {
+    if (!authToken?.trim()) {
+      onToast?.("error", "Sign in first to submit incident reports.");
+      return;
+    }
     resetModalState();
     setIsOpen(true);
   };
@@ -108,9 +93,9 @@ export function TrafficReportModal({ routeId, routeName, onToast }: TrafficRepor
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const authToken = token.trim();
-    if (!authToken) {
-      onToast?.("error", "JWT is required. Login first, then paste your token.");
+    const normalizedToken = authToken?.trim();
+    if (!normalizedToken) {
+      onToast?.("error", "Sign in first to submit incident reports.");
       return;
     }
 
@@ -141,7 +126,7 @@ export function TrafficReportModal({ routeId, routeName, onToast }: TrafficRepor
             coordinates: [parsedLng, parsedLat],
           },
         },
-        authToken,
+        normalizedToken,
       );
 
       onToast?.("success", "Incident report submitted successfully.");
@@ -162,6 +147,9 @@ export function TrafficReportModal({ routeId, routeName, onToast }: TrafficRepor
           ? `Report live conditions for ${routeName}.`
           : "Report traffic, police stops, roadblocks, and hazards around you."}
       </p>
+      {!authToken?.trim() && (
+        <p className="muted small">Sign in from `/login` to submit traffic reports.</p>
+      )}
       <button type="button" className="estimate-btn report-open-btn" onClick={openModal}>
         Open Traffic Report Modal
       </button>
@@ -177,16 +165,6 @@ export function TrafficReportModal({ routeId, routeName, onToast }: TrafficRepor
             </div>
 
             <form className="report-form" onSubmit={onSubmit}>
-              <label>
-                JWT token
-                <input
-                  type="password"
-                  placeholder="Paste Bearer token from login"
-                  value={token}
-                  onChange={(event) => handleTokenChange(event.target.value)}
-                />
-              </label>
-
               <div className="report-grid">
                 <label>
                   Type

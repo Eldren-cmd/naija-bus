@@ -85,7 +85,11 @@ describe("Phase 2 integration endpoints", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.token).toEqual(expect.any(String));
+    expect(response.body.accessToken).toEqual(expect.any(String));
     expect(response.body.user.email).toBe("rider@example.com");
+    expect(response.headers["set-cookie"]).toEqual(
+      expect.arrayContaining([expect.stringMatching(/^naija_refresh_token=/)]),
+    );
     expect(save).toHaveBeenCalledTimes(1);
   });
 

@@ -2,11 +2,14 @@ import bcrypt from "bcryptjs";
 import { Request, Response, Router } from "express";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { User } from "../models";
-import { signAccessToken } from "../lib/auth";
+import { signAccessToken, signRefreshToken } from "../lib/auth";
 import { AppUserRole } from "../types/auth";
 import { validateLoginBody, validateRegisterBody } from "../validation/requestSchemas";
 
 const authRouter = Router();
+const REFRESH_TOKEN_COOKIE_NAME = process.env.REFRESH_TOKEN_COOKIE_NAME || "naija_refresh_token";
+const REFRESH_COOKIE_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 30;
+const REFRESH_COOKIE_SECURE = process.env.NODE_ENV === "production";
 
 const sanitizeUser = (user: {
   _id: unknown;
@@ -19,6 +22,16 @@ const sanitizeUser = (user: {
   email: user.email,
   role: user.role,
 });
+
+const setRefreshCookie = (res: Response, refreshToken: string) => {
+  res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
+    httpOnly: true,
+    secure: REFRESH_COOKIE_SECURE,
+    sameSite: "lax",
+    path: "/",
+    maxAge: REFRESH_COOKIE_MAX_AGE_MS,
+  });
+};
 
 authRouter.post("/register", async (req: Request, res: Response) => {
   try {
@@ -51,7 +64,7 @@ authRouter.post("/register", async (req: Request, res: Response) => {
       role: created.role,
     });
 
-    return res.status(201).json({ token, user: sanitizeUser(created) });
+    return res.status(201).json({ token, accessToken: token, user: sanitizeUser(created) });
   } catch (error) {
     return res.status(500).json({ error: "failed to register user" });
   }
@@ -79,13 +92,19 @@ authRouter.post("/login", async (req: Request, res: Response) => {
     user.lastLoginAt = new Date();
     await user.save();
 
-    const token = signAccessToken({
+    const accessToken = signAccessToken({
       sub: String(user._id),
       email: user.email,
       role: user.role,
     });
+    const refreshToken = signRefreshToken({
+      sub: String(user._id),
+      email: user.email,
+      role: user.role,
+    });
+    setRefreshCookie(res, refreshToken);
 
-    return res.status(200).json({ token, user: sanitizeUser(user) });
+    return res.status(200).json({ token: accessToken, accessToken, user: sanitizeUser(user) });
   } catch (error) {
     return res.status(500).json({ error: "failed to login user" });
   }

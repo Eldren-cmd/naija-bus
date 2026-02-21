@@ -57,6 +57,7 @@ This repository is being built strictly from:
 - [x] Phase 4 / Task 4.7: MyTrips trip-card click now redraws stored checkpoint polyline on replay map
 - [x] Phase 4 / Task 4.8: TripRecorder now handles blocked geolocation permission with explicit UX + retry guidance
 - [x] Phase 4 / Task 4.9: Backend now emits realtime `trip:recorded` event after successful trip upload
+- [x] Phase 5 / Task 5.1: Login page added; access token now held in memory; backend login sets refresh token in httpOnly cookie
 
 ## Working Rules for This Build
 - Move step-by-step in task order.
@@ -86,6 +87,9 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 - `SEARCH_RATE_LIMIT_MAX`: max requests per window for `/search`.
 - `ROUTES_RATE_LIMIT_WINDOW_MS`: window size for `/routes` rate limit.
 - `ROUTES_RATE_LIMIT_MAX`: max requests per window for `/routes`.
+- `JWT_REFRESH_SECRET`: refresh token signing secret (falls back to `JWT_SECRET` if omitted).
+- `JWT_REFRESH_EXPIRES_IN`: refresh token expiry (default `30d`).
+- `REFRESH_TOKEN_COOKIE_NAME`: cookie key used for refresh token storage (`naija_refresh_token` default).
 
 ### Frontend Keys
 - `VITE_API_BASE`: backend base URL used by frontend API calls.

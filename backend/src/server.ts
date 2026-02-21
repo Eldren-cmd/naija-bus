@@ -29,7 +29,12 @@ export const app = express();
 const port = Number(process.env.PORT || 5000);
 const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
 
-app.use(cors({ origin: corsOrigin }));
+app.use(
+  cors({
+    origin: corsOrigin,
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use("/auth", authRouter);
 app.use("/api/v1/auth", authRouter);
