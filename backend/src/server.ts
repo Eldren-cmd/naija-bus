@@ -2,6 +2,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { connectToDatabase, ensureCoreIndexes, getDatabaseStatus } from "./config/db";
+import { authRouter } from "./routes/auth";
 
 dotenv.config();
 
@@ -11,6 +12,8 @@ const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
 
 app.use(cors({ origin: corsOrigin }));
 app.use(express.json());
+app.use("/auth", authRouter);
+app.use("/api/v1/auth", authRouter);
 
 app.get("/api/v1/health", (_req, res) => {
   res.status(200).json({

@@ -11,8 +11,9 @@ This repository is being built strictly from:
 - [x] Phase 1 / Task 1.4: MongoDB Atlas connection tested from backend
 - [x] Phase 1 / Task 1.5: Created 6 Mongoose models (Route, Stop, Fare, Report, User, TripRecord)
 - [x] Phase 1 / Task 1.6: Created 2dsphere + TTL indexes for route/stop/report collections
+- [x] Phase 1 / Task 1.7: Implemented auth routes (`POST /auth/register`, `POST /auth/login`) with bcrypt + JWT
 - [x] Social post archive initialized (`social_posts/`)
-- [ ] Remaining Phase 1 tasks (1.7 to 1.12)
+- [ ] Remaining Phase 1 tasks (1.8 to 1.12)
 
 ## Working Rules for This Build
 - Move step-by-step in task order.

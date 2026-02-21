@@ -42,7 +42,18 @@ Status: complete. All 6 model files created and backend TypeScript build passes.
 
 Status: complete. Indexes are present in Atlas and TTL seconds verified as `604800`.
 
+## Task 1.7
+- Implement auth routes with bcrypt + JWT
+- `POST /auth/register`
+- `POST /auth/login`
+
+Status: complete. Live checks confirm:
+- register returns `201` + JWT
+- login returns `200` + JWT
+- duplicate register returns `409`
+- wrong password returns `401`
+
 ## Next Tasks
-- 1.7 Implement auth routes with bcrypt + JWT
 - 1.8 Add JWT middleware for protected routes
 - 1.9 Create `.env.example` files and document required keys
+- 1.10 Write seed script for 5 Lagos corridors
