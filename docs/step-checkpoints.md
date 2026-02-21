@@ -396,6 +396,20 @@ Status: complete. Implemented:
 - added incident report request/response types in `frontend/src/types.ts`
 - added modal + location UI styles in `frontend/src/App.css`
 
+### Task 3.9
+- Add report markers layer to map (severity color coding)
+
+Status: complete. Implemented:
+- extended frontend API client with `GET /api/v1/reports?bbox=` helper
+- added report bbox typing in `frontend/src/types.ts`
+- updated `frontend/src/components/RouteMap.tsx` to:
+  - fetch active reports for route viewport bbox
+  - render report markers as a dedicated map layer
+  - color-code markers by severity (`high`/`medium`/`low`)
+  - scale marker radius by severity
+  - show marker popup summary on click
+- added map legend + live report count/error UX in `frontend/src/App.css`
+
 ### Next Tasks
 - DevPlan alignment backlog from Phase 2: cleared
-- 3.9 Add report markers layer to map (severity color coding)
+- 3.10 Add frontend Socket.IO client for real-time report marker updates

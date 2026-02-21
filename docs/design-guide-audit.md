@@ -27,9 +27,10 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Guide recommends toast feedback for submissions; current report success uses inline message text.
 
 4. Realtime map signals
-- Severity-based report marker colors (`high`/`medium`/`low`) are not yet present on map.
+- Severity-based report marker colors are now present on the map.
+- Live marker updates over Socket.IO are still pending.
 
 ## Implementation Note
 
 These design items align directly with pending DevPlan tasks:
-- `3.9`, `3.10`, `3.11`
+- `3.10`, `3.11`

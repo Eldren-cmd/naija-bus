@@ -44,6 +44,7 @@ This repository is being built strictly from:
 - [x] Phase 3 / Task 3.6: Fare estimate logic now blends rule-based fare with recent crowdsourced fare reports
 - [x] Phase 3 / Task 3.7: Frontend Report Fare flow added and connected to authenticated `POST /fare/report`
 - [x] Phase 3 / Task 3.8: Traffic report modal added with type/severity/description and auto-filled geolocation for authenticated `POST /reports`
+- [x] Phase 3 / Task 3.9: Route map now renders severity-coded incident markers from `GET /reports?bbox=`
 
 ## Working Rules for This Build
 - Move step-by-step in task order.

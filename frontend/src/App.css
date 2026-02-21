@@ -321,9 +321,55 @@
   width: 100%;
   height: 280px;
   border-radius: 0.9rem;
-  margin-bottom: 0.95rem;
+  margin-bottom: 0.55rem;
   border: 1px solid #ddc4a8;
   overflow: hidden;
+}
+
+.route-map-wrap {
+  margin-bottom: 0.95rem;
+}
+
+.map-report-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.7rem;
+  align-items: center;
+  margin-bottom: 0.35rem;
+  font-size: 0.78rem;
+  color: #33485f;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+}
+
+.report-dot {
+  width: 0.62rem;
+  height: 0.62rem;
+  border-radius: 999px;
+  display: inline-block;
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 1px rgba(20, 43, 69, 0.18);
+}
+
+.report-dot-high {
+  background: #d43d2d;
+}
+
+.report-dot-medium {
+  background: #e08c2c;
+}
+
+.report-dot-low {
+  background: #2c9c6a;
+}
+
+.map-report-meta {
+  margin: 0;
+  font-size: 0.78rem;
 }
 
 .panel-title {

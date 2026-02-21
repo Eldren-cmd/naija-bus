@@ -1,4 +1,5 @@
 import type {
+  Bbox,
   FareEstimate,
   FareReportInput,
   FareReportResponse,
@@ -91,4 +92,9 @@ export const reportIncident = async (
   authToken: string,
 ): Promise<IncidentReportResponse> => {
   return apiPost<IncidentReportResponse>("/api/v1/reports", input, authToken);
+};
+
+export const getReportsByBbox = async (bbox: Bbox): Promise<IncidentReportResponse[]> => {
+  const query = bbox.join(",");
+  return apiGet<IncidentReportResponse[]>(`/api/v1/reports?bbox=${encodeURIComponent(query)}`);
 };

@@ -3,6 +3,7 @@ export type TrafficLevel = "low" | "medium" | "high";
 export type TimeBand = "off_peak" | "normal" | "rush_hour";
 export type ReportType = "traffic" | "police" | "roadblock" | "accident" | "hazard" | "other";
 export type ReportSeverity = "low" | "medium" | "high";
+export type Bbox = [number, number, number, number];
 
 export type RouteSummary = {
   _id: string;
@@ -128,3 +129,5 @@ export type IncidentReportResponse = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type ViewportReport = IncidentReportResponse;
