@@ -627,6 +627,26 @@
   margin: 0 0 0.55rem;
 }
 
+.trip-permission-warning {
+  margin: 0.55rem 0 0.2rem;
+  border: 1px solid #e7b1b1;
+  border-radius: 0.8rem;
+  background: #fceeee;
+  padding: 0.62rem 0.68rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.trip-permission-warning p {
+  margin: 0;
+  color: #7b2424;
+  font-size: 0.82rem;
+}
+
+.trip-permission-warning .secondary-btn {
+  width: fit-content;
+}
+
 .trip-recorder-latest {
   border: 1px solid #d7e2ee;
   border-radius: 0.8rem;

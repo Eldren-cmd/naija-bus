@@ -18,10 +18,10 @@ Status labels:
 | 4.5 | complete | TripRecorder now supports Stop->preview modal with path/distance and upload to `POST /trips`. |
 | 4.6 | complete | `MyTrips` page added with authenticated trip history fetch and trip cards. |
 | 4.7 | complete | MyTrips now supports card-click selection and redraws stored checkpoint path on a replay map using GeoJSON line data. |
-| 4.8 | missing | Geolocation denial UX handling for trip recorder not implemented yet. |
+| 4.8 | complete | TripRecorder now handles blocked location permissions with explicit UX messaging, retry flow, and cleaner error behavior. |
 | 4.9 | missing | `trip:recorded` socket emit not implemented yet. |
 
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `4.8` next.
+1. Continue with `4.9` next.
 2. Keep progressing sequentially through Phase 4 tasks.

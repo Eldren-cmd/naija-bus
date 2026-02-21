@@ -19,6 +19,7 @@ React + TypeScript + Vite frontend for Naija Transport.
 - Trip preview + upload modal flow (`POST /api/v1/trips`) from recorder stop action
 - MyTrips page with authenticated trip history cards (`GET /api/v1/trips?userId=...`)
 - MyTrips trip replay map: selecting a trip card redraws stored checkpoint path on Mapbox
+- TripRecorder geolocation-denied UX: explicit blocked-permission warning with retry guidance
 
 ## Environment
 Create `frontend/.env` with:

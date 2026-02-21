@@ -619,5 +619,24 @@ Status: complete. Implemented:
   - `npm --prefix frontend run lint`
   - `npm --prefix frontend run build`
 
+### Task 4.8
+- Handle geolocation-denied UX path for trip recorder
+
+Status: complete. Implemented:
+- updated `frontend/src/components/TripRecorder.tsx`:
+  - added explicit geolocation permission state tracking (`granted`/`prompt`/`blocked`/fallback)
+  - added permission-aware start guard:
+    - if browser permission is already blocked, recorder does not start and shows actionable error
+  - added geolocation error mapping:
+    - permission denied
+    - timeout
+    - generic unavailable fallback
+  - prevented false "need 2 checkpoints" error when recorder stops due to permission failure
+  - added blocked-permission warning panel with retry button (`Retry Location Access`)
+- updated trip recorder styling in `frontend/src/App.css` for permission warning UI
+- validation checks passed:
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
 ### Next Tasks
-- Continue Phase 4 in strict order: `4.8` (geolocation-denied UX path for trip recorder)
+- Continue Phase 4 in strict order: `4.9` (`trip:recorded` socket emit integration)

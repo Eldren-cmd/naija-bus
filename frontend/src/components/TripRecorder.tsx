@@ -10,6 +10,12 @@ type TripRecorderProps = {
   onToast?: (tone: ToastTone, message: string) => void;
 };
 
+type GeoPermissionState = PermissionState | "unsupported" | "unknown";
+type StopRecordingOptions = {
+  suppressPreview?: boolean;
+  skipCheckpointError?: boolean;
+};
+
 const CAPTURE_INTERVAL_MS = 5000;
 const TOKEN_STORAGE_KEY = "naija_transport_jwt";
 const PREVIEW_WIDTH = 640;
@@ -63,6 +69,38 @@ const formatDuration = (seconds: number): string => {
   return `${mins}m ${secs}s`;
 };
 
+const formatPermissionState = (state: GeoPermissionState): string => {
+  if (state === "granted") return "granted";
+  if (state === "denied") return "blocked";
+  if (state === "prompt") return "prompt";
+  if (state === "unsupported") return "not detectable";
+  return "checking";
+};
+
+const getGeoErrorMessage = (
+  positionError: GeolocationPositionError,
+): { message: string; denied: boolean } => {
+  if (positionError.code === positionError.PERMISSION_DENIED) {
+    return {
+      message:
+        "Location access is blocked. Enable location permission for this site in browser settings, then retry.",
+      denied: true,
+    };
+  }
+
+  if (positionError.code === positionError.TIMEOUT) {
+    return {
+      message: "Location request timed out. Move to a clear-signal area and retry recording.",
+      denied: false,
+    };
+  }
+
+  return {
+    message: "Unable to track position. Check location services and try again.",
+    denied: false,
+  };
+};
+
 const toPolylinePoints = (checkpoints: TripCheckpoint[]): string | null => {
   if (checkpoints.length < 2) return null;
 
@@ -103,6 +141,8 @@ export function TripRecorder({
   const [tripEndedAt, setTripEndedAt] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [geoPermissionState, setGeoPermissionState] = useState<GeoPermissionState>("unknown");
+  const [permissionDenied, setPermissionDenied] = useState(false);
   const watchIdRef = useRef<number | null>(null);
   const lastCapturedAtRef = useRef<number>(0);
 
@@ -114,6 +154,33 @@ export function TripRecorder({
   useEffect(() => {
     onCheckpointsChange?.(checkpoints);
   }, [checkpoints, onCheckpointsChange]);
+
+  useEffect(() => {
+    if (!("permissions" in window.navigator) || typeof window.navigator.permissions.query !== "function") {
+      setGeoPermissionState("unsupported");
+      return;
+    }
+
+    let mounted = true;
+    let permissionStatus: PermissionStatus | null = null;
+
+    const loadPermissionState = async () => {
+      try {
+        permissionStatus = await window.navigator.permissions.query({ name: "geolocation" });
+        if (!mounted) return;
+        setGeoPermissionState(permissionStatus.state);
+        permissionStatus.onchange = () => setGeoPermissionState(permissionStatus?.state ?? "unknown");
+      } catch {
+        if (mounted) setGeoPermissionState("unsupported");
+      }
+    };
+
+    void loadPermissionState();
+    return () => {
+      mounted = false;
+      if (permissionStatus) permissionStatus.onchange = null;
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -133,7 +200,7 @@ export function TripRecorder({
     window.localStorage.setItem(TOKEN_STORAGE_KEY, normalized);
   };
 
-  const stopRecording = () => {
+  const stopRecording = (options: StopRecordingOptions = {}) => {
     if (watchIdRef.current !== null) {
       window.navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
@@ -143,7 +210,10 @@ export function TripRecorder({
     const stoppedAt = new Date().toISOString();
     setTripEndedAt(stoppedAt);
 
+    if (options.suppressPreview) return;
+
     if (checkpoints.length < 2) {
+      if (options.skipCheckpointError) return;
       const message = "At least 2 checkpoints are required before preview and upload.";
       setError(message);
       onToast?.("error", message);
@@ -156,12 +226,24 @@ export function TripRecorder({
   const startRecording = () => {
     setError(null);
     setIsPreviewOpen(false);
+    setPermissionDenied(false);
+
     if (!window.navigator.geolocation) {
       const message = "Geolocation is not available in this browser.";
       setError(message);
       onToast?.("error", message);
       return;
     }
+
+    if (geoPermissionState === "denied") {
+      const message =
+        "Location access is currently blocked. Enable location permission for this site, then retry.";
+      setError(message);
+      setPermissionDenied(true);
+      onToast?.("error", message);
+      return;
+    }
+
     if (watchIdRef.current !== null) return;
 
     const startedAt = new Date().toISOString();
@@ -179,6 +261,8 @@ export function TripRecorder({
 
         if (!shouldCapture) return;
         lastCapturedAtRef.current = now;
+        setPermissionDenied(false);
+        setError(null);
 
         const nextCheckpoint: TripCheckpoint = {
           coords: {
@@ -193,11 +277,13 @@ export function TripRecorder({
 
         setCheckpoints((previous) => [...previous, nextCheckpoint]);
       },
-      () => {
-        const message = "Unable to track position. Check device location permission and try again.";
+      (positionError) => {
+        const { message, denied } = getGeoErrorMessage(positionError);
         setError(message);
+        setPermissionDenied(denied);
+        if (denied) setGeoPermissionState("denied");
         onToast?.("error", message);
-        stopRecording();
+        stopRecording({ suppressPreview: true, skipCheckpointError: true });
       },
       {
         enableHighAccuracy: true,
@@ -274,12 +360,24 @@ export function TripRecorder({
           ? `Record your live movement for ${routeName}. Checkpoints are sampled every 5 seconds.`
           : "Start a trip recording session. Checkpoints are sampled every 5 seconds."}
       </p>
+      <p className="muted small">Location permission: {formatPermissionState(geoPermissionState)}</p>
+
+      {(permissionDenied || geoPermissionState === "denied") && (
+        <div className="trip-permission-warning">
+          <p>
+            Location permission is blocked for this site. Enable location in your browser settings and retry.
+          </p>
+          <button type="button" className="secondary-btn" onClick={startRecording} disabled={isRecording}>
+            Retry Location Access
+          </button>
+        </div>
+      )}
 
       <div className="trip-recorder-actions">
         <button type="button" className="estimate-btn" onClick={startRecording} disabled={isRecording}>
           {isRecording ? "Recording..." : "Start Recording"}
         </button>
-        <button type="button" className="secondary-btn" onClick={stopRecording} disabled={!isRecording}>
+        <button type="button" className="secondary-btn" onClick={() => stopRecording()} disabled={!isRecording}>
           Stop & Preview
         </button>
       </div>
