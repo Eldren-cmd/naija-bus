@@ -161,5 +161,17 @@ Status: complete. Implemented:
   - invalid input -> `400`
   - unknown route -> `404`
 
+### Phase 2 Frontend MVP View
+- Build RouteView page section showing selected route + ordered stops
+- Build FareEstimate component calling `GET /fare/estimate`
+
+Status: complete. Implemented:
+- Route search + selectable route list in `frontend/src/App.tsx`
+- RouteView component in `frontend/src/components/RouteView.tsx`
+- FareEstimate component in `frontend/src/components/FareEstimate.tsx`
+- Shared API client in `frontend/src/lib/api.ts`
+- Verified frontend production build passes
+
 ### Next Tasks
-- Phase 2 backend endpoint sequence complete. Next: frontend RouteView + FareEstimate panel and integration tests.
+- Integration tests (Supertest) for Phase 2 endpoint flow
+- Map rendering task: draw selected route polyline in RouteView

@@ -26,6 +26,7 @@ This repository is being built strictly from:
 - [x] Phase 2 / Task 2.4: `GET /stops?near=lng,lat&radius=500` implemented with geospatial query
 - [x] Phase 2 / Task 2.5: Fare estimate service layer added (`fareService.ts`) with route lookup + time/traffic multipliers
 - [x] Phase 2 / Task 2.6: `GET /fare/estimate` endpoint implemented with route/time query support and fare breakdown response
+- [x] Phase 2 / Frontend MVP View: Route search + RouteView (ordered stops) + FareEstimate panel wired to backend API
 
 ## Working Rules for This Build
 - Move step-by-step in task order.
