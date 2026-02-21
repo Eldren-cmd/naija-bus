@@ -380,6 +380,22 @@ Status: complete. Implemented:
 - added report and success/error styles in `frontend/src/App.css`
 - saves JWT token locally in browser storage for repeated report submissions
 
+### Task 3.8
+- Build traffic report modal: type, severity, description, auto-fill location
+
+Status: complete. Implemented:
+- added `frontend/src/components/TrafficReportModal.tsx`
+- added modal workflow for incident reporting with:
+  - report `type`
+  - report `severity`
+  - `description`
+  - auto-fill location via browser geolocation
+  - manual lng/lat override fields
+- wired modal component into main route page (`frontend/src/App.tsx`)
+- added frontend API helper `reportIncident` in `frontend/src/lib/api.ts`
+- added incident report request/response types in `frontend/src/types.ts`
+- added modal + location UI styles in `frontend/src/App.css`
+
 ### Next Tasks
 - DevPlan alignment backlog from Phase 2: cleared
-- 3.8 Build traffic report modal: type, severity, description, auto-fill location
+- 3.9 Add report markers layer to map (severity color coding)

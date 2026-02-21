@@ -4,6 +4,7 @@ import { FareEstimate } from "./components/FareEstimate";
 import { ReportFarePanel } from "./components/ReportFarePanel";
 import { RouteView } from "./components/RouteView";
 import { SearchInput } from "./components/SearchInput";
+import { TrafficReportModal } from "./components/TrafficReportModal";
 import { getRouteById, getRoutes } from "./lib/api";
 import type { RouteDetail, RouteSummary } from "./types";
 import "./App.css";
@@ -175,6 +176,7 @@ function RouteFinderPage() {
             routeName={selectedRoute?.name}
             onSubmitted={() => setFareRefreshNonce((previous) => previous + 1)}
           />
+          <TrafficReportModal routeId={selectedRouteId} routeName={selectedRoute?.name} />
         </section>
       </section>
     </main>

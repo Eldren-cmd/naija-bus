@@ -57,8 +57,8 @@ Status labels:
 | 3.4 | complete | Socket.IO `/reports` namespace emits `report:created` + `fare:reported`. |
 | 3.5 | complete | Server-side socket filtering added via viewport/route subscriptions. |
 | 3.6 | complete | Fare estimation blends with recent crowdsourced fare reports. |
-| 3.7 | partial | Report fare flow exists, but implemented as inline panel not modal button. |
-| 3.8 | missing | Traffic report modal UI not implemented. |
+| 3.7 | complete | Frontend report fare flow implemented and connected to `POST /fare/report`. |
+| 3.8 | complete | Traffic report modal implemented with type, severity, description, and geolocation auto-fill. |
 | 3.9 | missing | Map report-marker layer by severity not implemented. |
 | 3.10 | missing | Frontend Socket.IO client reactive marker updates not implemented. |
 | 3.11 | missing | Toast component for report submission feedback not implemented. |
@@ -68,4 +68,4 @@ Status labels:
 ## Recovery Order (Strict DevPlan Alignment)
 
 1. Phase 2 backlog is cleared.
-2. Continue with remaining Phase 3 tasks: `3.8`, `3.9`, `3.10`, `3.11`, `3.13`.
+2. Continue with remaining Phase 3 tasks: `3.9`, `3.10`, `3.11`, `3.13`.

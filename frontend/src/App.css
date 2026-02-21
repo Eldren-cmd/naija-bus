@@ -409,6 +409,78 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.report-open-btn {
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.report-status {
+  margin-top: 0.6rem;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(13, 27, 42, 0.58);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.modal-card {
+  width: min(720px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  border-radius: 1rem;
+  border: 1px solid #d8c5b0;
+  background: #fffdfa;
+  padding: 1rem;
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.28);
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.modal-close-btn,
+.secondary-btn,
+.location-btn {
+  border: 1px solid #d8c5b0;
+  background: #fff;
+  color: #17324c;
+  border-radius: 0.72rem;
+  padding: 0.55rem 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.modal-close-btn:hover,
+.secondary-btn:hover,
+.location-btn:hover {
+  background: #fff4e7;
+}
+
+.location-row {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.location-grid {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
 .fare-card-top {
   margin-bottom: 0.8rem;
 }
@@ -513,5 +585,13 @@
 
   .report-grid {
     grid-template-columns: 1fr;
+  }
+
+  .location-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
   }
 }

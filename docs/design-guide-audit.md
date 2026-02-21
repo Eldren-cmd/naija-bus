@@ -32,5 +32,4 @@ Reference: `NaijaTransport_DesignGuide.docx`
 ## Implementation Note
 
 These design items align directly with pending DevPlan tasks:
-- `3.8`, `3.9`, `3.10`, `3.11`
-- plus Phase 2 UX polish gaps (`2.11`, `2.15`).
+- `3.9`, `3.10`, `3.11`

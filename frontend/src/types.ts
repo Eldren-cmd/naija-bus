@@ -1,6 +1,8 @@
 export type TransportType = "danfo" | "brt" | "keke" | "bus" | "ferry" | "mixed";
 export type TrafficLevel = "low" | "medium" | "high";
 export type TimeBand = "off_peak" | "normal" | "rush_hour";
+export type ReportType = "traffic" | "police" | "roadblock" | "accident" | "hazard" | "other";
+export type ReportSeverity = "low" | "medium" | "high";
 
 export type RouteSummary = {
   _id: string;
@@ -98,4 +100,31 @@ export type SearchResponse = {
     stops: number;
     total: number;
   };
+};
+
+export type IncidentReportInput = {
+  routeId?: string;
+  type: ReportType;
+  severity: ReportSeverity;
+  description?: string;
+  coords: {
+    type: "Point";
+    coordinates: [number, number];
+  };
+};
+
+export type IncidentReportResponse = {
+  _id: string;
+  routeId?: string;
+  userId: string;
+  type: ReportType;
+  severity: ReportSeverity;
+  description: string;
+  coords: {
+    type: "Point";
+    coordinates: [number, number];
+  };
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 };

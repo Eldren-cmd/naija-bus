@@ -2,6 +2,8 @@ import type {
   FareEstimate,
   FareReportInput,
   FareReportResponse,
+  IncidentReportInput,
+  IncidentReportResponse,
   RouteDetail,
   RouteSummary,
   SearchResponse,
@@ -82,4 +84,11 @@ export const reportFare = async (
 
 export const searchRoutesAndStops = async (query: string): Promise<SearchResponse> => {
   return apiGet<SearchResponse>(`/api/v1/search?q=${encodeURIComponent(query.trim())}`);
+};
+
+export const reportIncident = async (
+  input: IncidentReportInput,
+  authToken: string,
+): Promise<IncidentReportResponse> => {
+  return apiPost<IncidentReportResponse>("/api/v1/reports", input, authToken);
 };
