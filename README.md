@@ -25,6 +25,7 @@ This repository is being built strictly from:
 - [x] Phase 2 / Task 2.3: Admin-protected `POST/PUT/DELETE /routes` endpoints implemented
 - [x] Phase 2 / Task 2.4: `GET /stops?near=lng,lat&radius=500` implemented with geospatial query
 - [x] Phase 2 / Task 2.5: Fare estimate service layer added (`fareService.ts`) with route lookup + time/traffic multipliers
+- [x] Phase 2 / Task 2.6: `GET /fare/estimate` endpoint implemented with route/time query support and fare breakdown response
 
 ## Working Rules for This Build
 - Move step-by-step in task order.

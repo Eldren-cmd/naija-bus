@@ -150,5 +150,16 @@ Status: complete. Implemented:
 - traffic-level resolver (`low`, `medium`, `high`)
 - service-level helper tests in `backend/tests/fareService.test.ts`
 
+### Task 2.6
+- Implement `GET /fare/estimate?routeId=&time=` calling fare engine service
+
+Status: complete. Implemented:
+- `GET /api/v1/fare/estimate` and alias `GET /fare/estimate`
+- query validation (`routeId` required)
+- response includes fare breakdown + confidence + computed timestamp
+- service error mapping:
+  - invalid input -> `400`
+  - unknown route -> `404`
+
 ### Next Tasks
-- 2.6 Implement `GET /fare/estimate` using fare engine
+- Phase 2 backend endpoint sequence complete. Next: frontend RouteView + FareEstimate panel and integration tests.

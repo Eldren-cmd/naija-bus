@@ -6,6 +6,7 @@ import { connectToDatabase, ensureCoreIndexes, getDatabaseStatus } from "./confi
 import { Route, Stop } from "./models";
 import { authMiddleware, requireRoles } from "./middleware/authMiddleware";
 import { authRouter } from "./routes/auth";
+import { FareServiceError, estimateRouteFare } from "./services/fareService";
 
 dotenv.config();
 
@@ -410,6 +411,30 @@ const getStopsNearHandler = async (req: Request, res: Response) => {
 
 app.get("/api/v1/stops", getStopsNearHandler);
 app.get("/stops", getStopsNearHandler);
+
+const getFareEstimateHandler = async (req: Request, res: Response) => {
+  try {
+    const routeId = typeof req.query.routeId === "string" ? req.query.routeId.trim() : "";
+    if (!routeId) {
+      return res.status(400).json({ error: "routeId query is required" });
+    }
+
+    const time = typeof req.query.time === "string" ? req.query.time.trim() : undefined;
+    const trafficLevel =
+      typeof req.query.trafficLevel === "string" ? req.query.trafficLevel.trim() : undefined;
+
+    const estimate = await estimateRouteFare({ routeId, time, trafficLevel });
+    return res.status(200).json(estimate);
+  } catch (error) {
+    if (error instanceof FareServiceError) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "failed to estimate fare" });
+  }
+};
+
+app.get("/api/v1/fare/estimate", getFareEstimateHandler);
+app.get("/fare/estimate", getFareEstimateHandler);
 
 const startServer = async (): Promise<void> => {
   try {
