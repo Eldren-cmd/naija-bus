@@ -22,6 +22,7 @@ This repository is being built strictly from:
 - [x] Milestone Gate 1 verification complete (`register` returns JWT, `GET /api/v1/routes` returns seeded routes)
 - [x] Phase 2 / Task 2.1: `GET /routes` supports `q` text search and `bbox` geo filtering
 - [x] Phase 2 / Task 2.2: `GET /routes/:routeId` returns full route document with ordered stops
+- [x] Phase 2 / Task 2.3: Admin-protected `POST/PUT/DELETE /routes` endpoints implemented
 
 ## Working Rules for This Build
 - Move step-by-step in task order.

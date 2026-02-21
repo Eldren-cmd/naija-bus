@@ -98,8 +98,7 @@ Status: complete. Jest suite added (`tests/fareEngine.test.ts`) and passes (`5/5
 
 Status: Gate 1 passed. Phase 1 foundation is complete.
 
-## Next Phase (Phase 2)
-## Phase 2 — Core MVP
+## Phase 2 - Core MVP
 
 ### Task 2.1
 - Implement `GET /routes` with `q` text search and `bbox` geo filter support
@@ -119,7 +118,19 @@ Status: complete. Live checks confirm:
 - invalid routeId -> `400`
 - unknown routeId -> `404`
 
+### Task 2.3
+- Implement admin-protected `POST /routes`, `PUT /routes/:routeId`, `DELETE /routes/:routeId`
+- Protect with JWT middleware + admin role guard
+
+Status: complete. Live checks confirm:
+- no auth create -> `401`
+- non-admin create -> `403`
+- admin create -> `201`
+- admin update -> `200`
+- admin delete -> `200`
+- get deleted route -> `404`
+
 ### Next Tasks
-- 2.3 Implement admin `POST/PUT/DELETE /routes`
 - 2.4 Implement `GET /stops?near=lng,lat&radius=500`
 - 2.5 Implement fare engine service for estimate endpoint
+- 2.6 Implement `GET /fare/estimate` using fare engine
