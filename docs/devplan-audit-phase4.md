@@ -34,6 +34,6 @@ Implementation is complete in code, but final gate confirmation remains a user-r
 ## Cross-Guide Overlay (Design + Engagement)
 
 - Design alignment is strong for trip recording/replay UX; one optional visual consistency item (map style parity between RouteView and MyTrips) is tracked.
-- Engagement alignment is partial; Phase 4 improves retention behavior but does not complete rewards/gamification systems.
+- Engagement alignment is now strong for completed scope; Phase 4 now includes gamification baseline (points, streaks, badges, level progression, leaderboard surface).
 - Cross-phase retrospective + forward compliance tracking is maintained in:
   - `docs/cross-phase-compliance-audit.md`

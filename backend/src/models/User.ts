@@ -49,7 +49,36 @@ const userSchema = new Schema(
       default: 0,
       min: 0,
     },
+    tripStreak: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    tripCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    totalDistanceMeters: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    engagementPoints: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    level: {
+      type: Number,
+      default: 1,
+      min: 1,
+    },
     lastReportDate: {
+      type: Date,
+      required: false,
+    },
+    lastTripDate: {
       type: Date,
       required: false,
     },

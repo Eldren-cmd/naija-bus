@@ -18,8 +18,16 @@ Status labels:
 | 1 | complete | N/A (mostly backend/setup) | schema foundations implemented | aligned | roles + engagement fields implemented in user model. |
 | 2 | complete | major UI baseline implemented | N/A for core MVP | aligned | route search/map/fare UX established and refined. |
 | 3 | complete | realtime map/report UX implemented | report loop + bot-ingest baseline implemented | partial | `whatsapp-web.js` + bot token ingestion added; deeper automation/reward loops remain pending. |
-| 4 | complete | trip UX and replay implemented | retention support improved | aligned | map style parity gap for replay map has been closed. |
+| 4 | complete | trip UX and replay implemented | retention + gamification baseline implemented | aligned | phase-4 engagement gap now closed with points/streaks/badges/leaderboard surface. |
 | 5 (through 5.10) | complete through 5.10 | major polish updates + mobile responsiveness + loading skeleton UX applied | saved-routes retention loop + mobile usability + loading-state engagement support implemented | partial | remaining engagement systems are tracked for later phase-5 tasks or phase 6. |
+
+## Compliance Recheck (Previous Phases)
+
+- Rechecked completed scope for phases 1 through 4 against all three source guides:
+  - `NaijaTransport_DevPlan.docx`
+  - `NaijaTransport_DesignGuide.docx`
+  - `NaijaTransport_EngagementGuide.docx`
+- Result: no unresolved high-impact compliance blockers are currently tracked for phases 1 through 4.
 
 ## Forward Plan (Future Phases/Tasks)
 

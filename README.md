@@ -68,6 +68,7 @@ This repository is being built strictly from:
 - [x] Phase 5 / Task 5.9: Mobile responsive audit/fixes completed for Home, RouteView, and MyTrips
 - [x] Phase 5 / Task 5.10: Loading skeleton states implemented for core user flows (search/routes/route detail/fare/my-trips)
 - [x] Engagement Gap Remediation: Added bot-auth report ingestion endpoint (`POST /api/v1/reports/bot`) and `whatsapp-web.js` listener flow
+- [x] Engagement Gap Remediation: Added Phase 4 gamification baseline (points, streaks, badges, leaderboard surface)
 - [x] Design Gap Remediation: MyTrips replay map style aligned with RouteView (`navigation-night-v1`)
 
 ## Working Rules for This Build

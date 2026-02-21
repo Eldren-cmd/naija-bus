@@ -16,6 +16,12 @@ import {
 } from "./realtime/reportsSocket";
 import { startWhatsAppWebBot } from "./bots/whatsappWebBot";
 import { authRouter } from "./routes/auth";
+import {
+  awardReportEngagement,
+  awardTripEngagement,
+  getEngagementLeaderboard,
+  getEngagementSummaryByUserId,
+} from "./services/engagementService";
 import { FareServiceError, estimateRouteFare } from "./services/fareService";
 import type { BotContext, BotIngestResult, BotReportPayload } from "./types/bot";
 import {
@@ -818,6 +824,12 @@ const createFareReportHandler = async (req: Request, res: Response) => {
       createdAt: created.createdAt,
     });
 
+    await awardReportEngagement({
+      userId: req.user.id,
+      source: "fare_report",
+      occurredAt: created.createdAt,
+    });
+
     return res.status(201).json(created);
   } catch (_error) {
     return res.status(500).json({ error: "failed to save fare report" });
@@ -937,6 +949,12 @@ const createIncidentReportHandler = async (req: Request, res: Response) => {
       return res.status(result.status).json({ error: result.error });
     }
 
+    await awardReportEngagement({
+      userId: req.user.id,
+      source: "incident_report",
+      occurredAt: new Date(),
+    });
+
     return res.status(201).json(result.created);
   } catch (_error) {
     return res.status(500).json({ error: "failed to save report" });
@@ -1051,6 +1069,13 @@ const createTripRecordHandler = async (req: Request, res: Response) => {
       createdAt: created.createdAt,
     });
 
+    await awardTripEngagement({
+      userId: req.user.id,
+      distanceMeters: created.distanceMeters,
+      checkpointsCount: created.checkpoints.length,
+      occurredAt: created.createdAt,
+    });
+
     return res.status(201).json(created);
   } catch (_error) {
     return res.status(500).json({ error: "failed to save trip record" });
@@ -1093,6 +1118,43 @@ const getTripsHistoryHandler = async (req: Request, res: Response) => {
 
 app.get("/api/v1/trips", authMiddleware, getTripsHistoryHandler);
 app.get("/trips", authMiddleware, getTripsHistoryHandler);
+
+const getMyEngagementHandler = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "authentication required" });
+    }
+
+    const summary = await getEngagementSummaryByUserId(req.user.id);
+    if (!summary) {
+      return res.status(404).json({ error: "user not found" });
+    }
+
+    return res.status(200).json(summary);
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to fetch engagement summary" });
+  }
+};
+
+const getEngagementLeaderboardHandler = async (req: Request, res: Response) => {
+  try {
+    const limitRaw = typeof req.query.limit === "string" ? req.query.limit.trim() : "";
+    const limit = limitRaw ? Number(limitRaw) : 10;
+    if (!Number.isFinite(limit) || limit <= 0) {
+      return res.status(400).json({ error: "limit must be a positive number" });
+    }
+
+    const leaderboard = await getEngagementLeaderboard(limit);
+    return res.status(200).json(leaderboard);
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to fetch engagement leaderboard" });
+  }
+};
+
+app.get("/api/v1/engagement/me", authMiddleware, getMyEngagementHandler);
+app.get("/engagement/me", authMiddleware, getMyEngagementHandler);
+app.get("/api/v1/engagement/leaderboard", authMiddleware, getEngagementLeaderboardHandler);
+app.get("/engagement/leaderboard", authMiddleware, getEngagementLeaderboardHandler);
 
 const startServer = async (): Promise<void> => {
   try {

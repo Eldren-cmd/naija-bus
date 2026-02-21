@@ -44,7 +44,12 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - richer WhatsApp command grammar and moderation workflows
 
 ### Phase 4
-- Trip recording and history improve retention signals but do not yet include rewards/gamification loops.
+- Phase 4 engagement baseline is now implemented on top of trip recording/history:
+  - trip upload now awards engagement points
+  - trip streak and cumulative distance are tracked
+  - badge unlocks are applied from trip/report milestones
+  - level progression + airtime accrual are computed from engagement points
+  - MyTrips now surfaces points/level progress, badges, and leaderboard preview
 
 ### Phase 5 (through Task 5.10)
 - Added saved routes retention loop:
@@ -68,7 +73,7 @@ Reference: `NaijaTransport_EngagementGuide.docx`
 
 ### Phase 6 and Beyond
 - Twitter/X auto-feed bot
-- Airtime rewards job completion
+- Airtime rewards job automation + payout workflow hardening
 - PWA offline/service worker support
 - USSD fallback (post-launch scope)
 - Referral rewards flow (post-launch or late Phase 5 if prioritized)

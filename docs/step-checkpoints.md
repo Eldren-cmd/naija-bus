@@ -1032,5 +1032,40 @@ Status: complete. Implemented:
   - `npm --prefix frontend run lint`
   - `npm --prefix frontend run build`
 
+### Historical Gap Remediation (Phase 4 Engagement Gamification)
+- implemented engagement gamification baseline across backend + frontend:
+  - user model extensions for gamification state:
+    - `engagementPoints`
+    - `level`
+    - `tripCount`
+    - `tripStreak`
+    - `lastTripDate`
+    - `totalDistanceMeters`
+  - new backend engagement service:
+    - trip/report points awarding
+    - streak updates
+    - badge unlock logic
+    - level + airtime progression
+  - engagement-aware endpoints:
+    - `GET /api/v1/engagement/me`
+    - `GET /api/v1/engagement/leaderboard`
+  - trip/report handlers now trigger engagement updates:
+    - `POST /api/v1/trips`
+    - `POST /api/v1/reports`
+    - `POST /api/v1/fare/report`
+  - MyTrips engagement UI added:
+    - points, level progress, trip streak, badges, leaderboard preview
+- Design Guide applicability check:
+  - engagement panel follows current palette/typography/motion conventions
+  - layout remains responsive with no new design regressions introduced
+- Engagement Guide applicability check:
+  - phase-4 gamification loop is now active rather than deferred
+  - retention signals now tied to explicit reward/progression feedback
+- validation checks passed:
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
 ### Next Tasks
 - Continue Phase 5 in strict order: `5.11` (saved-routes empty state UX polish).

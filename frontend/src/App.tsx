@@ -16,13 +16,22 @@ import { MyTripMap } from "./components/MyTripMap";
 import {
   addSavedRoute,
   getAuthProfile,
+  getEngagementLeaderboard,
+  getMyEngagementSummary,
   getRouteById,
   getRoutes,
   getSavedRoutes,
   getTripsByUser,
   removeSavedRoute,
 } from "./lib/api";
-import type { RouteDetail, RouteSummary, TripCheckpoint, TripRecordResponse } from "./types";
+import type {
+  EngagementLeaderboardEntry,
+  EngagementSummary,
+  RouteDetail,
+  RouteSummary,
+  TripCheckpoint,
+  TripRecordResponse,
+} from "./types";
 import type { ToastItem, ToastTone } from "./components/ToastStack";
 import "./App.css";
 
@@ -41,6 +50,15 @@ const formatDateTime = (value: string): string => {
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
 };
+
+const formatNaira = (value: number): string =>
+  `\u20A6${new Intl.NumberFormat("en-NG", { maximumFractionDigits: 0 }).format(value)}`;
+
+const formatBadgeLabel = (value: string): string =>
+  value
+    .split("_")
+    .map((part) => (part ? `${part[0].toUpperCase()}${part.slice(1)}` : part))
+    .join(" ");
 
 function PrimaryNav({ active }: { active: "routes" | "my-trips" | "admin" }) {
   const { isAuthenticated, user, clearSession } = useAuth();
@@ -471,18 +489,30 @@ function MyTripsPage() {
   const { accessToken, isAuthenticated, user } = useAuth();
   const [profileName, setProfileName] = useState<string | null>(null);
   const [trips, setTrips] = useState<TripRecordResponse[]>([]);
+  const [engagement, setEngagement] = useState<EngagementSummary | null>(null);
+  const [leaderboard, setLeaderboard] = useState<EngagementLeaderboardEntry[]>([]);
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [engagementLoading, setEngagementLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [engagementError, setEngagementError] = useState<string | null>(null);
 
   const loadTripsWithToken = async (token: string) => {
     setLoading(true);
+    setEngagementLoading(true);
     setError(null);
+    setEngagementError(null);
     try {
       const profile = await getAuthProfile(token);
       setProfileName(profile.user.fullName);
-      const data = await getTripsByUser(profile.user.id, token);
+      const [data, engagementSummary, leaderboardRows] = await Promise.all([
+        getTripsByUser(profile.user.id, token),
+        getMyEngagementSummary(token),
+        getEngagementLeaderboard(token, 5),
+      ]);
       setTrips(data);
+      setEngagement(engagementSummary);
+      setLeaderboard(leaderboardRows);
       setSelectedTripId((previous) => {
         if (previous && data.some((trip) => trip._id === previous)) return previous;
         return data[0]?._id ?? null;
@@ -491,10 +521,14 @@ function MyTripsPage() {
       const message =
         requestError instanceof Error ? requestError.message : "Failed to load trip history";
       setError(message);
+      setEngagementError(message);
       setTrips([]);
+      setEngagement(null);
+      setLeaderboard([]);
       setSelectedTripId(null);
     } finally {
       setLoading(false);
+      setEngagementLoading(false);
     }
   };
 
@@ -505,6 +539,10 @@ function MyTripsPage() {
       setSelectedTripId(null);
       setProfileName(null);
       setError(null);
+      setEngagement(null);
+      setLeaderboard([]);
+      setEngagementError(null);
+      setEngagementLoading(false);
       return;
     }
     void loadTripsWithToken(normalizedToken);
@@ -550,6 +588,95 @@ function MyTripsPage() {
             </button>
           )}
           {error && <p className="error-text">{error}</p>}
+
+          <section className="engagement-card">
+            <div className="engagement-head">
+              <h3 className="panel-title">Engagement</h3>
+              {!engagementLoading && engagement && (
+                <span className="engagement-level-chip">Level {engagement.level}</span>
+              )}
+            </div>
+
+            {engagementLoading && (
+              <div className="engagement-skeleton" aria-hidden="true">
+                <div className="engagement-grid">
+                  <span className="skeleton-card" />
+                  <span className="skeleton-card" />
+                  <span className="skeleton-card" />
+                  <span className="skeleton-card" />
+                </div>
+                <span className="skeleton-line skeleton-line-lg" />
+                <span className="skeleton-line skeleton-line-md" />
+              </div>
+            )}
+
+            {engagementError && !engagementLoading && <p className="error-text">{engagementError}</p>}
+
+            {!engagementLoading && engagement && (
+              <>
+                <div className="engagement-grid">
+                  <article>
+                    <p className="muted small">Points</p>
+                    <strong>{engagement.points}</strong>
+                  </article>
+                  <article>
+                    <p className="muted small">Trip Streak</p>
+                    <strong>{engagement.tripStreak} days</strong>
+                  </article>
+                  <article>
+                    <p className="muted small">Trips</p>
+                    <strong>{engagement.tripCount}</strong>
+                  </article>
+                  <article>
+                    <p className="muted small">Distance</p>
+                    <strong>{formatDistance(engagement.totalDistanceMeters)}</strong>
+                  </article>
+                </div>
+
+                <div className="engagement-progress">
+                  <p className="muted small">
+                    {engagement.pointsToNextLevel} points to Level {engagement.level + 1}
+                  </p>
+                  <div className="progress-track" role="presentation" aria-hidden="true">
+                    <span style={{ width: `${engagement.progressPercent}%` }} />
+                  </div>
+                </div>
+
+                <p className="muted small">Airtime earned: {formatNaira(engagement.airtimeEarned)}</p>
+
+                <div>
+                  <p className="muted small">Badges</p>
+                  {engagement.badges.length === 0 ? (
+                    <p className="muted small">No badges yet. Keep recording trips and reporting updates.</p>
+                  ) : (
+                    <div className="badge-list">
+                      {engagement.badges.map((badge) => (
+                        <span key={badge}>{formatBadgeLabel(badge)}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <p className="muted small">Leaderboard</p>
+                  {leaderboard.length === 0 ? (
+                    <p className="muted small">No leaderboard entries yet.</p>
+                  ) : (
+                    <ol className="leaderboard-list">
+                      {leaderboard.map((entry) => (
+                        <li key={entry.userId}>
+                          <span>
+                            {entry.rank}. {entry.fullName}
+                          </span>
+                          <strong>{entry.points} pts</strong>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </div>
+              </>
+            )}
+          </section>
         </section>
 
         <section className="mytrips-main">

@@ -187,3 +187,30 @@ export type AuthLoginResponse = {
   accessToken?: string;
   user: AuthProfileResponse["user"];
 };
+
+export type EngagementSummary = {
+  userId: string;
+  points: number;
+  level: number;
+  nextLevelAtPoints: number;
+  progressPercent: number;
+  pointsToNextLevel: number;
+  reportCount: number;
+  reportStreak: number;
+  tripCount: number;
+  tripStreak: number;
+  totalDistanceMeters: number;
+  airtimeEarned: number;
+  badges: string[];
+};
+
+export type EngagementLeaderboardEntry = {
+  rank: number;
+  userId: string;
+  fullName: string;
+  points: number;
+  level: number;
+  tripCount: number;
+  reportCount: number;
+  badgesCount: number;
+};

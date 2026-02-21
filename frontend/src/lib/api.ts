@@ -2,6 +2,8 @@ import type {
   AuthLoginResponse,
   AuthProfileResponse,
   Bbox,
+  EngagementLeaderboardEntry,
+  EngagementSummary,
   FareEstimate,
   FareReportInput,
   FareReportResponse,
@@ -157,6 +159,21 @@ export const getTripsByUser = async (
 ): Promise<TripRecordResponse[]> => {
   return apiGet<TripRecordResponse[]>(
     `/api/v1/trips?userId=${encodeURIComponent(userId)}`,
+    authToken,
+  );
+};
+
+export const getMyEngagementSummary = async (authToken: string): Promise<EngagementSummary> => {
+  return apiGet<EngagementSummary>("/api/v1/engagement/me", authToken);
+};
+
+export const getEngagementLeaderboard = async (
+  authToken: string,
+  limit = 8,
+): Promise<EngagementLeaderboardEntry[]> => {
+  const safeLimit = Number.isFinite(limit) ? Math.max(1, Math.min(50, Math.floor(limit))) : 8;
+  return apiGet<EngagementLeaderboardEntry[]>(
+    `/api/v1/engagement/leaderboard?limit=${encodeURIComponent(String(safeLimit))}`,
     authToken,
   );
 };

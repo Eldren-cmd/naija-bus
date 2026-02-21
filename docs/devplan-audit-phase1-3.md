@@ -76,6 +76,6 @@ Status labels:
 - Engagement alignment is partial:
   - reporting loop features are implemented
   - bot-origin ingestion baseline is now implemented (`POST /api/v1/reports/bot` + `whatsapp-web.js` listener)
-  - broader rewards/gamification systems are still pending for later phases
+  - broader rewards/gamification systems were deferred beyond phase 3 and are now addressed at baseline level in phase-4 remediation
 - Full retrospective + forward plan tracking is maintained in:
   - `docs/cross-phase-compliance-audit.md`
