@@ -19,11 +19,11 @@ Status labels:
 | 2 | complete | major UI baseline implemented | N/A for core MVP | aligned | route search/map/fare UX established and refined. |
 | 3 | complete | realtime map/report UX implemented | report loop + bot-ingest baseline implemented | partial | `whatsapp-web.js` + bot token ingestion added; deeper automation/reward loops remain pending. |
 | 4 | complete | trip UX and replay implemented | retention support improved | aligned | map style parity gap for replay map has been closed. |
-| 5 (through 5.9) | complete through 5.9 | major polish updates + mobile responsiveness pass applied | saved-routes retention loop + mobile engagement usability updates implemented | partial | remaining engagement systems are tracked for later phase-5 tasks or phase 6. |
+| 5 (through 5.10) | complete through 5.10 | major polish updates + mobile responsiveness + loading skeleton UX applied | saved-routes retention loop + mobile usability + loading-state engagement support implemented | partial | remaining engagement systems are tracked for later phase-5 tasks or phase 6. |
 
 ## Forward Plan (Future Phases/Tasks)
 
-### Remaining Phase 5 (`5.9` to `5.14`)
+### Remaining Phase 5 (`5.11` to `5.14`)
 - Apply Design + Engagement checks in each completion entry.
 - Ensure no task is marked final without explicit cross-guide applicability note.
 

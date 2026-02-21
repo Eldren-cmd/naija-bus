@@ -85,7 +85,16 @@ export function SearchInput({ value, onChange, onSubmit, onSelectRoute }: Search
 
       {showDropdown && (
         <div className="search-dropdown">
-          {loading && <p className="muted small">Searching...</p>}
+          {loading && (
+            <div className="search-skeleton-list" aria-hidden="true">
+              {[1, 2, 3].map((item) => (
+                <div key={`search-skeleton-${item}`} className="search-skeleton-item">
+                  <span className="skeleton-line skeleton-line-md" />
+                  <span className="skeleton-line skeleton-line-sm" />
+                </div>
+              ))}
+            </div>
+          )}
           {error && !loading && <p className="error-text">{error}</p>}
 
           {!loading && results && (

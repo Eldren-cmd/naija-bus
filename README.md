@@ -66,6 +66,7 @@ This repository is being built strictly from:
 - [x] Phase 5 / Task 5.7: Admin panel stop creation form added and wired to protected `POST /stops` endpoint
 - [x] Phase 5 / Task 5.8: Saved routes endpoints added and Home now supports saved route list plus save/unsave actions
 - [x] Phase 5 / Task 5.9: Mobile responsive audit/fixes completed for Home, RouteView, and MyTrips
+- [x] Phase 5 / Task 5.10: Loading skeleton states implemented for core user flows (search/routes/route detail/fare/my-trips)
 - [x] Engagement Gap Remediation: Added bot-auth report ingestion endpoint (`POST /api/v1/reports/bot`) and `whatsapp-web.js` listener flow
 - [x] Design Gap Remediation: MyTrips replay map style aligned with RouteView (`navigation-night-v1`)
 

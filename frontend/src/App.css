@@ -470,6 +470,19 @@
   box-shadow: 0 10px 22px rgba(13, 27, 42, 0.1);
 }
 
+.search-skeleton-list {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.search-skeleton-item {
+  border: 1px solid #eadcc9;
+  border-radius: 0.66rem;
+  padding: 0.48rem 0.55rem;
+  display: grid;
+  gap: 0.22rem;
+}
+
 .search-group + .search-group {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
@@ -518,6 +531,97 @@
 .search-suggestion-list span {
   color: #5c6c7d;
   font-size: 0.76rem;
+}
+
+.skeleton-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skeleton-line,
+.skeleton-pill,
+.skeleton-block,
+.skeleton-card {
+  position: relative;
+  overflow: hidden;
+  background: #efe3d5;
+}
+
+.skeleton-line::after,
+.skeleton-pill::after,
+.skeleton-block::after,
+.skeleton-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.72) 45%, transparent 100%);
+  animation: skeletonShimmer 1.2s ease-in-out infinite;
+}
+
+.skeleton-line {
+  display: block;
+  border-radius: 999px;
+  height: 0.72rem;
+}
+
+.skeleton-line-sm {
+  width: 42%;
+}
+
+.skeleton-line-md {
+  width: 62%;
+}
+
+.skeleton-line-lg {
+  width: 82%;
+}
+
+.skeleton-line-xl {
+  width: min(220px, 70%);
+  height: 2rem;
+}
+
+.skeleton-pill {
+  display: inline-block;
+  width: 5.4rem;
+  height: 1.3rem;
+  border-radius: 999px;
+}
+
+.skeleton-pill-sm {
+  width: 4.1rem;
+}
+
+.skeleton-pill-circle {
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 999px;
+}
+
+.skeleton-block {
+  border-radius: 0.9rem;
+  min-height: 220px;
+  border: 1px solid #e1cbb0;
+}
+
+.skeleton-card {
+  border: 1px solid #e6d7c4;
+  border-radius: 0.85rem;
+  padding: 0.68rem;
+  display: grid;
+  gap: 0.22rem;
+}
+
+.skeleton-route-card {
+  min-height: 58px;
+}
+
+.skeleton-save-btn {
+  width: 100%;
+  height: 32px;
+  border: 1px solid #e0cfbc;
 }
 
 .route-list {
@@ -724,6 +828,10 @@
   background: #fff9f3;
   padding: 0.22rem 0.55rem;
   font-size: 0.77rem;
+}
+
+.route-subtitle-skeleton {
+  margin: 0.4rem 0 0.5rem;
 }
 
 .map-placeholder {
@@ -1131,6 +1239,17 @@
   margin-bottom: 0.22rem;
 }
 
+.fare-breakdown-skeleton ul {
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.skeleton-trip-card {
+  pointer-events: none;
+}
+
 .muted {
   color: #57697c;
 }
@@ -1227,6 +1346,12 @@
   }
 }
 
+@keyframes skeletonShimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 @media (max-width: 1020px) {
   .app-shell {
     padding: 1rem;
@@ -1293,6 +1418,10 @@
 
   .route-save-btn {
     width: 100%;
+    min-height: 44px;
+  }
+
+  .skeleton-save-btn {
     min-height: 44px;
   }
 

@@ -61,6 +61,7 @@ export function FareEstimate({ routeId, routeName, refreshSignal = 0 }: FareEsti
     if (!estimate) return 0;
     return Math.max(0, Math.min(100, Math.round(estimate.confidence * 100)));
   }, [estimate]);
+  const showSkeleton = loading && !estimate && !error;
 
   const loadEstimate = async () => {
     if (!routeId) return;
@@ -127,7 +128,21 @@ export function FareEstimate({ routeId, routeName, refreshSignal = 0 }: FareEsti
 
       {error && <p className="error-text">{error}</p>}
 
-      {estimate && (
+      {showSkeleton && (
+        <div className="fare-breakdown fare-breakdown-skeleton" aria-hidden="true">
+          <p className="skeleton-line skeleton-line-sm" />
+          <p className="skeleton-line skeleton-line-xl" />
+          <span className="skeleton-pill skeleton-pill-sm" />
+          <ul className="skeleton-list">
+            <li className="skeleton-line skeleton-line-md" />
+            <li className="skeleton-line skeleton-line-md" />
+            <li className="skeleton-line skeleton-line-md" />
+            <li className="skeleton-line skeleton-line-sm" />
+          </ul>
+        </div>
+      )}
+
+      {estimate && !showSkeleton && (
         <div className="fare-breakdown">
           <p className="muted small">Estimated fare</p>
           <AnimatedFare target={estimate.estimatedFare} />

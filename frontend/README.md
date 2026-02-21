@@ -30,6 +30,7 @@ React + TypeScript + Vite frontend for Naija Transport.
 - Admin stop creation form now posts validated stop payloads to protected `POST /api/v1/stops`
 - Home now includes signed-in saved routes panel with save/unsave route actions via `GET/POST/DELETE /api/v1/routes/saved`
 - Mobile responsiveness pass completed for Home, RouteView, and MyTrips (optimized breakpoints: 1020px, 768px, 560px)
+- Loading skeleton states added for high-frequency views (search suggestions, route list, route detail, fare card, and MyTrips history)
 
 ## Environment
 Create `frontend/.env` with:

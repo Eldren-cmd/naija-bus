@@ -12,8 +12,31 @@ export function RouteView({ route, loading, error, tripCheckpoints }: RouteViewP
   if (loading) {
     return (
       <section className="route-view card">
-        <h2 className="panel-title">Route View</h2>
-        <p className="muted">Loading selected route...</p>
+        <div className="route-head">
+          <h2 className="panel-title">Route View</h2>
+          <span className="skeleton-pill skeleton-pill-sm" aria-hidden="true" />
+        </div>
+        <div className="route-subtitle-skeleton" aria-hidden="true">
+          <span className="skeleton-line skeleton-line-lg" />
+        </div>
+        <div className="route-meta" aria-hidden="true">
+          <span className="skeleton-pill" />
+          <span className="skeleton-pill" />
+          <span className="skeleton-pill" />
+        </div>
+        <div className="map-placeholder skeleton-block" aria-hidden="true" />
+        <h3 className="panel-title">Stops</h3>
+        <ol className="stops-list skeleton-list" aria-hidden="true">
+          {[1, 2, 3, 4].map((item) => (
+            <li key={`route-stop-skeleton-${item}`}>
+              <span className="stop-order skeleton-pill skeleton-pill-circle" />
+              <div>
+                <p className="skeleton-line skeleton-line-md" />
+                <small className="skeleton-line skeleton-line-sm" />
+              </div>
+            </li>
+          ))}
+        </ol>
       </section>
     );
   }

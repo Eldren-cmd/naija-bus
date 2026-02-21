@@ -46,18 +46,21 @@ Reference: `NaijaTransport_EngagementGuide.docx`
 ### Phase 4
 - Trip recording and history improve retention signals but do not yet include rewards/gamification loops.
 
-### Phase 5 (through Task 5.9)
+### Phase 5 (through Task 5.10)
 - Added saved routes retention loop:
   - authenticated save/unsave route actions
   - saved routes surfaced directly on Home
 - Added mobile usability hardening for engagement-critical surfaces:
   - report interaction controls
   - saved-routes interaction flow on smaller screens
+- Added loading-state trust/retention UX for frequent actions:
+  - route discovery surfaces now show skeleton placeholders during load
+  - saved-routes panel and trip-history list now show skeleton placeholders
+  - fare insight retrieval now shows skeleton placeholder before first estimate resolves
 
 ## Future Compliance Plan
 
 ### Remaining Phase 5
-- `5.10`: loading skeletons should cover high-frequency engagement actions.
 - `5.11`: empty saved-routes UX should include clear call-to-action copy.
 - `5.12`: global error boundary should preserve trust with clear recovery messaging.
 - `5.13`: E2E flows should include auth + save route + report actions.

@@ -340,64 +340,90 @@ function RouteFinderPage() {
             <section className="saved-routes-panel">
               <div className="saved-routes-head">
                 <h3 className="panel-title">Saved Routes</h3>
-                {savedRoutesLoading && <span className="muted small">Loading...</span>}
               </div>
               {savedRoutesError && <p className="error-text">{savedRoutesError}</p>}
-              {!savedRoutesLoading && savedRoutes.length === 0 && (
-                <p className="muted">No saved routes yet.</p>
+              {savedRoutesLoading && (
+                <ul className="saved-route-list skeleton-list" aria-hidden="true">
+                  {[1, 2, 3].map((item) => (
+                    <li key={`saved-route-skeleton-${item}`}>
+                      <div className="skeleton-card skeleton-route-card">
+                        <span className="skeleton-line skeleton-line-lg" />
+                        <span className="skeleton-line skeleton-line-sm" />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               )}
-              <ul className="saved-route-list">
-                {savedRoutes.map((route) => (
-                  <li key={route._id}>
-                    <button
-                      type="button"
-                      className={route._id === selectedRouteId ? "active" : ""}
-                      onClick={() => onSelectRouteFromList(route._id)}
-                    >
-                      <strong>{route.name}</strong>
-                      <span>
-                        {route.origin} to {route.destination}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              {!savedRoutesLoading && savedRoutes.length === 0 && <p className="muted">No saved routes yet.</p>}
+              {!savedRoutesLoading && savedRoutes.length > 0 && (
+                <ul className="saved-route-list">
+                  {savedRoutes.map((route) => (
+                    <li key={route._id}>
+                      <button
+                        type="button"
+                        className={route._id === selectedRouteId ? "active" : ""}
+                        onClick={() => onSelectRouteFromList(route._id)}
+                      >
+                        <strong>{route.name}</strong>
+                        <span>
+                          {route.origin} to {route.destination}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
           )}
 
           {routesError && <p className="error-text">{routesError}</p>}
-          {routesLoading && <p className="muted">Loading routes...</p>}
 
-          <ul className="route-list">
-            {routes.map((route) => (
-              <li key={route._id} className="route-list-item">
-                <button
-                  type="button"
-                  className={route._id === selectedRouteId ? "active" : ""}
-                  onClick={() => onSelectRouteFromList(route._id)}
-                >
-                  <strong>{route.name}</strong>
-                  <span>
-                    {route.origin} to {route.destination}
-                  </span>
-                </button>
-                {accessToken?.trim() && (
+          {routesLoading && (
+            <ul className="route-list skeleton-list" aria-hidden="true">
+              {[1, 2, 3, 4, 5].map((item) => (
+                <li key={`route-skeleton-${item}`} className="route-list-item">
+                  <div className="skeleton-card skeleton-route-card">
+                    <span className="skeleton-line skeleton-line-lg" />
+                    <span className="skeleton-line skeleton-line-sm" />
+                  </div>
+                  {accessToken?.trim() && <div className="skeleton-pill skeleton-save-btn" />}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {!routesLoading && (
+            <ul className="route-list">
+              {routes.map((route) => (
+                <li key={route._id} className="route-list-item">
                   <button
                     type="button"
-                    className={`route-save-btn ${savedRouteIds.has(route._id) ? "saved" : ""}`}
-                    onClick={() => void onToggleSavedRoute(route)}
-                    disabled={savingRouteId === route._id}
+                    className={route._id === selectedRouteId ? "active" : ""}
+                    onClick={() => onSelectRouteFromList(route._id)}
                   >
-                    {savingRouteId === route._id
-                      ? "Updating..."
-                      : savedRouteIds.has(route._id)
-                        ? "Saved"
-                        : "Save"}
+                    <strong>{route.name}</strong>
+                    <span>
+                      {route.origin} to {route.destination}
+                    </span>
                   </button>
-                )}
-              </li>
-            ))}
-          </ul>
+                  {accessToken?.trim() && (
+                    <button
+                      type="button"
+                      className={`route-save-btn ${savedRouteIds.has(route._id) ? "saved" : ""}`}
+                      onClick={() => void onToggleSavedRoute(route)}
+                      disabled={savingRouteId === route._id}
+                    >
+                      {savingRouteId === route._id
+                        ? "Updating..."
+                        : savedRouteIds.has(route._id)
+                          ? "Saved"
+                          : "Save"}
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
 
           {!routesLoading && routes.length === 0 && <p className="muted">No routes matched your search.</p>}
         </aside>
@@ -533,7 +559,26 @@ function MyTripsPage() {
                 <p className="muted">You are signed out. Login first to view your trip history.</p>
               </div>
             )}
-            {loading && <p className="muted">Loading trip history...</p>}
+            {loading && (
+              <ul className="trip-card-list skeleton-list" aria-hidden="true">
+                {[1, 2, 3].map((item) => (
+                  <li key={`trip-skeleton-${item}`}>
+                    <article className="trip-card card skeleton-trip-card">
+                      <div className="trip-card-head">
+                        <span className="skeleton-line skeleton-line-md" />
+                        <span className="skeleton-pill skeleton-pill-sm" />
+                      </div>
+                      <p className="skeleton-line skeleton-line-md" />
+                      <div className="trip-card-meta">
+                        <span className="skeleton-pill" />
+                        <span className="skeleton-pill" />
+                        <span className="skeleton-pill" />
+                      </div>
+                    </article>
+                  </li>
+                ))}
+              </ul>
+            )}
 
             {isAuthenticated && !loading && trips.length === 0 && (
               <div className="mytrip-empty card">
@@ -541,36 +586,38 @@ function MyTripsPage() {
               </div>
             )}
 
-            <ul className="trip-card-list">
-              {trips.map((trip) => {
-                const routeSummary =
-                  typeof trip.routeId === "object" && trip.routeId
-                    ? `${trip.routeId.name} (${trip.routeId.origin} to ${trip.routeId.destination})`
-                    : "Route not specified";
-                const isActive = trip._id === selectedTripId;
+            {!loading && (
+              <ul className="trip-card-list">
+                {trips.map((trip) => {
+                  const routeSummary =
+                    typeof trip.routeId === "object" && trip.routeId
+                      ? `${trip.routeId.name} (${trip.routeId.origin} to ${trip.routeId.destination})`
+                      : "Route not specified";
+                  const isActive = trip._id === selectedTripId;
 
-                return (
-                  <li key={trip._id}>
-                    <button
-                      type="button"
-                      className={`trip-card card ${isActive ? "is-active" : ""}`}
-                      onClick={() => setSelectedTripId(trip._id)}
-                    >
-                      <div className="trip-card-head">
-                        <strong>{formatDateTime(trip.startedAt)}</strong>
-                        <span>{formatDistance(trip.distanceMeters)}</span>
-                      </div>
-                      <p className="trip-card-route">{routeSummary}</p>
-                      <div className="trip-card-meta">
-                        <span>Duration: {formatDuration(trip.durationSeconds)}</span>
-                        <span>Checkpoints: {trip.checkpoints.length}</span>
-                        <span>Ended: {formatDateTime(trip.endedAt)}</span>
-                      </div>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
+                  return (
+                    <li key={trip._id}>
+                      <button
+                        type="button"
+                        className={`trip-card card ${isActive ? "is-active" : ""}`}
+                        onClick={() => setSelectedTripId(trip._id)}
+                      >
+                        <div className="trip-card-head">
+                          <strong>{formatDateTime(trip.startedAt)}</strong>
+                          <span>{formatDistance(trip.distanceMeters)}</span>
+                        </div>
+                        <p className="trip-card-route">{routeSummary}</p>
+                        <div className="trip-card-meta">
+                          <span>Duration: {formatDuration(trip.durationSeconds)}</span>
+                          <span>Checkpoints: {trip.checkpoints.length}</span>
+                          <span>Ended: {formatDateTime(trip.endedAt)}</span>
+                        </div>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </section>
 
           <section className="mytrips-map-panel card">

@@ -17,6 +17,7 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Route list cards and saved-route cards now include hover lift + shadow motion in `frontend/src/App.css`.
 - MyTrips replay map style aligned to `mapbox://styles/mapbox/navigation-night-v1` in `frontend/src/components/MyTripMap.tsx`.
 - Mobile responsive pass completed for Home, RouteView, and MyTrips in `frontend/src/App.css` (1020/768/560 breakpoints).
+- Loading skeleton states added across Route Finder, RouteView, Fare Estimate, Search typeahead, and MyTrips to reduce abrupt layout shifts.
 
 ## High-Impact Gaps To Implement Next
 

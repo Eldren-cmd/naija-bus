@@ -998,3 +998,39 @@ Status: complete. Implemented:
 
 ### Next Tasks
 - Continue Phase 5 in strict order: `5.10` (loading skeleton states).
+
+### Task 5.10
+- Implement loading skeleton states for high-frequency user flows
+
+Status: complete. Implemented:
+- added shared skeleton shimmer system in `frontend/src/App.css`:
+  - reusable skeleton primitives (`line`, `pill`, `block`, `card`)
+  - shimmer animation for perceived progress during API loads
+- Route Finder loading skeletons (`frontend/src/App.tsx`):
+  - route list now renders skeleton cards while `GET /routes` is loading
+  - saved-routes panel now renders skeleton cards while `GET /routes/saved` is loading
+- Search typeahead loading skeleton (`frontend/src/components/SearchInput.tsx`):
+  - replaced plain "Searching..." text with dropdown skeleton items
+- Route detail loading skeleton (`frontend/src/components/RouteView.tsx`):
+  - route header/meta placeholders
+  - map placeholder block
+  - ordered stop placeholder rows
+- Fare estimate loading skeleton (`frontend/src/components/FareEstimate.tsx`):
+  - skeleton state shown when estimate is fetching and no estimate is cached
+- MyTrips loading skeleton (`frontend/src/App.tsx`):
+  - trip history list now shows trip-card skeleton placeholders while loading
+- Design Guide applicability check:
+  - loading placeholders preserve existing visual language and avoid abrupt content shifts
+  - motion remains restrained and consistent with existing UI animation style
+- Engagement Guide applicability check:
+  - skeletons now cover high-frequency engagement surfaces:
+    - route discovery/search selection
+    - saved-routes retention surface
+    - fare insight retrieval
+    - trip history revisit flow
+- validation checks passed:
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
+### Next Tasks
+- Continue Phase 5 in strict order: `5.11` (saved-routes empty state UX polish).

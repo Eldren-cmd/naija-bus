@@ -25,7 +25,7 @@ Cross-guide enforcement (mandatory for remaining tasks):
 | 5.7 | complete | Stop creation form added in AdminPanel and wired to protected backend `POST /api/v1/stops` endpoint with payload validation and integration tests. |
 | 5.8 | complete | Saved routes endpoints implemented (`GET/POST/DELETE /api/v1/routes/saved`) and integrated into Home with save/unsave UI state. |
 | 5.9 | complete | Mobile responsiveness pass completed across Home/RouteView/MyTrips with touch-target and layout fixes for smaller breakpoints. |
-| 5.10 | missing | Loading skeleton states not implemented yet. |
+| 5.10 | complete | Loading skeleton states implemented across Route Finder, RouteView, Fare Estimate, Search typeahead, and MyTrips list surfaces. |
 | 5.11 | missing | Empty state UX for saved routes section not implemented yet. |
 | 5.12 | missing | Global error boundary is not implemented yet. |
 | 5.13 | missing | Playwright E2E coverage for Phase 5 flows is not implemented yet. |
@@ -33,7 +33,7 @@ Cross-guide enforcement (mandatory for remaining tasks):
 
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `5.10` next.
+1. Continue with `5.11` next.
 2. Progress sequentially through Phase 5 tasks.
 
 ## Cross-Phase Compliance Tracking
