@@ -153,7 +153,7 @@ const run = async () => {
         destination: routePayload.destination,
       },
       { $set: routePayload },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
+      { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
     );
 
     await Stop.deleteMany({ routeId: routeDoc._id });

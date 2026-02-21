@@ -80,7 +80,12 @@ Status: complete. Added `backend/.env.example`, `frontend/.env.example`, and REA
 
 Status: complete. Seed dataset and script created; `--dry-run` validation passes.
 
+## Task 1.11
+- Run `node scripts/seed.js`
+- Verify seeded routes in Atlas
+
+Status: complete. Seed execution successful with `5` routes and `25` stops verified.
+
 ## Next Tasks
-- 1.11 Run seed script and verify seeded routes
 - 1.12 Write first unit test (fare engine) and ensure CI-ready test pass
 - Gate 1 verification: register returns JWT, routes endpoint returns seeded routes

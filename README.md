@@ -16,8 +16,9 @@ This repository is being built strictly from:
 - [x] Phase 1 / Task 1.8: Added JWT auth middleware for protected routes
 - [x] Phase 1 / Task 1.9: Added `.env.example` files and documented required env keys
 - [x] Phase 1 / Task 1.10: Added route seed dataset and seed script for 5 Lagos corridors
+- [x] Phase 1 / Task 1.11: Executed seed script and verified 5 routes in Atlas
 - [x] Social post archive initialized (`social_posts/`)
-- [ ] Remaining Phase 1 tasks (1.11 to 1.12)
+- [ ] Remaining Phase 1 tasks (1.12 only)
 
 ## Working Rules for This Build
 - Move step-by-step in task order.
@@ -53,3 +54,7 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 Commands:
 1. Validate only (no DB writes): `node scripts/seed.js --dry-run`
 2. Seed database: `node scripts/seed.js`
+
+Latest seed verification:
+- Routes in Atlas: `5`
+- Stops in Atlas: `25`
