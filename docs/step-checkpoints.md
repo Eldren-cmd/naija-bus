@@ -832,3 +832,34 @@ Status: complete. Implemented:
 
 ### Next Tasks
 - Continue Phase 5 in strict order: `5.6` (route creation form in AdminPanel using `POST /routes`).
+
+### Task 5.6
+- Add route creation form in AdminPanel; calls `POST /routes` with all fields
+
+Status: complete. Implemented:
+- extended AdminPanel UI with full route creation form in:
+  - `frontend/src/components/AdminPanel.tsx`
+- form captures required create payload fields:
+  - `name`, `origin`, `destination`, `baseFare`
+  - `polyline` (parsed from `lng,lat | lng,lat | ...`)
+- form also captures optional route metadata:
+  - `corridor`
+  - `aliases` (comma-separated)
+  - `transportType`
+  - `confidenceScore`
+- added frontend admin create API helper in `frontend/src/lib/api.ts`:
+  - `createRouteAdmin` -> `POST /api/v1/routes`
+- added client-side validation for:
+  - valid positive fare
+  - confidence range `0..1`
+  - polyline coordinate parsing/validation
+- added corresponding admin creation styles in `frontend/src/App.css`
+- after successful route creation, route table reloads automatically
+- validation checks passed:
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+
+### Next Tasks
+- Continue Phase 5 in strict order: `5.7` (stop creation form in AdminPanel, requires backend `POST /stops` endpoint alignment).

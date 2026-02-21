@@ -11,6 +11,7 @@ import type {
   RouteSummary,
   SearchResponse,
   TrafficLevel,
+  TransportType,
   TripRecordInput,
   TripRecordResponse,
 } from "../types";
@@ -197,4 +198,26 @@ export const deleteRouteAdmin = async (
     `/api/v1/routes/${encodeURIComponent(routeId)}`,
     authToken,
   );
+};
+
+type RouteAdminCreateInput = {
+  name: string;
+  origin: string;
+  destination: string;
+  baseFare: number;
+  polyline: {
+    type: "LineString";
+    coordinates: [number, number][];
+  };
+  corridor?: string;
+  aliases?: string[];
+  transportType?: TransportType;
+  confidenceScore?: number;
+};
+
+export const createRouteAdmin = async (
+  input: RouteAdminCreateInput,
+  authToken: string,
+): Promise<RouteDetail> => {
+  return apiPost<RouteDetail>("/api/v1/routes", input, authToken);
 };

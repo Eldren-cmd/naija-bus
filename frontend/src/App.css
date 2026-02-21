@@ -132,6 +132,39 @@
   justify-content: flex-end;
 }
 
+.admin-create-form {
+  border: 1px solid #ddc7ae;
+  border-radius: 0.9rem;
+  padding: 0.75rem;
+  background: #fff9f2;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.admin-create-grid {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.admin-create-form label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #2d4258;
+}
+
+.admin-create-form input,
+.admin-create-form select,
+.admin-create-form textarea {
+  width: 100%;
+  border-radius: 0.6rem;
+  border: 1px solid #d7c6b2;
+  padding: 0.42rem 0.48rem;
+  font: inherit;
+}
+
 .admin-table-wrap {
   border: 1px solid #d8c5b0;
   border-radius: 0.9rem;
@@ -1115,6 +1148,10 @@
   }
 
   .trip-preview-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-create-grid {
     grid-template-columns: 1fr;
   }
 

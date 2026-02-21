@@ -16,7 +16,7 @@ Status labels:
 | 5.3 | complete | Added `POST /auth/refresh` endpoint and axios interceptor-based 401 refresh/retry flow wired to in-memory auth provider session. |
 | 5.4 | complete | `ProtectedRoute` is implemented and `/my-trips` now redirects unauthenticated users to `/login` with return path state. |
 | 5.5 | complete | Admin-only `/admin` panel added with routes table, inline edit flow, and delete action wired to admin backend endpoints. |
-| 5.6 | missing | Route creation form in AdminPanel not implemented yet. |
+| 5.6 | complete | AdminPanel now includes route creation form posting full route payload (`POST /api/v1/routes`) with polyline parsing and validation. |
 | 5.7 | missing | Stop creation form + `POST /stops` wiring not implemented yet. |
 | 5.8 | missing | Saved routes endpoint + Home integration not implemented yet. |
 | 5.9 | missing | Mobile responsive audit/fixes for Home/RouteView/MyTrips not completed for this phase yet. |
@@ -28,5 +28,5 @@ Status labels:
 
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `5.6` next.
+1. Continue with `5.7` next.
 2. Progress sequentially through Phase 5 tasks.
