@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, Navigate, Route, Routes, useNavigate, useParams } from "react-router-dom";
+import type { ReactElement } from "react";
+import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "./auth/AuthContext";
 import { FareEstimate } from "./components/FareEstimate";
 import { LoginPage } from "./components/LoginPage";
@@ -62,6 +63,17 @@ function PrimaryNav({ active }: { active: "routes" | "my-trips" }) {
       )}
     </nav>
   );
+}
+
+function ProtectedRoute({ children }: { children: ReactElement }) {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  return children;
 }
 
 function RouteFinderPage() {
@@ -440,7 +452,14 @@ function App() {
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/" element={<RouteFinderPage />} />
       <Route path="/route/:routeId" element={<RouteFinderPage />} />
-      <Route path="/my-trips" element={<MyTripsPage />} />
+      <Route
+        path="/my-trips"
+        element={
+          <ProtectedRoute>
+            <MyTripsPage />
+          </ProtectedRoute>
+        }
+      />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

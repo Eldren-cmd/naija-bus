@@ -783,3 +783,24 @@ Status: complete. Implemented:
 
 ### Next Tasks
 - Continue Phase 5 in strict order: `5.4` (ProtectedRoute redirect to `/login` when unauthenticated).
+
+### Task 5.4
+- Add `ProtectedRoute` wrapper; redirect to `/login` if no valid token
+
+Status: complete. Implemented:
+- added `ProtectedRoute` component in `frontend/src/App.tsx`
+  - checks auth context session state (`isAuthenticated`)
+  - redirects unauthenticated users to `/login`
+  - preserves attempted path in router state (`from`) for post-login redirect
+- wrapped MyTrips route in protected shell:
+  - `/my-trips` now requires active authenticated session
+  - signed-out access immediately redirects to `/login`
+- existing login page already consumes redirect state and navigates back after successful auth
+- validation checks passed:
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+
+### Next Tasks
+- Continue Phase 5 in strict order: `5.5` (AdminPanel page for admin route management).

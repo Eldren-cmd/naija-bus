@@ -24,6 +24,7 @@ React + TypeScript + Vite frontend for Naija Transport.
 - Frontend auth context/provider added; token persistence in localStorage removed
 - Signup page (`/signup`) wired to `POST /api/v1/auth/register` with auto-login redirect flow
 - Axios HTTP client now auto-refreshes session on `401` via `POST /api/v1/auth/refresh` and retries original request
+- Protected route wrapper now redirects signed-out users from `/my-trips` to `/login`
 
 ## Environment
 Create `frontend/.env` with:
