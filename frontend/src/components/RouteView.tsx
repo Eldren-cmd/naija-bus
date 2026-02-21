@@ -1,13 +1,14 @@
-import type { RouteDetail } from "../types";
+import type { RouteDetail, TripCheckpoint } from "../types";
 import { RouteMap } from "./RouteMap";
 
 type RouteViewProps = {
   route: RouteDetail | null;
   loading: boolean;
   error: string | null;
+  tripCheckpoints: TripCheckpoint[];
 };
 
-export function RouteView({ route, loading, error }: RouteViewProps) {
+export function RouteView({ route, loading, error, tripCheckpoints }: RouteViewProps) {
   if (loading) {
     return (
       <section className="route-view card">
@@ -49,7 +50,7 @@ export function RouteView({ route, loading, error }: RouteViewProps) {
         <span>Stops: {route.stops.length}</span>
         <span>Path points: {route.polyline.coordinates.length}</span>
       </div>
-      <RouteMap route={route} />
+      <RouteMap route={route} tripCheckpoints={tripCheckpoints} />
       <h3 className="panel-title">Stops</h3>
       <ol className="stops-list">
         {route.stops.map((stop) => (

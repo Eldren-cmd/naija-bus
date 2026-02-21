@@ -51,6 +51,7 @@ This repository is being built strictly from:
 - [x] Phase 4 / Task 4.1: Backend trip recording endpoint (`POST /trips`) implemented with computed polyline, distance, and duration
 - [x] Phase 4 / Task 4.2: Backend trip history endpoint (`GET /trips?userId=`) implemented with auth and role-aware access control
 - [x] Phase 4 / Task 4.3: Frontend `TripRecorder` component added with Start/watchPosition checkpoint capture every 5 seconds
+- [x] Phase 4 / Task 4.4: Route map now draws live in-progress trip polyline from recorder checkpoints
 
 ## Working Rules for This Build
 - Move step-by-step in task order.

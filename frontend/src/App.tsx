@@ -8,7 +8,7 @@ import { ToastStack } from "./components/ToastStack";
 import { TrafficReportModal } from "./components/TrafficReportModal";
 import { TripRecorder } from "./components/TripRecorder";
 import { getRouteById, getRoutes } from "./lib/api";
-import type { RouteDetail, RouteSummary } from "./types";
+import type { RouteDetail, RouteSummary, TripCheckpoint } from "./types";
 import type { ToastItem, ToastTone } from "./components/ToastStack";
 import "./App.css";
 
@@ -26,6 +26,7 @@ function RouteFinderPage() {
   const [selectedRoute, setSelectedRoute] = useState<RouteDetail | null>(null);
   const [routeLoading, setRouteLoading] = useState(false);
   const [routeError, setRouteError] = useState<string | null>(null);
+  const [tripCheckpoints, setTripCheckpoints] = useState<TripCheckpoint[]>([]);
   const [fareRefreshNonce, setFareRefreshNonce] = useState(0);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const toastTimersRef = useRef<number[]>([]);
@@ -193,8 +194,13 @@ function RouteFinderPage() {
         </aside>
 
         <section className="right-panel">
-          <RouteView route={selectedRoute} loading={routeLoading} error={routeError} />
-          <TripRecorder routeName={selectedRoute?.name} />
+          <RouteView
+            route={selectedRoute}
+            loading={routeLoading}
+            error={routeError}
+            tripCheckpoints={tripCheckpoints}
+          />
+          <TripRecorder routeName={selectedRoute?.name} onCheckpointsChange={setTripCheckpoints} />
           <FareEstimate
             routeId={selectedRouteId}
             routeName={selectedRoute?.name}

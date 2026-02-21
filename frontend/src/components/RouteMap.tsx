@@ -3,11 +3,19 @@ import mapboxgl from "mapbox-gl";
 import type { FeatureCollection, LineString, Point } from "geojson";
 import { io, type Socket } from "socket.io-client";
 import { getReportsByBbox } from "../lib/api";
-import type { Bbox, ReportSeverity, ReportType, RouteDetail, ViewportReport } from "../types";
+import type {
+  Bbox,
+  ReportSeverity,
+  ReportType,
+  RouteDetail,
+  TripCheckpoint,
+  ViewportReport,
+} from "../types";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 type RouteMapProps = {
   route: RouteDetail;
+  tripCheckpoints: TripCheckpoint[];
 };
 
 const MAP_STYLE = "mapbox://styles/mapbox/streets-v12";
@@ -15,6 +23,8 @@ const ROUTE_SOURCE_ID = "route-line-source";
 const STOP_SOURCE_ID = "route-stop-source";
 const REPORT_SOURCE_ID = "route-report-source";
 const REPORT_LAYER_ID = "route-report-layer";
+const TRIP_SOURCE_ID = "trip-live-source";
+const TRIP_LAYER_ID = "trip-live-layer";
 const LAGOS_CENTER: [number, number] = [3.3792, 6.5244];
 const MAPBOX_TOKEN = (import.meta.env.VITE_MAPBOX_KEY || "").trim();
 const HAS_VALID_TOKEN =
@@ -81,6 +91,26 @@ const toStopFeatureCollection = (route: RouteDetail): FeatureCollection<Point> =
     },
   })),
 });
+
+const toTripFeatureCollection = (checkpoints: TripCheckpoint[]): FeatureCollection<LineString> => {
+  if (checkpoints.length < 2) {
+    return { type: "FeatureCollection", features: [] };
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        properties: { label: "live-trip" },
+        geometry: {
+          type: "LineString",
+          coordinates: checkpoints.map((checkpoint) => checkpoint.coords.coordinates),
+        },
+      },
+    ],
+  };
+};
 
 const isPoint = (value: unknown): value is [number, number] => {
   if (!Array.isArray(value) || value.length !== 2) return false;
@@ -184,7 +214,7 @@ const upsertReport = (current: ViewportReport[], incoming: ViewportReport): View
   return current.map((item, index) => (index === existingIndex ? incoming : item));
 };
 
-export function RouteMap({ route }: RouteMapProps) {
+export function RouteMap({ route, tripCheckpoints }: RouteMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const [reports, setReports] = useState<ViewportReport[]>([]);
@@ -194,6 +224,7 @@ export function RouteMap({ route }: RouteMapProps) {
 
   const routeLineData = useMemo(() => toRouteFeatureCollection(route), [route]);
   const stopData = useMemo(() => toStopFeatureCollection(route), [route]);
+  const tripLineData = useMemo(() => toTripFeatureCollection(tripCheckpoints), [tripCheckpoints]);
   const routeBbox = useMemo(() => toRouteBbox(route), [route]);
   const routeBboxKey = useMemo(() => (routeBbox ? routeBbox.join(",") : ""), [routeBbox]);
   const reportData = useMemo(() => toReportFeatureCollection(reports), [reports]);
@@ -363,6 +394,41 @@ export function RouteMap({ route }: RouteMapProps) {
   }, [reportData]);
 
   useEffect(() => {
+    if (!HAS_VALID_TOKEN || !mapRef.current) return;
+    const map = mapRef.current;
+
+    const drawTripLine = () => {
+      if (!map.getSource(TRIP_SOURCE_ID)) {
+        map.addSource(TRIP_SOURCE_ID, { type: "geojson", data: tripLineData });
+        map.addLayer({
+          id: TRIP_LAYER_ID,
+          type: "line",
+          source: TRIP_SOURCE_ID,
+          layout: {
+            "line-cap": "round",
+            "line-join": "round",
+          },
+          paint: {
+            "line-color": "#1B8A6B",
+            "line-width": 4.2,
+            "line-opacity": 0.9,
+            "line-dasharray": [1, 0.8],
+          },
+        });
+      } else {
+        const source = map.getSource(TRIP_SOURCE_ID) as mapboxgl.GeoJSONSource;
+        source.setData(tripLineData);
+      }
+    };
+
+    if (map.isStyleLoaded()) {
+      drawTripLine();
+    } else {
+      map.once("load", drawTripLine);
+    }
+  }, [tripLineData]);
+
+  useEffect(() => {
     if (!routeBbox || !HAS_VALID_TOKEN) {
       setRealtimeStatus("disconnected");
       return;
@@ -438,9 +504,18 @@ export function RouteMap({ route }: RouteMapProps) {
           <i className="report-dot report-dot-low" />
           Low
         </span>
+        <span className="legend-item">
+          <i className="trip-line-swatch" />
+          Live trip
+        </span>
       </div>
       <p className="muted map-report-meta">
         {reportsLoading ? "Loading live reports..." : `${reports.length} active reports in this route area.`}
+      </p>
+      <p className="muted map-report-meta">
+        {tripCheckpoints.length >= 2
+          ? `Live trip path points: ${tripCheckpoints.length}`
+          : "Live trip path appears after at least 2 checkpoints."}
       </p>
       <p className="muted map-report-meta">
         Realtime socket:{" "}

@@ -3,6 +3,7 @@ import type { TripCheckpoint } from "../types";
 
 type TripRecorderProps = {
   routeName?: string;
+  onCheckpointsChange?: (checkpoints: TripCheckpoint[]) => void;
 };
 
 const CAPTURE_INTERVAL_MS = 5000;
@@ -12,7 +13,7 @@ const formatRecordedAt = (value: string): string => {
   return Number.isNaN(date.getTime()) ? value : date.toLocaleTimeString();
 };
 
-export function TripRecorder({ routeName }: TripRecorderProps) {
+export function TripRecorder({ routeName, onCheckpointsChange }: TripRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [checkpoints, setCheckpoints] = useState<TripCheckpoint[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +27,10 @@ export function TripRecorder({ routeName }: TripRecorderProps) {
     }
     setIsRecording(false);
   };
+
+  useEffect(() => {
+    onCheckpointsChange?.(checkpoints);
+  }, [checkpoints, onCheckpointsChange]);
 
   useEffect(() => {
     return () => {
@@ -44,6 +49,7 @@ export function TripRecorder({ routeName }: TripRecorderProps) {
     if (watchIdRef.current !== null) return;
 
     lastCapturedAtRef.current = 0;
+    setCheckpoints([]);
     setIsRecording(true);
 
     watchIdRef.current = window.navigator.geolocation.watchPosition(
@@ -80,10 +86,7 @@ export function TripRecorder({ routeName }: TripRecorderProps) {
     );
   };
 
-  const latestCheckpoint = useMemo(
-    () => checkpoints[checkpoints.length - 1] ?? null,
-    [checkpoints],
-  );
+  const latestCheckpoint = useMemo(() => checkpoints[checkpoints.length - 1] ?? null, [checkpoints]);
 
   return (
     <section className="trip-recorder-card card">
@@ -95,20 +98,10 @@ export function TripRecorder({ routeName }: TripRecorderProps) {
       </p>
 
       <div className="trip-recorder-actions">
-        <button
-          type="button"
-          className="estimate-btn"
-          onClick={startRecording}
-          disabled={isRecording}
-        >
+        <button type="button" className="estimate-btn" onClick={startRecording} disabled={isRecording}>
           {isRecording ? "Recording..." : "Start Recording"}
         </button>
-        <button
-          type="button"
-          className="secondary-btn"
-          onClick={stopRecording}
-          disabled={!isRecording}
-        >
+        <button type="button" className="secondary-btn" onClick={stopRecording} disabled={!isRecording}>
           Stop
         </button>
       </div>
@@ -124,7 +117,7 @@ export function TripRecorder({ routeName }: TripRecorderProps) {
           <small>
             {formatRecordedAt(latestCheckpoint.recordedAt)}
             {typeof latestCheckpoint.accuracyMeters === "number"
-              ? ` • ±${Math.round(latestCheckpoint.accuracyMeters)}m`
+              ? ` | +/-${Math.round(latestCheckpoint.accuracyMeters)}m`
               : ""}
           </small>
         </div>

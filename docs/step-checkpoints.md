@@ -530,5 +530,23 @@ Status: complete. Implemented:
   - `npm --prefix frontend run lint`
   - `npm --prefix frontend run build`
 
+### Task 4.4
+- Show live polyline on map as checkpoints are collected (in-progress trip)
+
+Status: complete. Implemented:
+- lifted live trip checkpoints to route-level state in `frontend/src/App.tsx`
+- passed checkpoint stream through:
+  - `App` -> `RouteView` -> `RouteMap`
+- extended `frontend/src/components/RouteMap.tsx` with live trip map layers:
+  - added `trip-live-source` GeoJSON source
+  - added `trip-live-layer` line layer for in-progress trip path
+  - updates polyline in real time as new checkpoints arrive
+  - clears line automatically when a new recording starts (checkpoint reset)
+- added map legend + status text for live trip path
+- added map legend swatch styling in `frontend/src/App.css`
+- validation checks passed:
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
 ### Next Tasks
-- Continue Phase 4 in strict order: `4.4` (live in-progress trip polyline on map)
+- Continue Phase 4 in strict order: `4.5` (Stop -> preview modal -> upload flow)
