@@ -206,5 +206,26 @@ Status: complete (technical checks). Verified:
 - `GET /api/v1/fare/estimate?routeId=&time=08:30` -> returned fare breakdown
 - frontend dev server reachable on `http://localhost:5173` (`200`)
 
+### Milestone Gate 2 (Visual Confirmation)
+- Record browser flow: search `Ojota`, select route, show map + stops + fare panel
+
+Status: complete. Verified from captured recording:
+- `Ojota -> CMS` search and selection shown
+- route map polyline + stop markers visible
+- stops list visible
+- fare estimate panel with breakdown and confidence visible
+
+## Phase 3 - Crowdsourced Intelligence
+
+### Task 3.1
+- Implement `POST /fare/report` (auth required); store fare report in DB
+
+Status: complete. Implemented:
+- `POST /api/v1/fare/report` and alias `POST /fare/report`
+- auth-protected report submission with validation
+- route existence check before save
+- mapped payload `reportedFare` -> `Fare.amount`
+- added integration tests in `backend/tests/fareReport.integration.test.ts`
+
 ### Next Tasks
-- Milestone Gate 2 visual confirmation + screen recording in browser
+- 3.2 Implement `POST /reports` for traffic/police/roadblock submissions

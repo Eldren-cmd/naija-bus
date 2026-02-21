@@ -30,6 +30,8 @@ This repository is being built strictly from:
 - [x] Phase 2 / Integration Tests: Supertest flow added for login, routes list, and fare estimate endpoints
 - [x] Phase 2 / Map Rendering: Selected route polyline + stop markers now render in RouteView (Mapbox)
 - [x] Milestone Gate 2 / Technical Check: `Ojota` search flow resolves route + map data + fare estimate, backend DB connected, frontend reachable
+- [x] Milestone Gate 2 / Visual Check: Browser recording confirms `Ojota` search, route load, map render, stops list, and fare panel
+- [x] Phase 3 / Task 3.1: Authenticated `POST /fare/report` endpoint implemented with payload validation and route existence check
 
 ## Working Rules for This Build
 - Move step-by-step in task order.

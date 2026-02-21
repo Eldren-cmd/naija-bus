@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import { isValidObjectId } from "mongoose";
 import { connectToDatabase, ensureCoreIndexes, getDatabaseStatus } from "./config/db";
-import { Route, Stop } from "./models";
+import { Fare, Route, Stop } from "./models";
 import { authMiddleware, requireRoles } from "./middleware/authMiddleware";
 import { authRouter } from "./routes/auth";
 import { FareServiceError, estimateRouteFare } from "./services/fareService";
@@ -66,6 +66,10 @@ const parseNear = (nearRaw: string): [number, number] | null => {
 
 const TRANSPORT_TYPES = ["danfo", "brt", "keke", "bus", "ferry", "mixed"] as const;
 type TransportType = (typeof TRANSPORT_TYPES)[number];
+const TRAFFIC_LEVELS = ["low", "medium", "high"] as const;
+type TrafficLevel = (typeof TRAFFIC_LEVELS)[number];
+const FARE_REPORT_SOURCES = ["system", "user_report", "admin_update"] as const;
+type FareReportSource = (typeof FARE_REPORT_SOURCES)[number];
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
@@ -85,6 +89,10 @@ const isCoordinatePair = (value: unknown): value is [number, number] => {
 
 const isTransportType = (value: unknown): value is TransportType =>
   typeof value === "string" && (TRANSPORT_TYPES as readonly string[]).includes(value);
+const isTrafficLevel = (value: unknown): value is TrafficLevel =>
+  typeof value === "string" && (TRAFFIC_LEVELS as readonly string[]).includes(value);
+const isFareReportSource = (value: unknown): value is FareReportSource =>
+  typeof value === "string" && (FARE_REPORT_SOURCES as readonly string[]).includes(value);
 
 const isPolylinePayload = (
   value: unknown,
@@ -179,6 +187,26 @@ const validateRouteUpdatePayload = (body: unknown): string | null => {
     return "isActive must be boolean";
   }
 
+  return null;
+};
+
+const validateFareReportPayload = (body: unknown): string | null => {
+  if (!isObject(body)) return "request body must be an object";
+  if (typeof body.routeId !== "string" || !isValidObjectId(body.routeId.trim())) {
+    return "routeId is required and must be a valid id";
+  }
+  if (!Number.isFinite(body.reportedFare) || Number(body.reportedFare) <= 0) {
+    return "reportedFare must be a positive number";
+  }
+  if (body.trafficLevel !== undefined && !isTrafficLevel(body.trafficLevel)) {
+    return "trafficLevel must be one of: low, medium, high";
+  }
+  if (body.notes !== undefined && typeof body.notes !== "string") {
+    return "notes must be a string";
+  }
+  if (body.source !== undefined && !isFareReportSource(body.source)) {
+    return "source must be one of: system, user_report, admin_update";
+  }
   return null;
 };
 
@@ -435,6 +463,42 @@ const getFareEstimateHandler = async (req: Request, res: Response) => {
 
 app.get("/api/v1/fare/estimate", getFareEstimateHandler);
 app.get("/fare/estimate", getFareEstimateHandler);
+
+const createFareReportHandler = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "authentication required" });
+    }
+
+    const validationError = validateFareReportPayload(req.body);
+    if (validationError) {
+      return res.status(400).json({ error: validationError });
+    }
+
+    const body = req.body as Record<string, unknown>;
+    const routeId = String(body.routeId).trim();
+    const route = await Route.findOne({ _id: routeId, isActive: true }).select("_id").lean();
+    if (!route) {
+      return res.status(404).json({ error: "route not found" });
+    }
+
+    const created = await Fare.create({
+      routeId,
+      amount: Number(body.reportedFare),
+      source: isFareReportSource(body.source) ? body.source : ("user_report" as const),
+      trafficLevel: isTrafficLevel(body.trafficLevel) ? body.trafficLevel : ("medium" as const),
+      reportedBy: req.user.id,
+      notes: typeof body.notes === "string" ? body.notes.trim() : "",
+    });
+
+    return res.status(201).json(created);
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to save fare report" });
+  }
+};
+
+app.post("/api/v1/fare/report", authMiddleware, createFareReportHandler);
+app.post("/fare/report", authMiddleware, createFareReportHandler);
 
 const startServer = async (): Promise<void> => {
   try {
