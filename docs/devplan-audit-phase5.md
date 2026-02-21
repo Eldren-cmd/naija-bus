@@ -9,6 +9,11 @@ Status labels:
 - `partial`: implemented with differences from DevPlan
 - `missing`: not implemented yet
 
+Cross-guide enforcement (mandatory for remaining tasks):
+- `NaijaTransport_DesignGuide.docx` must be checked for UI/UX items on each task.
+- `NaijaTransport_EngagementGuide.docx` must be checked for engagement applicability on each task.
+- A task should only remain `complete` when applicable Design/Engagement requirements are implemented or explicitly documented as not applicable.
+
 | Task | Status | Notes |
 | --- | --- | --- |
 | 5.1 | complete | Login page implemented; access token moved to in-memory session state; backend login now sets refresh token via httpOnly cookie. |
@@ -30,3 +35,8 @@ Status labels:
 
 1. Continue with `5.9` next.
 2. Progress sequentially through Phase 5 tasks.
+
+## Cross-Phase Compliance Tracking
+
+- Previous-phase and future-phase cross-guide compliance is now tracked centrally in:
+  - `docs/cross-phase-compliance-audit.md`

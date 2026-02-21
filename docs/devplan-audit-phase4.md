@@ -30,3 +30,10 @@ Status labels:
 
 Milestone Gate 4 includes a manual real-device GPS recording flow.  
 Implementation is complete in code, but final gate confirmation remains a user-run validation step.
+
+## Cross-Guide Overlay (Design + Engagement)
+
+- Design alignment is strong for trip recording/replay UX; one optional visual consistency item (map style parity between RouteView and MyTrips) is tracked.
+- Engagement alignment is partial; Phase 4 improves retention behavior but does not complete rewards/gamification systems.
+- Cross-phase retrospective + forward compliance tracking is maintained in:
+  - `docs/cross-phase-compliance-audit.md`

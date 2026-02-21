@@ -544,6 +544,18 @@
   cursor: pointer;
   display: grid;
   gap: 0.16rem;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.route-list button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(13, 27, 42, 0.14);
+  border-color: #d8b38d;
+  background: #fffaf4;
 }
 
 .route-list button strong {
@@ -603,6 +615,18 @@
   cursor: pointer;
   display: grid;
   gap: 0.12rem;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.saved-route-list button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(13, 27, 42, 0.12);
+  border-color: #d8b38d;
+  background: #fffaf4;
 }
 
 .saved-route-list button strong {

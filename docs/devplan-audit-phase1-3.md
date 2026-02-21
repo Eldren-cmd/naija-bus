@@ -69,3 +69,12 @@ Status labels:
 
 1. Phase 2 backlog is cleared.
 2. Phase 3 tasks are complete (`3.1` through `3.13`).
+
+## Cross-Guide Overlay (Design + Engagement)
+
+- Design alignment for completed UI tasks in these phases is generally in place.
+- Engagement alignment is partial:
+  - reporting loop features are implemented
+  - WhatsApp/bot-origin ingestion features from engagement guidance remain pending
+- Full retrospective + forward plan tracking is maintained in:
+  - `docs/cross-phase-compliance-audit.md`

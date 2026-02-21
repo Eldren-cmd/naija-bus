@@ -1,17 +1,17 @@
-# Engagement Guide Mapping (Pre-Step 8 Reconciliation)
+# Engagement Guide Mapping
 
-Source added to strict references:
-- `NaijaTransport_EngagementGuide.docx`
+Audit date: 2026-02-21  
+Reference: `NaijaTransport_EngagementGuide.docx`
 
-## Implemented Now (because they belong in foundation/model layer)
+## Implemented Foundations (Phase 1)
 
-1. User role expansion for engagement actors:
+1. Role model support is in place:
 - `user`
 - `champion`
 - `conductor`
 - `admin`
 
-2. User engagement data fields (for later Phase 3/5/6 features):
+2. Engagement-ready user fields are in place:
 - `championRoutes`
 - `reportCount`
 - `streak`
@@ -25,23 +25,50 @@ Source added to strict references:
 - `phone`
 - `source`
 
-Rationale:
-- These are schema foundations referenced by multiple engagement strategies.
-- Adding them now avoids later migration friction and keeps Step 1 model work complete.
+## Retrospective Compliance (Completed Phases)
 
-## Not Implemented Yet (scheduled by development plan and engagement guide phase mapping)
+### Phase 1
+- Engagement foundation requirements are satisfied at schema level.
 
-1. WhatsApp bot integration (Phase 3)
-2. Bot auth middleware + bot-origin report ingestion (Phase 3)
-3. Quick-report conductor UI + conductor links (Phase 5)
-4. Badge award engine + streak cron + leaderboard endpoint (Phase 5)
-5. Airtime rewards job (Phase 5/6)
-6. Twitter/X auto-feed bot (Phase 6)
-7. Referral rewards flow (Post-launch v2 or late Phase 5 depending scope)
-8. PWA offline mode/service worker (Phase 6)
-9. USSD fallback (Post-launch v2)
+### Phase 2
+- No major engagement-specific features were required; focus was core route/fare MVP.
 
-## Pre-Step 8 Status
+### Phase 3
+- Community reporting loop is partially aligned:
+  - fare reports and traffic reports are live
+  - realtime visibility of reports is live
+- Engagement guide items not yet implemented in this phase:
+  - WhatsApp bot integration
+  - bot-auth report ingestion path
 
-Foundation Steps 1–7 remain in order and complete.
-Proceeding next with Step 8 (`authMiddleware.ts`) after this reconciliation checkpoint.
+### Phase 4
+- Trip recording and history improve retention signals but do not yet include rewards/gamification loops.
+
+### Phase 5 (through Task 5.8)
+- Added saved routes retention loop:
+  - authenticated save/unsave route actions
+  - saved routes surfaced directly on Home
+
+## Future Compliance Plan
+
+### Remaining Phase 5
+- `5.9`: include engagement-oriented mobile usability checks for reporting and saved routes.
+- `5.10`: loading skeletons should cover high-frequency engagement actions.
+- `5.11`: empty saved-routes UX should include clear call-to-action copy.
+- `5.12`: global error boundary should preserve trust with clear recovery messaging.
+- `5.13`: E2E flows should include auth + save route + report actions.
+- `5.14`: UAT should include engagement acceptance checks (repeat-use loop and report loop).
+
+### Phase 6 and Beyond
+- Twitter/X auto-feed bot
+- Airtime rewards job completion
+- PWA offline/service worker support
+- USSD fallback (post-launch scope)
+- Referral rewards flow (post-launch or late Phase 5 if prioritized)
+
+## Rule Going Forward
+
+For every new task completion:
+1. Check if an Engagement Guide item applies.
+2. Implement it in-sequence when it matches scope.
+3. If not in-scope for the active task, document the deferral explicitly in checkpoint/audit notes.

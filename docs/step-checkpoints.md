@@ -59,6 +59,10 @@ Status: complete. Live checks confirm:
 - Deferred feature-level engagement work to the planned phases
 - Full mapping documented in `docs/engagement-guide-mapping.md`
 
+## Cross-Phase Compliance Tracking
+- Full retrospective (previous phases) and forward (future phases) Design+Engagement compliance audit is maintained in:
+  - `docs/cross-phase-compliance-audit.md`
+
 ## Task 1.8
 - Add JWT middleware for protected routes
 - Validate protected route behavior with and without token
@@ -678,6 +682,13 @@ Notes:
 
 ## Phase 5 - Auth, Admin & UX Polish
 
+### Mandatory Cross-Guide Check (Design + Engagement)
+- After each Phase 5 task completion, run and record:
+  - DevPlan acceptance check
+  - Design Guide applicability check (`NaijaTransport_DesignGuide.docx`)
+  - Engagement Guide applicability check (`NaijaTransport_EngagementGuide.docx`)
+- If an applicable guide requirement is missing, do not mark the task fully complete until it is implemented or explicitly documented as out-of-scope for that task.
+
 ### Task 5.1
 - Build Login page (`POST /auth/login`); store access token in memory; refresh token in httpOnly cookie
 
@@ -935,3 +946,4 @@ Status: complete. Implemented:
 
 ### Next Tasks
 - Continue Phase 5 in strict order: `5.9` (mobile responsive audit/fixes for Home, RouteView, and MyTrips).
+- Include mandatory Design + Engagement applicability checks in the `5.9` completion record.

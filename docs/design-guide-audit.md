@@ -12,16 +12,18 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Font variables configured in `frontend/src/index.css`.
 - Warm cream background and amber/navy palette direction already in place.
 - Animated fare number transition implemented in `frontend/src/components/FareEstimate.tsx`.
+- RouteView map style switched to `mapbox://styles/mapbox/navigation-night-v1`.
+- Route polyline now includes glow + stronger layered line styling in `frontend/src/components/RouteMap.tsx`.
+- Route list cards and saved-route cards now include hover lift + shadow motion in `frontend/src/App.css`.
 
 ## High-Impact Gaps To Implement Next
 
-1. Route map visual style
-- RouteView map still uses `streets-v12`; guide recommends `navigation-night-v1` for RouteView.
-- Route glow + stronger line styling not yet implemented.
+1. Route map visual style follow-through
+- MyTrips replay map still uses `streets-v12`; keep or align with RouteView style if we want full visual consistency.
 
 2. Search and card interaction polish
-- Search focus ring + typeahead dropdown behavior now implemented.
-- Route cards do not yet apply the recommended hover lift + shadow motion.
+- Search focus ring + typeahead dropdown behavior implemented.
+- Route cards now apply hover lift + shadow motion.
 
 3. Feedback interactions
 - Guide-recommended toast feedback for submissions is now implemented.
@@ -33,5 +35,4 @@ Reference: `NaijaTransport_DesignGuide.docx`
 ## Implementation Note
 
 Remaining design-only polish still open:
-- Route map visual style (`navigation-night-v1` + stronger route glow)
-- Route card hover lift + shadow motion
+- Decide whether to align MyTrips map style with RouteView map style for full consistency

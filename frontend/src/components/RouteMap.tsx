@@ -18,8 +18,10 @@ type RouteMapProps = {
   tripCheckpoints: TripCheckpoint[];
 };
 
-const MAP_STYLE = "mapbox://styles/mapbox/streets-v12";
+const MAP_STYLE = "mapbox://styles/mapbox/navigation-night-v1";
 const ROUTE_SOURCE_ID = "route-line-source";
+const ROUTE_GLOW_LAYER_ID = "route-line-glow-layer";
+const ROUTE_LAYER_ID = "route-line-layer";
 const STOP_SOURCE_ID = "route-stop-source";
 const REPORT_SOURCE_ID = "route-report-source";
 const REPORT_LAYER_ID = "route-report-layer";
@@ -289,13 +291,24 @@ export function RouteMap({ route, tripCheckpoints }: RouteMapProps) {
       if (!map.getSource(ROUTE_SOURCE_ID)) {
         map.addSource(ROUTE_SOURCE_ID, { type: "geojson", data: routeLineData });
         map.addLayer({
-          id: "route-line-layer",
+          id: ROUTE_GLOW_LAYER_ID,
+          type: "line",
+          source: ROUTE_SOURCE_ID,
+          paint: {
+            "line-color": "#FFAA5E",
+            "line-width": 11,
+            "line-opacity": 0.32,
+            "line-blur": 1.2,
+          },
+        });
+        map.addLayer({
+          id: ROUTE_LAYER_ID,
           type: "line",
           source: ROUTE_SOURCE_ID,
           paint: {
             "line-color": "#CC5500",
-            "line-width": 5,
-            "line-opacity": 0.95,
+            "line-width": 5.2,
+            "line-opacity": 0.97,
           },
         });
       } else {
