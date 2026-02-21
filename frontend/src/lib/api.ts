@@ -9,6 +9,8 @@ import type {
   RouteSummary,
   SearchResponse,
   TrafficLevel,
+  TripRecordInput,
+  TripRecordResponse,
 } from "../types";
 
 const API_BASE = (import.meta.env.VITE_API_BASE || "http://localhost:5000").replace(/\/+$/, "");
@@ -97,4 +99,11 @@ export const reportIncident = async (
 export const getReportsByBbox = async (bbox: Bbox): Promise<IncidentReportResponse[]> => {
   const query = bbox.join(",");
   return apiGet<IncidentReportResponse[]>(`/api/v1/reports?bbox=${encodeURIComponent(query)}`);
+};
+
+export const createTripRecord = async (
+  input: TripRecordInput,
+  authToken: string,
+): Promise<TripRecordResponse> => {
+  return apiPost<TripRecordResponse>("/api/v1/trips", input, authToken);
 };

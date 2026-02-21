@@ -200,7 +200,12 @@ function RouteFinderPage() {
             error={routeError}
             tripCheckpoints={tripCheckpoints}
           />
-          <TripRecorder routeName={selectedRoute?.name} onCheckpointsChange={setTripCheckpoints} />
+          <TripRecorder
+            routeId={selectedRouteId}
+            routeName={selectedRoute?.name}
+            onCheckpointsChange={setTripCheckpoints}
+            onToast={notify}
+          />
           <FareEstimate
             routeId={selectedRouteId}
             routeName={selectedRoute?.name}

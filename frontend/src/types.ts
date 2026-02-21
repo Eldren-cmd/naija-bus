@@ -140,3 +140,27 @@ export type TripCheckpoint = {
   recordedAt: string;
   accuracyMeters?: number;
 };
+
+export type TripRecordInput = {
+  routeId?: string;
+  checkpoints: TripCheckpoint[];
+  startedAt?: string;
+  endedAt?: string;
+};
+
+export type TripRecordResponse = {
+  _id: string;
+  userId: string;
+  routeId?: string;
+  checkpoints: TripCheckpoint[];
+  polyline: {
+    type: "LineString";
+    coordinates: [number, number][];
+  };
+  distanceMeters: number;
+  durationSeconds: number;
+  startedAt: string;
+  endedAt: string;
+  createdAt: string;
+  updatedAt: string;
+};

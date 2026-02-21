@@ -15,7 +15,7 @@ Status labels:
 | 4.2 | complete | `GET /trips?userId=` implemented with auth, access control, validation, and trip history query behavior. |
 | 4.3 | complete | `TripRecorder` component added with Start/watchPosition cadence and local checkpoint state. |
 | 4.4 | complete | Live in-progress trip polyline now renders on RouteMap from recorder checkpoints. |
-| 4.5 | missing | Stop/preview/upload flow UI not implemented yet. |
+| 4.5 | complete | TripRecorder now supports Stop->preview modal with path/distance and upload to `POST /trips`. |
 | 4.6 | missing | `MyTrips` page list view not implemented yet. |
 | 4.7 | missing | MyTrips map redraw from stored checkpoints not implemented yet. |
 | 4.8 | missing | Geolocation denial UX handling for trip recorder not implemented yet. |
@@ -23,5 +23,5 @@ Status labels:
 
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `4.5` next.
+1. Continue with `4.6` next.
 2. Keep progressing sequentially through Phase 4 tasks.

@@ -1,32 +1,115 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createTripRecord } from "../lib/api";
 import type { TripCheckpoint } from "../types";
+import type { ToastTone } from "./ToastStack";
 
 type TripRecorderProps = {
+  routeId?: string | null;
   routeName?: string;
   onCheckpointsChange?: (checkpoints: TripCheckpoint[]) => void;
+  onToast?: (tone: ToastTone, message: string) => void;
 };
 
 const CAPTURE_INTERVAL_MS = 5000;
+const TOKEN_STORAGE_KEY = "naija_transport_jwt";
+const PREVIEW_WIDTH = 640;
+const PREVIEW_HEIGHT = 220;
+const PREVIEW_PADDING = 16;
 
 const formatRecordedAt = (value: string): string => {
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? value : date.toLocaleTimeString();
 };
 
-export function TripRecorder({ routeName, onCheckpointsChange }: TripRecorderProps) {
+const toRadians = (degrees: number): number => (degrees * Math.PI) / 180;
+
+const haversineDistanceMeters = (from: [number, number], to: [number, number]): number => {
+  const EARTH_RADIUS_METERS = 6_371_000;
+  const [fromLng, fromLat] = from;
+  const [toLng, toLat] = to;
+
+  const latDelta = toRadians(toLat - fromLat);
+  const lngDelta = toRadians(toLng - fromLng);
+  const fromLatRad = toRadians(fromLat);
+  const toLatRad = toRadians(toLat);
+
+  const a =
+    Math.sin(latDelta / 2) ** 2 +
+    Math.cos(fromLatRad) * Math.cos(toLatRad) * Math.sin(lngDelta / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return EARTH_RADIUS_METERS * c;
+};
+
+const computeDistanceMeters = (checkpoints: TripCheckpoint[]): number => {
+  if (checkpoints.length < 2) return 0;
+  let total = 0;
+  for (let i = 1; i < checkpoints.length; i += 1) {
+    total += haversineDistanceMeters(
+      checkpoints[i - 1].coords.coordinates,
+      checkpoints[i].coords.coordinates,
+    );
+  }
+  return Math.round(total);
+};
+
+const formatDistance = (meters: number): string => {
+  if (meters >= 1000) return `${(meters / 1000).toFixed(2)} km`;
+  return `${meters} m`;
+};
+
+const formatDuration = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}m ${secs}s`;
+};
+
+const toPolylinePoints = (checkpoints: TripCheckpoint[]): string | null => {
+  if (checkpoints.length < 2) return null;
+
+  const coords = checkpoints.map((checkpoint) => checkpoint.coords.coordinates);
+  const lngs = coords.map(([lng]) => lng);
+  const lats = coords.map(([, lat]) => lat);
+
+  const minLng = Math.min(...lngs);
+  const maxLng = Math.max(...lngs);
+  const minLat = Math.min(...lats);
+  const maxLat = Math.max(...lats);
+
+  const spanLng = maxLng - minLng || 0.000001;
+  const spanLat = maxLat - minLat || 0.000001;
+  const drawWidth = PREVIEW_WIDTH - PREVIEW_PADDING * 2;
+  const drawHeight = PREVIEW_HEIGHT - PREVIEW_PADDING * 2;
+
+  return coords
+    .map(([lng, lat]) => {
+      const x = PREVIEW_PADDING + ((lng - minLng) / spanLng) * drawWidth;
+      const y = PREVIEW_HEIGHT - PREVIEW_PADDING - ((lat - minLat) / spanLat) * drawHeight;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+};
+
+export function TripRecorder({
+  routeId,
+  routeName,
+  onCheckpointsChange,
+  onToast,
+}: TripRecorderProps) {
+  const [token, setToken] = useState("");
   const [isRecording, setIsRecording] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [checkpoints, setCheckpoints] = useState<TripCheckpoint[]>([]);
+  const [tripStartedAt, setTripStartedAt] = useState<string | null>(null);
+  const [tripEndedAt, setTripEndedAt] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const watchIdRef = useRef<number | null>(null);
   const lastCapturedAtRef = useRef<number>(0);
 
-  const stopRecording = () => {
-    if (watchIdRef.current !== null) {
-      window.navigator.geolocation.clearWatch(watchIdRef.current);
-      watchIdRef.current = null;
-    }
-    setIsRecording(false);
-  };
+  useEffect(() => {
+    const saved = window.localStorage.getItem(TOKEN_STORAGE_KEY);
+    if (saved) setToken(saved);
+  }, []);
 
   useEffect(() => {
     onCheckpointsChange?.(checkpoints);
@@ -40,15 +123,51 @@ export function TripRecorder({ routeName, onCheckpointsChange }: TripRecorderPro
     };
   }, []);
 
+  const handleTokenChange = (nextToken: string) => {
+    setToken(nextToken);
+    const normalized = nextToken.trim();
+    if (!normalized) {
+      window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+      return;
+    }
+    window.localStorage.setItem(TOKEN_STORAGE_KEY, normalized);
+  };
+
+  const stopRecording = () => {
+    if (watchIdRef.current !== null) {
+      window.navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+    setIsRecording(false);
+
+    const stoppedAt = new Date().toISOString();
+    setTripEndedAt(stoppedAt);
+
+    if (checkpoints.length < 2) {
+      const message = "At least 2 checkpoints are required before preview and upload.";
+      setError(message);
+      onToast?.("error", message);
+      return;
+    }
+
+    setIsPreviewOpen(true);
+  };
+
   const startRecording = () => {
     setError(null);
+    setIsPreviewOpen(false);
     if (!window.navigator.geolocation) {
-      setError("Geolocation is not available in this browser.");
+      const message = "Geolocation is not available in this browser.";
+      setError(message);
+      onToast?.("error", message);
       return;
     }
     if (watchIdRef.current !== null) return;
 
+    const startedAt = new Date().toISOString();
     lastCapturedAtRef.current = 0;
+    setTripStartedAt(startedAt);
+    setTripEndedAt(null);
     setCheckpoints([]);
     setIsRecording(true);
 
@@ -75,7 +194,9 @@ export function TripRecorder({ routeName, onCheckpointsChange }: TripRecorderPro
         setCheckpoints((previous) => [...previous, nextCheckpoint]);
       },
       () => {
-        setError("Unable to track position. Check device location permission and try again.");
+        const message = "Unable to track position. Check device location permission and try again.";
+        setError(message);
+        onToast?.("error", message);
         stopRecording();
       },
       {
@@ -86,7 +207,64 @@ export function TripRecorder({ routeName, onCheckpointsChange }: TripRecorderPro
     );
   };
 
+  const uploadTrip = async () => {
+    setError(null);
+    if (checkpoints.length < 2) {
+      const message = "At least 2 checkpoints are required for upload.";
+      setError(message);
+      onToast?.("error", message);
+      return;
+    }
+
+    const authToken = token.trim();
+    if (!authToken) {
+      const message = "JWT is required. Login first, then paste your token.";
+      setError(message);
+      onToast?.("error", message);
+      return;
+    }
+
+    const startedAt = tripStartedAt || checkpoints[0].recordedAt;
+    const endedAt = tripEndedAt || checkpoints[checkpoints.length - 1].recordedAt;
+
+    setUploading(true);
+    try {
+      const response = await createTripRecord(
+        {
+          routeId: routeId || undefined,
+          checkpoints,
+          startedAt,
+          endedAt,
+        },
+        authToken,
+      );
+
+      onToast?.(
+        "success",
+        `Trip uploaded: ${formatDistance(response.distanceMeters)} in ${formatDuration(response.durationSeconds)}.`,
+      );
+      setIsPreviewOpen(false);
+      setCheckpoints([]);
+      setTripStartedAt(null);
+      setTripEndedAt(null);
+    } catch (requestError) {
+      const message = requestError instanceof Error ? requestError.message : "Failed to upload trip";
+      setError(message);
+      onToast?.("error", message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const latestCheckpoint = useMemo(() => checkpoints[checkpoints.length - 1] ?? null, [checkpoints]);
+  const previewDistanceMeters = useMemo(() => computeDistanceMeters(checkpoints), [checkpoints]);
+  const previewPolylinePoints = useMemo(() => toPolylinePoints(checkpoints), [checkpoints]);
+  const previewDurationSeconds = useMemo(() => {
+    const startValue = tripStartedAt ? new Date(tripStartedAt).getTime() : NaN;
+    const endValue = tripEndedAt ? new Date(tripEndedAt).getTime() : Date.now();
+    if (!Number.isFinite(startValue) || !Number.isFinite(endValue)) return 0;
+    return Math.max(0, Math.round((endValue - startValue) / 1000));
+  }, [tripStartedAt, tripEndedAt]);
 
   return (
     <section className="trip-recorder-card card">
@@ -102,7 +280,7 @@ export function TripRecorder({ routeName, onCheckpointsChange }: TripRecorderPro
           {isRecording ? "Recording..." : "Start Recording"}
         </button>
         <button type="button" className="secondary-btn" onClick={stopRecording} disabled={!isRecording}>
-          Stop
+          Stop & Preview
         </button>
       </div>
 
@@ -124,6 +302,56 @@ export function TripRecorder({ routeName, onCheckpointsChange }: TripRecorderPro
       )}
 
       {error && <p className="error-text">{error}</p>}
+
+      {isPreviewOpen && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Trip preview modal">
+          <div className="modal-card">
+            <div className="modal-head">
+              <h3 className="panel-title">Trip Preview</h3>
+              <button type="button" className="modal-close-btn" onClick={() => setIsPreviewOpen(false)}>
+                Close
+              </button>
+            </div>
+
+            <div className="trip-preview-meta">
+              <span>Route: {routeName || "Unspecified route"}</span>
+              <span>Points: {checkpoints.length}</span>
+              <span>Distance: {formatDistance(previewDistanceMeters)}</span>
+              <span>Duration: {formatDuration(previewDurationSeconds)}</span>
+            </div>
+
+            <div className="trip-preview-canvas">
+              {previewPolylinePoints ? (
+                <svg viewBox={`0 0 ${PREVIEW_WIDTH} ${PREVIEW_HEIGHT}`} aria-label="Trip path preview">
+                  <rect x="0" y="0" width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} rx="12" />
+                  <polyline points={previewPolylinePoints} />
+                </svg>
+              ) : (
+                <p className="muted">Trip path preview requires at least 2 checkpoints.</p>
+              )}
+            </div>
+
+            <label className="trip-token-field">
+              JWT token
+              <input
+                type="password"
+                value={token}
+                placeholder="Paste Bearer token from login"
+                onChange={(event) => handleTokenChange(event.target.value)}
+              />
+            </label>
+
+            <div className="modal-actions">
+              <button type="button" className="secondary-btn" onClick={() => setIsPreviewOpen(false)}>
+                Cancel
+              </button>
+              <button type="button" className="estimate-btn" onClick={() => void uploadTrip()} disabled={uploading}>
+                {uploading ? "Uploading..." : "Upload Trip"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

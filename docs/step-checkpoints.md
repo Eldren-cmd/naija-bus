@@ -548,5 +548,27 @@ Status: complete. Implemented:
   - `npm --prefix frontend run lint`
   - `npm --prefix frontend run build`
 
+### Task 4.5
+- Stop button -> preview modal showing trip path + distance -> Upload button -> `POST /trips`
+
+Status: complete. Implemented:
+- enhanced `frontend/src/components/TripRecorder.tsx` flow:
+  - `Stop & Preview` opens modal when at least 2 checkpoints exist
+  - preview modal shows:
+    - trip path preview (SVG polyline)
+    - checkpoint count
+    - computed distance
+    - computed duration
+  - upload action calls `POST /api/v1/trips`
+- added frontend trip API wiring:
+  - `createTripRecord` in `frontend/src/lib/api.ts`
+  - `TripRecordInput`/`TripRecordResponse` types in `frontend/src/types.ts`
+- added JWT token field in preview modal (stored in localStorage key already used by auth flows)
+- wired `TripRecorder` with app toast notifications in `frontend/src/App.tsx`
+- added preview modal/path styles in `frontend/src/App.css`
+- validation checks passed:
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
 ### Next Tasks
-- Continue Phase 4 in strict order: `4.5` (Stop -> preview modal -> upload flow)
+- Continue Phase 4 in strict order: `4.6` (`MyTrips` page list view)
