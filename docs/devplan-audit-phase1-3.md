@@ -1,6 +1,6 @@
 # DevPlan Audit (Phase 1-3)
 
-Audit date: 2026-02-21  
+Audit date: 2026-02-21 (refreshed)  
 Reference: `NaijaTransport_DevPlan.docx`  
 Scope: Task-by-task check from `1.1` to `3.13`.
 
@@ -36,8 +36,8 @@ Status labels:
 | 2.4 | complete | `GET /stops?near=lng,lat&radius=` implemented. |
 | 2.5 | complete | Fare engine/service implemented. |
 | 2.6 | complete | `GET /fare/estimate` implemented. |
-| 2.7 | missing | `GET /search?q=` aggregation endpoint not present. |
-| 2.8 | missing | `express-rate-limit` not applied on `/search` and `/routes`. |
+| 2.7 | complete | `GET /search?q=` aggregation endpoint implemented for routes + stops. |
+| 2.8 | complete | `express-rate-limit` applied on `/search` and `/routes` endpoints. |
 | 2.9 | missing | `zod` schema validation for POST/PUT not implemented. |
 | 2.10 | complete | Route map component implemented with Mapbox line + stops. |
 | 2.11 | missing | Debounced typeahead `SearchInput` calling `/search` not implemented. |
@@ -67,5 +67,5 @@ Status labels:
 
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Finish remaining Phase 2 tasks first: `2.7`, `2.8`, `2.9`, `2.11`, `2.15`.
+1. Finish remaining Phase 2 tasks first: `2.9`, `2.11`, `2.15`.
 2. Continue with remaining Phase 3 tasks: `3.8`, `3.9`, `3.10`, `3.11`, `3.13`.

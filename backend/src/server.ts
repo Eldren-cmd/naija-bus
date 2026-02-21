@@ -1,6 +1,7 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
+import { rateLimit } from "express-rate-limit";
 import { createServer } from "http";
 import { isValidObjectId } from "mongoose";
 import { connectToDatabase, ensureCoreIndexes, getDatabaseStatus } from "./config/db";
@@ -30,6 +31,34 @@ app.get("/api/v1/health", (_req, res) => {
 });
 
 const escapeRegex = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const parsePositiveInteger = (value: string | undefined, fallback: number): number => {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+};
+
+const SEARCH_RATE_LIMIT_WINDOW_MS = parsePositiveInteger(
+  process.env.SEARCH_RATE_LIMIT_WINDOW_MS,
+  60_000,
+);
+const SEARCH_RATE_LIMIT_MAX = parsePositiveInteger(process.env.SEARCH_RATE_LIMIT_MAX, 60);
+const ROUTES_RATE_LIMIT_WINDOW_MS = parsePositiveInteger(
+  process.env.ROUTES_RATE_LIMIT_WINDOW_MS,
+  60_000,
+);
+const ROUTES_RATE_LIMIT_MAX = parsePositiveInteger(process.env.ROUTES_RATE_LIMIT_MAX, 120);
+
+const createRateLimiter = (windowMs: number, max: number) =>
+  rateLimit({
+    windowMs,
+    max,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    message: { error: "too many requests, please try again shortly" },
+  });
+
+const searchRateLimiter = createRateLimiter(SEARCH_RATE_LIMIT_WINDOW_MS, SEARCH_RATE_LIMIT_MAX);
+const routesRateLimiter = createRateLimiter(ROUTES_RATE_LIMIT_WINDOW_MS, ROUTES_RATE_LIMIT_MAX);
 
 const parseBbox = (bboxRaw: string): [number, number, number, number] | null => {
   const parts = bboxRaw.split(",").map((part) => Number(part.trim()));
@@ -321,8 +350,8 @@ const getRoutesHandler = async (req: Request, res: Response) => {
   }
 };
 
-app.get("/api/v1/routes", getRoutesHandler);
-app.get("/routes", getRoutesHandler);
+app.get("/api/v1/routes", routesRateLimiter, getRoutesHandler);
+app.get("/routes", routesRateLimiter, getRoutesHandler);
 
 const getSearchHandler = async (req: Request, res: Response) => {
   try {
@@ -400,8 +429,8 @@ const getSearchHandler = async (req: Request, res: Response) => {
   }
 };
 
-app.get("/api/v1/search", getSearchHandler);
-app.get("/search", getSearchHandler);
+app.get("/api/v1/search", searchRateLimiter, getSearchHandler);
+app.get("/search", searchRateLimiter, getSearchHandler);
 
 const getRouteByIdHandler = async (req: Request, res: Response) => {
   try {

@@ -27,6 +27,7 @@ This repository is being built strictly from:
 - [x] Phase 2 / Task 2.5: Fare estimate service layer added (`fareService.ts`) with route lookup + time/traffic multipliers
 - [x] Phase 2 / Task 2.6: `GET /fare/estimate` endpoint implemented with route/time query support and fare breakdown response
 - [x] Phase 2 / Task 2.7: `GET /search?q=` endpoint implemented to aggregate route + stop matches
+- [x] Phase 2 / Task 2.8: Added `express-rate-limit` protection on `/search` and `/routes`
 - [x] Phase 2 / Frontend MVP View: Route search + RouteView (ordered stops) + FareEstimate panel wired to backend API
 - [x] Phase 2 / Integration Tests: Supertest flow added for login, routes list, and fare estimate endpoints
 - [x] Phase 2 / Map Rendering: Selected route polyline + stop markers now render in RouteView (Mapbox)
@@ -62,6 +63,12 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 - `JWT_SECRET`: long random secret used to sign/verify access tokens.
 - `JWT_EXPIRES_IN`: token duration (for example `7d`).
 - `CORS_ORIGIN`: allowed frontend origin (local default `http://localhost:5173`).
+
+### Backend Optional Keys
+- `SEARCH_RATE_LIMIT_WINDOW_MS`: window size for `/search` rate limit.
+- `SEARCH_RATE_LIMIT_MAX`: max requests per window for `/search`.
+- `ROUTES_RATE_LIMIT_WINDOW_MS`: window size for `/routes` rate limit.
+- `ROUTES_RATE_LIMIT_MAX`: max requests per window for `/routes`.
 
 ### Frontend Keys
 - `VITE_API_BASE`: backend base URL used by frontend API calls.

@@ -172,6 +172,21 @@ Status: complete. Implemented:
 - combined response includes `routes`, `stops`, and `counts` summary
 - added integration tests in `backend/tests/phase2.integration.test.ts`
 
+### Task 2.8
+- Add rate limiting (`express-rate-limit`) on `/search` and `/routes`
+
+Status: complete. Implemented:
+- added `express-rate-limit` dependency in backend
+- added configurable rate limit middleware in `backend/src/server.ts`
+- applied limiter to:
+  - `GET /api/v1/search` and `GET /search`
+  - `GET /api/v1/routes` and `GET /routes`
+- added optional environment keys in `backend/.env.example`:
+  - `SEARCH_RATE_LIMIT_WINDOW_MS`
+  - `SEARCH_RATE_LIMIT_MAX`
+  - `ROUTES_RATE_LIMIT_WINDOW_MS`
+  - `ROUTES_RATE_LIMIT_MAX`
+
 ### Phase 2 Frontend MVP View
 - Build RouteView page section showing selected route + ordered stops
 - Build FareEstimate component calling `GET /fare/estimate`
@@ -320,5 +335,5 @@ Status: complete. Implemented:
 - saves JWT token locally in browser storage for repeated report submissions
 
 ### Next Tasks
-- DevPlan alignment backlog from Phase 2: `2.7`, `2.8`, `2.9`, `2.11`, `2.15` (see `docs/devplan-audit-phase1-3.md`)
+- DevPlan alignment backlog from Phase 2: `2.9`, `2.11`, `2.15` (see `docs/devplan-audit-phase1-3.md`)
 - 3.8 Build traffic report modal: type, severity, description, auto-fill location
