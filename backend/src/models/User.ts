@@ -20,8 +20,71 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ["user", "admin"],
+      enum: ["user", "champion", "conductor", "admin"],
       default: "user",
+    },
+    phone: {
+      type: String,
+      trim: true,
+      required: false,
+      unique: true,
+      sparse: true,
+    },
+    source: {
+      type: String,
+      enum: ["app", "web", "whatsapp", "ussd", "bot"],
+      default: "app",
+    },
+    championRoutes: {
+      type: [{ type: Schema.Types.ObjectId, ref: "Route" }],
+      default: [],
+    },
+    reportCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    streak: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    lastReportDate: {
+      type: Date,
+      required: false,
+    },
+    airtimeEarned: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    badges: {
+      type: [String],
+      default: [],
+    },
+    referralCode: {
+      type: String,
+      required: false,
+      unique: true,
+      sparse: true,
+      uppercase: true,
+      trim: true,
+    },
+    referredBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: false,
+    },
+    referralPaid: {
+      type: Boolean,
+      default: false,
+    },
+    conductorToken: {
+      type: String,
+      required: false,
+      unique: true,
+      sparse: true,
+      trim: true,
     },
     savedRoutes: {
       type: [{ type: Schema.Types.ObjectId, ref: "Route" }],

@@ -3,6 +3,7 @@
 This repository is being built strictly from:
 - `NaijaTransport_DesignGuide.docx`
 - `NaijaTransport_DevPlan.docx`
+- `NaijaTransport_EngagementGuide.docx`
 
 ## Current Progress
 - [x] Phase 1 / Task 1.1: Monorepo skeleton created (`frontend/`, `backend/`, `seed/`, `scripts/`)

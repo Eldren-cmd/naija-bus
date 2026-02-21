@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 type JwtPayload = {
   sub: string;
   email: string;
-  role: "user" | "admin";
+  role: "user" | "champion" | "conductor" | "admin";
 };
 
 export const signAccessToken = (payload: JwtPayload): string => {

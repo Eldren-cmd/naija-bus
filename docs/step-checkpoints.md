@@ -53,6 +53,12 @@ Status: complete. Live checks confirm:
 - duplicate register returns `409`
 - wrong password returns `401`
 
+## Pre-Step 8 Reconciliation (Engagement Guide)
+- Added `NaijaTransport_EngagementGuide.docx` as a strict source
+- Implemented foundation-level engagement schema extensions in `User` model
+- Deferred feature-level engagement work to the planned phases
+- Full mapping documented in `docs/engagement-guide-mapping.md`
+
 ## Next Tasks
 - 1.8 Add JWT middleware for protected routes
 - 1.9 Create `.env.example` files and document required keys

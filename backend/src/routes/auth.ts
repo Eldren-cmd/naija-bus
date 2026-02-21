@@ -11,7 +11,7 @@ const sanitizeUser = (user: {
   _id: unknown;
   fullName: string;
   email: string;
-  role: "user" | "admin";
+  role: "user" | "champion" | "conductor" | "admin";
 }) => ({
   id: String(user._id),
   fullName: user.fullName,
