@@ -13,7 +13,7 @@ Status labels:
 | --- | --- | --- |
 | 4.1 | complete | `POST /trips` implemented with auth, payload validation, route check, computed polyline/distance/duration, and integration tests. |
 | 4.2 | complete | `GET /trips?userId=` implemented with auth, access control, validation, and trip history query behavior. |
-| 4.3 | missing | `TripRecorder` component start/watchPosition flow not implemented yet. |
+| 4.3 | complete | `TripRecorder` component added with Start/watchPosition cadence and local checkpoint state. |
 | 4.4 | missing | Live in-progress trip polyline map rendering not implemented yet. |
 | 4.5 | missing | Stop/preview/upload flow UI not implemented yet. |
 | 4.6 | missing | `MyTrips` page list view not implemented yet. |
@@ -23,5 +23,5 @@ Status labels:
 
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `4.3` next.
+1. Continue with `4.4` next.
 2. Keep progressing sequentially through Phase 4 tasks.

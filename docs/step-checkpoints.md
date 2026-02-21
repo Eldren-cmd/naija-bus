@@ -512,5 +512,23 @@ Status: complete. Implemented:
   - `npm --prefix backend run test`
   - `npm --prefix backend run build`
 
+### Task 4.3
+- Build `TripRecorder` component: Start button -> watchPosition every 5s -> local state array
+
+Status: complete. Implemented:
+- added `frontend/src/components/TripRecorder.tsx`
+- component behavior:
+  - `Start Recording` initializes browser geolocation `watchPosition`
+  - captures checkpoints at a 5-second cadence into local state array
+  - stores each checkpoint as GeoJSON point + timestamp + optional accuracy
+  - exposes recording state, checkpoint count, and latest checkpoint summary
+  - supports `Stop` to halt watch stream
+- wired TripRecorder into main route flow in `frontend/src/App.tsx`
+- added trip recorder styles in `frontend/src/App.css`
+- added shared frontend checkpoint type in `frontend/src/types.ts`
+- validation checks passed:
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
 ### Next Tasks
-- Continue Phase 4 in strict order: `4.3` (`TripRecorder` component with watchPosition flow)
+- Continue Phase 4 in strict order: `4.4` (live in-progress trip polyline on map)

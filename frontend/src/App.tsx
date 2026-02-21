@@ -6,6 +6,7 @@ import { RouteView } from "./components/RouteView";
 import { SearchInput } from "./components/SearchInput";
 import { ToastStack } from "./components/ToastStack";
 import { TrafficReportModal } from "./components/TrafficReportModal";
+import { TripRecorder } from "./components/TripRecorder";
 import { getRouteById, getRoutes } from "./lib/api";
 import type { RouteDetail, RouteSummary } from "./types";
 import type { ToastItem, ToastTone } from "./components/ToastStack";
@@ -193,6 +194,7 @@ function RouteFinderPage() {
 
         <section className="right-panel">
           <RouteView route={selectedRoute} loading={routeLoading} error={routeError} />
+          <TripRecorder routeName={selectedRoute?.name} />
           <FareEstimate
             routeId={selectedRouteId}
             routeName={selectedRoute?.name}

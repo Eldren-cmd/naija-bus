@@ -131,3 +131,12 @@ export type IncidentReportResponse = {
 };
 
 export type ViewportReport = IncidentReportResponse;
+
+export type TripCheckpoint = {
+  coords: {
+    type: "Point";
+    coordinates: [number, number];
+  };
+  recordedAt: string;
+  accuracyMeters?: number;
+};

@@ -14,6 +14,7 @@ React + TypeScript + Vite frontend for Naija Transport.
 - Severity-coded incident report markers on the route map (`GET /api/v1/reports?bbox=`)
 - Realtime incident marker updates with Socket.IO (`report:created` on `/reports`)
 - Toast notification feedback for report submission success/error states
+- TripRecorder component with geolocation checkpoint capture cadence (every 5 seconds)
 
 ## Environment
 Create `frontend/.env` with:

@@ -435,6 +435,42 @@
   background: linear-gradient(165deg, #fff 0%, #fff8f0 100%);
 }
 
+.trip-recorder-card {
+  padding: 1rem;
+  border: 1px solid #d9c8b4;
+  background: linear-gradient(165deg, #fff 0%, #f7fbff 100%);
+}
+
+.trip-recorder-actions {
+  display: flex;
+  gap: 0.55rem;
+  margin-top: 0.65rem;
+  margin-bottom: 0.5rem;
+}
+
+.trip-recorder-meta {
+  margin: 0 0 0.55rem;
+}
+
+.trip-recorder-latest {
+  border: 1px solid #d7e2ee;
+  border-radius: 0.8rem;
+  background: #f6fbff;
+  padding: 0.55rem 0.6rem;
+  margin-bottom: 0.55rem;
+}
+
+.trip-recorder-latest p {
+  margin: 0;
+  font-weight: 700;
+}
+
+.trip-recorder-latest small {
+  color: #4f647a;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
 .report-form {
   margin-top: 0.75rem;
   display: grid;
@@ -700,6 +736,10 @@
 
   .modal-actions {
     flex-direction: column-reverse;
+  }
+
+  .trip-recorder-actions {
+    flex-direction: column;
   }
 
   .toast-stack {
