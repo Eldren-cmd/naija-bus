@@ -74,7 +74,13 @@ Status: complete. Live checks confirm:
 
 Status: complete. Added `backend/.env.example`, `frontend/.env.example`, and README env key documentation.
 
+## Task 1.10
+- Add `seed/initialRoutes.json` with 5 Lagos corridors
+- Add `scripts/seed.js` to insert/update routes and stops
+
+Status: complete. Seed dataset and script created; `--dry-run` validation passes.
+
 ## Next Tasks
-- 1.10 Write seed script for 5 Lagos corridors
 - 1.11 Run seed script and verify seeded routes
 - 1.12 Write first unit test (fare engine) and ensure CI-ready test pass
+- Gate 1 verification: register returns JWT, routes endpoint returns seeded routes

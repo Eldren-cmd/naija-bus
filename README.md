@@ -15,8 +15,9 @@ This repository is being built strictly from:
 - [x] Phase 1 / Task 1.7: Implemented auth routes (`POST /auth/register`, `POST /auth/login`) with bcrypt + JWT
 - [x] Phase 1 / Task 1.8: Added JWT auth middleware for protected routes
 - [x] Phase 1 / Task 1.9: Added `.env.example` files and documented required env keys
+- [x] Phase 1 / Task 1.10: Added route seed dataset and seed script for 5 Lagos corridors
 - [x] Social post archive initialized (`social_posts/`)
-- [ ] Remaining Phase 1 tasks (1.10 to 1.12)
+- [ ] Remaining Phase 1 tasks (1.11 to 1.12)
 
 ## Working Rules for This Build
 - Move step-by-step in task order.
@@ -44,3 +45,11 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 ### Frontend Keys
 - `VITE_API_BASE`: backend base URL used by frontend API calls.
 - `VITE_MAPBOX_KEY`: Mapbox token (required from Phase 2 map work onward).
+
+## Seed Data (Phase 1 Task 1.10)
+- Dataset file: `seed/initialRoutes.json` (5 Lagos corridors).
+- Script file: `scripts/seed.js`.
+
+Commands:
+1. Validate only (no DB writes): `node scripts/seed.js --dry-run`
+2. Seed database: `node scripts/seed.js`

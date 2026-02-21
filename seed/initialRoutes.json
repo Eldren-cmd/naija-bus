@@ -1,0 +1,138 @@
+[
+  {
+    "name": "Ojota -> CMS",
+    "origin": "Ojota",
+    "destination": "CMS",
+    "corridor": "Ikorodu Road to Lagos Island",
+    "aliases": ["Ojota CMS", "Ojota to CMS", "Ojota -> CMS"],
+    "transportType": "danfo",
+    "baseFare": 300,
+    "confidenceScore": 0.72,
+    "polyline": {
+      "type": "LineString",
+      "coordinates": [
+        [3.3788, 6.5839],
+        [3.3707, 6.559],
+        [3.3589, 6.5469],
+        [3.3742, 6.5125],
+        [3.3953, 6.4892],
+        [3.4058, 6.4527],
+        [3.3976, 6.4479]
+      ]
+    },
+    "stops": [
+      { "name": "Ojota", "coords": [3.3788, 6.5839], "isMajor": true },
+      { "name": "Maryland", "coords": [3.3707, 6.559], "isMajor": true },
+      { "name": "Anthony", "coords": [3.3589, 6.5469], "isMajor": false },
+      { "name": "Jibowu", "coords": [3.3742, 6.5125], "isMajor": true },
+      { "name": "Yaba", "coords": [3.3953, 6.4892], "isMajor": true },
+      { "name": "CMS", "coords": [3.3976, 6.4479], "isMajor": true }
+    ]
+  },
+  {
+    "name": "Lekki -> VI",
+    "origin": "Lekki",
+    "destination": "Victoria Island",
+    "corridor": "Lekki-Epe Expressway to VI",
+    "aliases": ["Lekki VI", "Lekki to VI", "Lekki -> VI"],
+    "transportType": "bus",
+    "baseFare": 500,
+    "confidenceScore": 0.69,
+    "polyline": {
+      "type": "LineString",
+      "coordinates": [
+        [3.465, 6.4354],
+        [3.4417, 6.4342],
+        [3.424, 6.431],
+        [3.4147, 6.4312]
+      ]
+    },
+    "stops": [
+      { "name": "Lekki Phase 1", "coords": [3.465, 6.4354], "isMajor": true },
+      { "name": "Lekki Toll Gate", "coords": [3.4417, 6.4342], "isMajor": true },
+      { "name": "Oniru", "coords": [3.424, 6.431], "isMajor": false },
+      { "name": "Victoria Island", "coords": [3.4147, 6.4312], "isMajor": true }
+    ]
+  },
+  {
+    "name": "Berger -> Oshodi",
+    "origin": "Berger",
+    "destination": "Oshodi",
+    "corridor": "Lagos-Ibadan Expressway to Oshodi",
+    "aliases": ["Berger Oshodi", "Berger to Oshodi", "Berger -> Oshodi"],
+    "transportType": "danfo",
+    "baseFare": 400,
+    "confidenceScore": 0.7,
+    "polyline": {
+      "type": "LineString",
+      "coordinates": [
+        [3.3475, 6.6498],
+        [3.366, 6.6392],
+        [3.3568, 6.6018],
+        [3.329, 6.5659],
+        [3.343, 6.5532]
+      ]
+    },
+    "stops": [
+      { "name": "Berger", "coords": [3.3475, 6.6498], "isMajor": true },
+      { "name": "Ojodu", "coords": [3.366, 6.6392], "isMajor": false },
+      { "name": "Ikeja Along", "coords": [3.3568, 6.6018], "isMajor": true },
+      { "name": "Airport Road", "coords": [3.329, 6.5659], "isMajor": false },
+      { "name": "Oshodi", "coords": [3.343, 6.5532], "isMajor": true }
+    ]
+  },
+  {
+    "name": "Yaba -> Ikeja",
+    "origin": "Yaba",
+    "destination": "Ikeja",
+    "corridor": "Yaba axis to Ikeja central",
+    "aliases": ["Yaba Ikeja", "Yaba to Ikeja", "Yaba -> Ikeja"],
+    "transportType": "danfo",
+    "baseFare": 250,
+    "confidenceScore": 0.68,
+    "polyline": {
+      "type": "LineString",
+      "coordinates": [
+        [3.3763, 6.5096],
+        [3.3793, 6.5178],
+        [3.367, 6.5383],
+        [3.3568, 6.6018],
+        [3.3439, 6.6075]
+      ]
+    },
+    "stops": [
+      { "name": "Yaba", "coords": [3.3763, 6.5096], "isMajor": true },
+      { "name": "Sabo", "coords": [3.3793, 6.5178], "isMajor": false },
+      { "name": "Fadeyi", "coords": [3.367, 6.5383], "isMajor": false },
+      { "name": "Ikeja Along", "coords": [3.3568, 6.6018], "isMajor": true },
+      { "name": "Ikeja Under Bridge", "coords": [3.3439, 6.6075], "isMajor": true }
+    ]
+  },
+  {
+    "name": "Ajah -> VI",
+    "origin": "Ajah",
+    "destination": "Victoria Island",
+    "corridor": "Ajah-Lekki to VI",
+    "aliases": ["Ajah VI", "Ajah to VI", "Ajah -> VI"],
+    "transportType": "bus",
+    "baseFare": 700,
+    "confidenceScore": 0.66,
+    "polyline": {
+      "type": "LineString",
+      "coordinates": [
+        [3.5458, 6.4698],
+        [3.4898, 6.4437],
+        [3.4417, 6.4342],
+        [3.424, 6.431],
+        [3.4147, 6.4312]
+      ]
+    },
+    "stops": [
+      { "name": "Ajah", "coords": [3.5458, 6.4698], "isMajor": true },
+      { "name": "Chevron", "coords": [3.4898, 6.4437], "isMajor": false },
+      { "name": "Lekki Toll Gate", "coords": [3.4417, 6.4342], "isMajor": true },
+      { "name": "Oniru", "coords": [3.424, 6.431], "isMajor": false },
+      { "name": "Victoria Island", "coords": [3.4147, 6.4312], "isMajor": true }
+    ]
+  }
+]
