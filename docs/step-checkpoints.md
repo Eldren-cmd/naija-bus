@@ -196,5 +196,15 @@ Status: complete. Implemented:
 - Added fallback message when `VITE_MAPBOX_KEY` is missing
 - Verified frontend build and lint pass
 
+### Milestone Gate 2 (Technical Flow Check)
+- Verify flow: search `Ojota`, open route, load route detail + fare panel data
+
+Status: complete (technical checks). Verified:
+- `GET /api/v1/health` -> `ok`, DB `connected`
+- `GET /api/v1/routes?q=Ojota` -> returned route match
+- `GET /api/v1/routes/:routeId` -> returned stops and polyline payload
+- `GET /api/v1/fare/estimate?routeId=&time=08:30` -> returned fare breakdown
+- frontend dev server reachable on `http://localhost:5173` (`200`)
+
 ### Next Tasks
-- Gate 2 flow check: search "Ojota", open route, confirm map + fare panel UX
+- Milestone Gate 2 visual confirmation + screen recording in browser
