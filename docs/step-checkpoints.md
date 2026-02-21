@@ -99,6 +99,18 @@ Status: complete. Jest suite added (`tests/fareEngine.test.ts`) and passes (`5/5
 Status: Gate 1 passed. Phase 1 foundation is complete.
 
 ## Next Phase (Phase 2)
-- 2.1 Implement `GET /routes` with text + bbox query support
+## Phase 2 — Core MVP
+
+### Task 2.1
+- Implement `GET /routes` with `q` text search and `bbox` geo filter support
+
+Status: complete. Live checks confirm:
+- `GET /api/v1/routes` -> `200` with all seeded routes
+- `GET /api/v1/routes?q=Ojota` -> filtered match
+- `GET /api/v1/routes?bbox=...` -> geo-filtered match
+- invalid `bbox` -> `400`
+
+### Next Tasks
 - 2.2 Implement `GET /routes/:routeId`
 - 2.3 Implement admin `POST/PUT/DELETE /routes`
+- 2.4 Implement `GET /stops?near=lng,lat&radius=500`

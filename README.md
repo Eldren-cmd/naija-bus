@@ -20,6 +20,7 @@ This repository is being built strictly from:
 - [x] Phase 1 / Task 1.12: Added first unit test suite (fare engine base logic) with Jest
 - [x] Social post archive initialized (`social_posts/`)
 - [x] Milestone Gate 1 verification complete (`register` returns JWT, `GET /api/v1/routes` returns seeded routes)
+- [x] Phase 2 / Task 2.1: `GET /routes` supports `q` text search and `bbox` geo filtering
 
 ## Working Rules for This Build
 - Move step-by-step in task order.
