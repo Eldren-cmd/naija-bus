@@ -60,7 +60,7 @@ Status labels:
 | 3.7 | complete | Frontend report fare flow implemented and connected to `POST /fare/report`. |
 | 3.8 | complete | Traffic report modal implemented with type, severity, description, and geolocation auto-fill. |
 | 3.9 | complete | Route map now renders severity-coded report markers from `GET /reports?bbox=`. |
-| 3.10 | missing | Frontend Socket.IO client reactive marker updates not implemented. |
+| 3.10 | complete | Frontend Socket.IO client now applies `report:created` events to map markers in real time. |
 | 3.11 | missing | Toast component for report submission feedback not implemented. |
 | 3.12 | complete | TTL index on `reports.createdAt` already configured. |
 | 3.13 | missing | Two-browser real-time marker demo validation not yet completed. |
@@ -68,4 +68,4 @@ Status labels:
 ## Recovery Order (Strict DevPlan Alignment)
 
 1. Phase 2 backlog is cleared.
-2. Continue with remaining Phase 3 tasks: `3.10`, `3.11`, `3.13`.
+2. Continue with remaining Phase 3 tasks: `3.11`, `3.13`.

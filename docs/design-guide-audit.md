@@ -28,9 +28,9 @@ Reference: `NaijaTransport_DesignGuide.docx`
 
 4. Realtime map signals
 - Severity-based report marker colors are now present on the map.
-- Live marker updates over Socket.IO are still pending.
+- Live marker updates over Socket.IO are now implemented.
 
 ## Implementation Note
 
 These design items align directly with pending DevPlan tasks:
-- `3.10`, `3.11`
+- `3.11`

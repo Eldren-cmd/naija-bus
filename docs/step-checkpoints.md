@@ -410,6 +410,19 @@ Status: complete. Implemented:
   - show marker popup summary on click
 - added map legend + live report count/error UX in `frontend/src/App.css`
 
+### Task 3.10
+- Add frontend Socket.IO client for real-time report marker updates
+
+Status: complete. Implemented:
+- added frontend `socket.io-client` dependency
+- updated `frontend/src/components/RouteMap.tsx` to:
+  - open Socket.IO connection to `/reports` namespace
+  - subscribe/unsubscribe to current route viewport bbox (`viewport:subscribe`)
+  - subscribe/unsubscribe current route channel (`route:subscribe`)
+  - handle `report:created` events and upsert markers without page reload
+  - show realtime connection state under map
+- kept initial `GET /reports?bbox=` fetch as baseline data load before live stream updates
+
 ### Next Tasks
 - DevPlan alignment backlog from Phase 2: cleared
-- 3.10 Add frontend Socket.IO client for real-time report marker updates
+- 3.11 Add toast feedback component for report submissions
