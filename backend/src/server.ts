@@ -10,7 +10,7 @@ import { FareServiceError, estimateRouteFare } from "./services/fareService";
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 const port = Number(process.env.PORT || 5000);
 const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
 
@@ -449,4 +449,6 @@ const startServer = async (): Promise<void> => {
   }
 };
 
-void startServer();
+if (process.env.NODE_ENV !== "test") {
+  void startServer();
+}

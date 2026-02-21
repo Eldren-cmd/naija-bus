@@ -27,6 +27,7 @@ This repository is being built strictly from:
 - [x] Phase 2 / Task 2.5: Fare estimate service layer added (`fareService.ts`) with route lookup + time/traffic multipliers
 - [x] Phase 2 / Task 2.6: `GET /fare/estimate` endpoint implemented with route/time query support and fare breakdown response
 - [x] Phase 2 / Frontend MVP View: Route search + RouteView (ordered stops) + FareEstimate panel wired to backend API
+- [x] Phase 2 / Integration Tests: Supertest flow added for login, routes list, and fare estimate endpoints
 
 ## Working Rules for This Build
 - Move step-by-step in task order.

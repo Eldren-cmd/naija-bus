@@ -172,6 +172,18 @@ Status: complete. Implemented:
 - Shared API client in `frontend/src/lib/api.ts`
 - Verified frontend production build passes
 
+### Phase 2 Integration Tests (Supertest)
+- Write integration tests (Supertest): login, GET routes, GET fare/estimate
+
+Status: complete. Implemented:
+- Added `backend/tests/phase2.integration.test.ts`
+- Added test environment setup `backend/tests/setupEnv.ts`
+- Added Supertest dependencies in backend devDependencies
+- Verified:
+  - `POST /api/v1/auth/login` -> `200` with JWT
+  - `GET /api/v1/routes` -> `200` with route payload
+  - `GET /api/v1/fare/estimate` -> `200` with fare breakdown
+  - unknown route on fare estimate -> `404`
+
 ### Next Tasks
-- Integration tests (Supertest) for Phase 2 endpoint flow
 - Map rendering task: draw selected route polyline in RouteView
