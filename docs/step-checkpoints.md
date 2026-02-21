@@ -597,5 +597,27 @@ Status: complete. Implemented:
   - `npm --prefix frontend run lint`
   - `npm --prefix frontend run build`
 
+### Task 4.7
+- On MyTrips card click: show trip polyline on map using stored checkpoints GeoJSON
+
+Status: complete. Implemented:
+- added `frontend/src/components/MyTripMap.tsx`
+- map behavior:
+  - builds trip line GeoJSON from stored `trip.checkpoints[].coords.coordinates`
+  - renders selected trip polyline in a dedicated MyTrips map panel
+  - fits map bounds to selected trip path
+  - clears line state when no replayable trip is selected
+- updated `frontend/src/App.tsx` MyTrips flow:
+  - added selectable trip-card behavior
+  - preserves selected card when possible after reload
+  - defaults to first trip on successful load
+  - wired selected trip into `MyTripMap`
+- updated MyTrips UI styles in `frontend/src/App.css`:
+  - active trip card state
+  - map panel layout and canvas styling
+- validation checks passed:
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
 ### Next Tasks
-- Continue Phase 4 in strict order: `4.7` (MyTrips card click -> show stored trip polyline on map)
+- Continue Phase 4 in strict order: `4.8` (geolocation-denied UX path for trip recorder)

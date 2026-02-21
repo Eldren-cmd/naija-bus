@@ -18,6 +18,7 @@ React + TypeScript + Vite frontend for Naija Transport.
 - Live in-progress trip polyline rendering on map from recorder checkpoints
 - Trip preview + upload modal flow (`POST /api/v1/trips`) from recorder stop action
 - MyTrips page with authenticated trip history cards (`GET /api/v1/trips?userId=...`)
+- MyTrips trip replay map: selecting a trip card redraws stored checkpoint path on Mapbox
 
 ## Environment
 Create `frontend/.env` with:

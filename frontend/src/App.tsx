@@ -7,6 +7,7 @@ import { SearchInput } from "./components/SearchInput";
 import { ToastStack } from "./components/ToastStack";
 import { TrafficReportModal } from "./components/TrafficReportModal";
 import { TripRecorder } from "./components/TripRecorder";
+import { MyTripMap } from "./components/MyTripMap";
 import { getAuthProfile, getRouteById, getRoutes, getTripsByUser } from "./lib/api";
 import type { RouteDetail, RouteSummary, TripCheckpoint, TripRecordResponse } from "./types";
 import type { ToastItem, ToastTone } from "./components/ToastStack";
@@ -261,6 +262,7 @@ function MyTripsPage() {
   const [token, setToken] = useState("");
   const [profileName, setProfileName] = useState<string | null>(null);
   const [trips, setTrips] = useState<TripRecordResponse[]>([]);
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -272,11 +274,16 @@ function MyTripsPage() {
       setProfileName(profile.user.fullName);
       const data = await getTripsByUser(profile.user.id, authToken);
       setTrips(data);
+      setSelectedTripId((previous) => {
+        if (previous && data.some((trip) => trip._id === previous)) return previous;
+        return data[0]?._id ?? null;
+      });
     } catch (requestError) {
       const message =
         requestError instanceof Error ? requestError.message : "Failed to load trip history";
       setError(message);
       setTrips([]);
+      setSelectedTripId(null);
     } finally {
       setLoading(false);
     }
@@ -307,6 +314,9 @@ function MyTripsPage() {
     }
     void loadTripsWithToken(authToken);
   };
+
+  const selectedTrip =
+    selectedTripId && trips.length > 0 ? trips.find((trip) => trip._id === selectedTripId) ?? null : null;
 
   return (
     <main className="app-shell">
@@ -339,38 +349,57 @@ function MyTripsPage() {
           {error && <p className="error-text">{error}</p>}
         </section>
 
-        <section className="mytrips-list">
-          {loading && <p className="muted">Loading trip history...</p>}
+        <section className="mytrips-main">
+          <section className="mytrips-list">
+            {loading && <p className="muted">Loading trip history...</p>}
 
-          {!loading && trips.length === 0 && (
-            <div className="mytrip-empty card">
-              <p className="muted">No uploaded trips yet. Record and upload your first trip from Route Finder.</p>
+            {!loading && trips.length === 0 && (
+              <div className="mytrip-empty card">
+                <p className="muted">No uploaded trips yet. Record and upload your first trip from Route Finder.</p>
+              </div>
+            )}
+
+            <ul className="trip-card-list">
+              {trips.map((trip) => {
+                const routeSummary =
+                  typeof trip.routeId === "object" && trip.routeId
+                    ? `${trip.routeId.name} (${trip.routeId.origin} to ${trip.routeId.destination})`
+                    : "Route not specified";
+                const isActive = trip._id === selectedTripId;
+
+                return (
+                  <li key={trip._id}>
+                    <button
+                      type="button"
+                      className={`trip-card card ${isActive ? "is-active" : ""}`}
+                      onClick={() => setSelectedTripId(trip._id)}
+                    >
+                      <div className="trip-card-head">
+                        <strong>{formatDateTime(trip.startedAt)}</strong>
+                        <span>{formatDistance(trip.distanceMeters)}</span>
+                      </div>
+                      <p className="trip-card-route">{routeSummary}</p>
+                      <div className="trip-card-meta">
+                        <span>Duration: {formatDuration(trip.durationSeconds)}</span>
+                        <span>Checkpoints: {trip.checkpoints.length}</span>
+                        <span>Ended: {formatDateTime(trip.endedAt)}</span>
+                      </div>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+
+          <section className="mytrips-map-panel card">
+            <div className="mytrips-map-head">
+              <h3 className="panel-title">Trip Replay Map</h3>
+              <p className="muted small">
+                Select a trip card to replay its stored checkpoints as a route line.
+              </p>
             </div>
-          )}
-
-          <ul className="trip-card-list">
-            {trips.map((trip) => {
-              const routeSummary =
-                typeof trip.routeId === "object" && trip.routeId
-                  ? `${trip.routeId.name} (${trip.routeId.origin} to ${trip.routeId.destination})`
-                  : "Route not specified";
-
-              return (
-                <li key={trip._id} className="trip-card card">
-                  <div className="trip-card-head">
-                    <strong>{formatDateTime(trip.startedAt)}</strong>
-                    <span>{formatDistance(trip.distanceMeters)}</span>
-                  </div>
-                  <p className="trip-card-route">{routeSummary}</p>
-                  <div className="trip-card-meta">
-                    <span>Duration: {formatDuration(trip.durationSeconds)}</span>
-                    <span>Checkpoints: {trip.checkpoints.length}</span>
-                    <span>Ended: {formatDateTime(trip.endedAt)}</span>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+            <MyTripMap trip={selectedTrip} />
+          </section>
         </section>
       </section>
     </main>

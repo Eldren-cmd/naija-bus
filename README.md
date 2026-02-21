@@ -54,6 +54,7 @@ This repository is being built strictly from:
 - [x] Phase 4 / Task 4.4: Route map now draws live in-progress trip polyline from recorder checkpoints
 - [x] Phase 4 / Task 4.5: TripRecorder stop flow now opens preview modal and uploads trip to backend (`POST /trips`)
 - [x] Phase 4 / Task 4.6: MyTrips page now fetches and displays trip history cards (date, distance, duration)
+- [x] Phase 4 / Task 4.7: MyTrips trip-card click now redraws stored checkpoint polyline on replay map
 
 ## Working Rules for This Build
 - Move step-by-step in task order.
