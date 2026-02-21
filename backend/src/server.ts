@@ -1,8 +1,9 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
+import { isValidObjectId } from "mongoose";
 import { connectToDatabase, ensureCoreIndexes, getDatabaseStatus } from "./config/db";
-import { Route } from "./models";
+import { Route, Stop } from "./models";
 import { authRouter } from "./routes/auth";
 
 dotenv.config();
@@ -101,6 +102,28 @@ const getRoutesHandler = async (req: Request, res: Response) => {
 
 app.get("/api/v1/routes", getRoutesHandler);
 app.get("/routes", getRoutesHandler);
+
+const getRouteByIdHandler = async (req: Request, res: Response) => {
+  try {
+    const routeId = req.params.routeId;
+    if (!isValidObjectId(routeId)) {
+      return res.status(400).json({ error: "invalid routeId" });
+    }
+
+    const route = await Route.findOne({ _id: routeId, isActive: true }).lean();
+    if (!route) {
+      return res.status(404).json({ error: "route not found" });
+    }
+
+    const stops = await Stop.find({ routeId: route._id }).sort({ order: 1 }).lean();
+    return res.status(200).json({ ...route, stops });
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to fetch route" });
+  }
+};
+
+app.get("/api/v1/routes/:routeId", getRouteByIdHandler);
+app.get("/routes/:routeId", getRouteByIdHandler);
 
 const startServer = async (): Promise<void> => {
   try {

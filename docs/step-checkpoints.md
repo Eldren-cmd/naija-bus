@@ -110,7 +110,16 @@ Status: complete. Live checks confirm:
 - `GET /api/v1/routes?bbox=...` -> geo-filtered match
 - invalid `bbox` -> `400`
 
+### Task 2.2
+- Implement `GET /routes/:routeId`
+- Return full route document + ordered stops
+
+Status: complete. Live checks confirm:
+- valid routeId -> `200` with route payload and stops
+- invalid routeId -> `400`
+- unknown routeId -> `404`
+
 ### Next Tasks
-- 2.2 Implement `GET /routes/:routeId`
 - 2.3 Implement admin `POST/PUT/DELETE /routes`
 - 2.4 Implement `GET /stops?near=lng,lat&radius=500`
+- 2.5 Implement fare engine service for estimate endpoint
