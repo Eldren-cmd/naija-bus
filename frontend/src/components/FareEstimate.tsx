@@ -5,6 +5,7 @@ import type { FareEstimate as FareEstimateData, TrafficLevel } from "../types";
 type FareEstimateProps = {
   routeId: string | null;
   routeName?: string;
+  refreshSignal?: number;
 };
 
 const getCurrentClockTime = (): string => {
@@ -49,7 +50,7 @@ const AnimatedFare = ({ target }: { target: number }) => {
   return <span className="fare-amount">{formatNaira(value)}</span>;
 };
 
-export function FareEstimate({ routeId, routeName }: FareEstimateProps) {
+export function FareEstimate({ routeId, routeName, refreshSignal = 0 }: FareEstimateProps) {
   const [time, setTime] = useState(getCurrentClockTime);
   const [trafficLevel, setTrafficLevel] = useState<TrafficLevel>("medium");
   const [loading, setLoading] = useState(false);
@@ -85,7 +86,7 @@ export function FareEstimate({ routeId, routeName }: FareEstimateProps) {
     }
     void loadEstimate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [routeId]);
+  }, [routeId, refreshSignal]);
 
   if (!routeId) {
     return (

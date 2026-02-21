@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { FareEstimate } from "./components/FareEstimate";
+import { ReportFarePanel } from "./components/ReportFarePanel";
 import { RouteView } from "./components/RouteView";
 import { getRouteById, getRoutes } from "./lib/api";
 import type { FormEvent } from "react";
@@ -17,6 +18,7 @@ function App() {
   const [selectedRoute, setSelectedRoute] = useState<RouteDetail | null>(null);
   const [routeLoading, setRouteLoading] = useState(false);
   const [routeError, setRouteError] = useState<string | null>(null);
+  const [fareRefreshNonce, setFareRefreshNonce] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -134,7 +136,16 @@ function App() {
 
         <section className="right-panel">
           <RouteView route={selectedRoute} loading={routeLoading} error={routeError} />
-          <FareEstimate routeId={selectedRouteId} routeName={selectedRoute?.name} />
+          <FareEstimate
+            routeId={selectedRouteId}
+            routeName={selectedRoute?.name}
+            refreshSignal={fareRefreshNonce}
+          />
+          <ReportFarePanel
+            routeId={selectedRouteId}
+            routeName={selectedRoute?.name}
+            onSubmitted={() => setFareRefreshNonce((previous) => previous + 1)}
+          />
         </section>
       </section>
     </main>

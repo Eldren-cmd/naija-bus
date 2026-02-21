@@ -93,7 +93,10 @@
 
 .search-box input,
 .fare-controls input,
-.fare-controls select {
+.fare-controls select,
+.report-form input,
+.report-form select,
+.report-form textarea {
   width: 100%;
   border-radius: 0.75rem;
   border: 1px solid #d7c6b2;
@@ -302,6 +305,32 @@
   animation: slideInRight 300ms ease-out;
 }
 
+.report-card {
+  padding: 1rem;
+  border: 1px solid #d9c8b4;
+  background: linear-gradient(165deg, #fff 0%, #fff8f0 100%);
+}
+
+.report-form {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.report-form label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #36475b;
+}
+
+.report-grid {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .fare-card-top {
   margin-bottom: 0.8rem;
 }
@@ -376,6 +405,14 @@
   padding: 0.45rem 0.6rem;
 }
 
+.success-text {
+  color: #0f5a40;
+  background: #e9f8f1;
+  border: 1px solid #abd6c6;
+  border-radius: 0.66rem;
+  padding: 0.45rem 0.6rem;
+}
+
 @keyframes slideInRight {
   from {
     transform: translateX(20px);
@@ -393,6 +430,10 @@
   }
 
   .fare-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .report-grid {
     grid-template-columns: 1fr;
   }
 }

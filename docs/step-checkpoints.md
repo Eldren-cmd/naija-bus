@@ -269,5 +269,16 @@ Status: complete. Implemented:
 - added tests in `backend/tests/fareServiceCrowdsource.test.ts`
 - live check confirmed blended output after submitting a new fare report
 
+### Task 3.5
+- Build Report Fare UI flow on RouteView and connect to `POST /fare/report`
+
+Status: complete. Implemented:
+- added `frontend/src/components/ReportFarePanel.tsx`
+- added authenticated fare report API client call in `frontend/src/lib/api.ts`
+- wired Report Fare panel into main route flow in `frontend/src/App.tsx`
+- added fare estimate refresh signal after successful report submit
+- added report and success/error styles in `frontend/src/App.css`
+- saves JWT token locally in browser storage for repeated report submissions
+
 ### Next Tasks
-- 3.5 Build Report Fare UI flow on RouteView and connect to `POST /fare/report`
+- 3.6 Continue with next Phase 3 frontend/realtime task from the dev plan sequence

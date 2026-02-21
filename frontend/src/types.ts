@@ -49,3 +49,22 @@ export type FareEstimate = {
   estimatedFare: number;
   computedAt: string;
 };
+
+export type FareReportInput = {
+  routeId: string;
+  reportedFare: number;
+  trafficLevel?: TrafficLevel;
+  notes?: string;
+};
+
+export type FareReportResponse = {
+  _id: string;
+  routeId: string;
+  amount: number;
+  source: "system" | "user_report" | "admin_update";
+  trafficLevel: TrafficLevel;
+  reportedBy: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+};
