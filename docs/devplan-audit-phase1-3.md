@@ -1,0 +1,71 @@
+# DevPlan Audit (Phase 1-3)
+
+Audit date: 2026-02-21  
+Reference: `NaijaTransport_DevPlan.docx`  
+Scope: Task-by-task check from `1.1` to `3.13`.
+
+Status labels:
+- `complete`: implemented and verified in code/tests
+- `partial`: implemented with differences from DevPlan
+- `missing`: not implemented yet
+
+## Phase 1
+
+| Task | Status | Notes |
+| --- | --- | --- |
+| 1.1 | complete | Monorepo structure exists: `frontend/`, `backend/`, `seed/`, `scripts/`. |
+| 1.2 | complete | Vite + React + TypeScript + Tailwind configured in frontend. |
+| 1.3 | complete | Node + Express + TypeScript backend with `ts-node-dev`. |
+| 1.4 | complete | DB connection layer implemented and health endpoint exposes DB status. |
+| 1.5 | complete | All 6 models exist: `Route`, `Stop`, `Fare`, `Report`, `User`, `TripRecord`. |
+| 1.6 | complete | Required geospatial + TTL indexes implemented in model schemas. |
+| 1.7 | complete | `POST /auth/register` and `POST /auth/login` with bcrypt + JWT. |
+| 1.8 | complete | `authMiddleware` and role guard middleware present. |
+| 1.9 | complete | `backend/.env.example` and `frontend/.env.example` present and documented. |
+| 1.10 | complete | Seed dataset + seed script implemented. |
+| 1.11 | complete | Seed execution flow and verification scripts/logging already present. |
+| 1.12 | complete | Base fare engine unit test suite exists and passes. |
+
+## Phase 2
+
+| Task | Status | Notes |
+| --- | --- | --- |
+| 2.1 | complete | `GET /routes` with `q` and `bbox` filtering exists. |
+| 2.2 | complete | `GET /routes/:routeId` returns route + ordered stops. |
+| 2.3 | complete | Admin-protected `POST/PUT/DELETE /routes` implemented. |
+| 2.4 | complete | `GET /stops?near=lng,lat&radius=` implemented. |
+| 2.5 | complete | Fare engine/service implemented. |
+| 2.6 | complete | `GET /fare/estimate` implemented. |
+| 2.7 | missing | `GET /search?q=` aggregation endpoint not present. |
+| 2.8 | missing | `express-rate-limit` not applied on `/search` and `/routes`. |
+| 2.9 | missing | `zod` schema validation for POST/PUT not implemented. |
+| 2.10 | complete | Route map component implemented with Mapbox line + stops. |
+| 2.11 | missing | Debounced typeahead `SearchInput` calling `/search` not implemented. |
+| 2.12 | complete | RouteView fetches detail and draws polyline + stops. |
+| 2.13 | complete | FareEstimate component wired to API with breakdown/confidence. |
+| 2.14 | complete | Ordered stops list exists in RouteView. |
+| 2.15 | partial | Search-select flow works, but no `/route/:routeId` navigation route. |
+| 2.16 | complete | Supertest integration tests exist for login/routes/fare estimate. |
+
+## Phase 3
+
+| Task | Status | Notes |
+| --- | --- | --- |
+| 3.1 | complete | Auth-protected `POST /fare/report` implemented. |
+| 3.2 | complete | Auth-protected `POST /reports` implemented. |
+| 3.3 | complete | `GET /reports?bbox=` implemented with validation/filtering. |
+| 3.4 | complete | Socket.IO `/reports` namespace emits `report:created` + `fare:reported`. |
+| 3.5 | complete | Server-side socket filtering added via viewport/route subscriptions. |
+| 3.6 | complete | Fare estimation blends with recent crowdsourced fare reports. |
+| 3.7 | partial | Report fare flow exists, but implemented as inline panel not modal button. |
+| 3.8 | missing | Traffic report modal UI not implemented. |
+| 3.9 | missing | Map report-marker layer by severity not implemented. |
+| 3.10 | missing | Frontend Socket.IO client reactive marker updates not implemented. |
+| 3.11 | missing | Toast component for report submission feedback not implemented. |
+| 3.12 | complete | TTL index on `reports.createdAt` already configured. |
+| 3.13 | missing | Two-browser real-time marker demo validation not yet completed. |
+
+## Recovery Order (Strict DevPlan Alignment)
+
+1. Finish remaining Phase 2 tasks first: `2.7`, `2.8`, `2.9`, `2.11`, `2.15`.
+2. Continue with remaining Phase 3 tasks: `3.8`, `3.9`, `3.10`, `3.11`, `3.13`.

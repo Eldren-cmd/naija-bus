@@ -264,6 +264,22 @@ Status: complete. Implemented:
 - emit `report:created` after successful `POST /reports`
 - integration tests now assert emit calls on successful submissions
 
+### Task 3.5
+- Implement server-side bbox filtering for socket events (only emit to relevant clients)
+
+Status: complete. Implemented:
+- updated realtime namespace handlers in `backend/src/realtime/reportsSocket.ts`
+- added per-socket viewport subscriptions via:
+  - `viewport:subscribe`
+  - `viewport:unsubscribe`
+- added route subscriptions for fare events via:
+  - `route:subscribe`
+  - `route:unsubscribe`
+- `report:created` now emits only to sockets whose subscribed bbox contains report coords
+- `fare:reported` now targets sockets subscribed to the route when route subscriptions exist
+- retained backward-compatible broadcast behavior when no subscriptions are registered
+- added socket filtering unit tests in `backend/tests/reportsSocket.filtering.test.ts`
+
 ### Task 3.6
 - Update fare estimate logic to incorporate recent crowdsourced fare reports
 
@@ -293,4 +309,5 @@ Status: complete. Implemented:
 - saves JWT token locally in browser storage for repeated report submissions
 
 ### Next Tasks
-- 3.5 Implement server-side bbox filtering for socket events (only emit to relevant clients)
+- DevPlan alignment backlog from Phase 2: `2.7`, `2.8`, `2.9`, `2.11`, `2.15` (see `docs/devplan-audit-phase1-3.md`)
+- 3.8 Build traffic report modal: type, severity, description, auto-fill location
