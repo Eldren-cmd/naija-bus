@@ -80,6 +80,24 @@ type ReportSeverity = (typeof REPORT_SEVERITIES)[number];
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
 
+const isPopulatedRouteRef = (
+  value: unknown,
+): value is {
+  _id: unknown;
+  name: string;
+  origin: string;
+  destination: string;
+  transportType?: string;
+  isActive?: boolean;
+} => {
+  if (!isObject(value)) return false;
+  return (
+    typeof value.name === "string" &&
+    typeof value.origin === "string" &&
+    typeof value.destination === "string"
+  );
+};
+
 const isCoordinatePair = (value: unknown): value is [number, number] => {
   return (
     Array.isArray(value) &&
@@ -305,6 +323,85 @@ const getRoutesHandler = async (req: Request, res: Response) => {
 
 app.get("/api/v1/routes", getRoutesHandler);
 app.get("/routes", getRoutesHandler);
+
+const getSearchHandler = async (req: Request, res: Response) => {
+  try {
+    const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
+    if (!q) {
+      return res.status(400).json({ error: "q query is required" });
+    }
+
+    const regex = new RegExp(escapeRegex(q), "i");
+
+    const [routeMatches, stopMatches] = await Promise.all([
+      Route.find({
+        isActive: true,
+        $or: [
+          { name: regex },
+          { origin: regex },
+          { destination: regex },
+          { corridor: regex },
+          { aliases: regex },
+        ],
+      })
+        .sort({ name: 1 })
+        .limit(12)
+        .lean(),
+      Stop.find({ name: regex })
+        .sort({ isMajor: -1, name: 1 })
+        .limit(16)
+        .populate("routeId", "name origin destination transportType isActive")
+        .lean(),
+    ]);
+
+    const routes = routeMatches.map((route) => ({
+      _id: String(route._id),
+      name: route.name,
+      origin: route.origin,
+      destination: route.destination,
+      transportType: route.transportType,
+    }));
+
+    const stops = stopMatches
+      .map((stop) => {
+        if (!isPopulatedRouteRef(stop.routeId) || stop.routeId.isActive === false) {
+          return null;
+        }
+
+        return {
+          _id: String(stop._id),
+          name: stop.name,
+          order: stop.order,
+          isMajor: stop.isMajor,
+          coords: stop.coords,
+          route: {
+            _id: String(stop.routeId._id),
+            name: stop.routeId.name,
+            origin: stop.routeId.origin,
+            destination: stop.routeId.destination,
+            transportType: stop.routeId.transportType || "danfo",
+          },
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null);
+
+    return res.status(200).json({
+      query: q,
+      routes,
+      stops,
+      counts: {
+        routes: routes.length,
+        stops: stops.length,
+        total: routes.length + stops.length,
+      },
+    });
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to search routes and stops" });
+  }
+};
+
+app.get("/api/v1/search", getSearchHandler);
+app.get("/search", getSearchHandler);
 
 const getRouteByIdHandler = async (req: Request, res: Response) => {
   try {

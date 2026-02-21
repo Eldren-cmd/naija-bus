@@ -55,7 +55,7 @@ jest.mock("../src/services/fareService", () => {
   };
 });
 
-import { Route, User } from "../src/models";
+import { Route, Stop, User } from "../src/models";
 import { app } from "../src/server";
 import { estimateRouteFare, FareServiceError } from "../src/services/fareService";
 
@@ -155,5 +155,70 @@ describe("Phase 2 integration endpoints", () => {
 
     expect(response.status).toBe(404);
     expect(response.body.error).toBe("route not found");
+  });
+
+  it("GET /api/v1/search returns 400 when q is missing", async () => {
+    const response = await request(app).get("/api/v1/search");
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe("q query is required");
+  });
+
+  it("GET /api/v1/search aggregates route and stop matches", async () => {
+    const routeLean = jest.fn().mockResolvedValue([
+      {
+        _id: "r1",
+        name: "Ojota -> CMS",
+        origin: "Ojota",
+        destination: "CMS",
+        transportType: "danfo",
+      },
+    ]);
+    const routeLimit = jest.fn().mockReturnValue({ lean: routeLean });
+    const routeSort = jest.fn().mockReturnValue({ limit: routeLimit });
+    (Route.find as unknown as jest.Mock).mockReturnValue({ sort: routeSort });
+
+    const stopLean = jest.fn().mockResolvedValue([
+      {
+        _id: "s1",
+        name: "Ojota",
+        order: 0,
+        isMajor: true,
+        coords: { type: "Point", coordinates: [3.3788, 6.5839] },
+        routeId: {
+          _id: "r1",
+          name: "Ojota -> CMS",
+          origin: "Ojota",
+          destination: "CMS",
+          transportType: "danfo",
+          isActive: true,
+        },
+      },
+    ]);
+    const stopPopulate = jest.fn().mockReturnValue({ lean: stopLean });
+    const stopLimit = jest.fn().mockReturnValue({ populate: stopPopulate });
+    const stopSort = jest.fn().mockReturnValue({ limit: stopLimit });
+    (Stop.find as unknown as jest.Mock).mockReturnValue({ sort: stopSort });
+
+    const response = await request(app).get("/api/v1/search").query({ q: "ojota" });
+
+    expect(response.status).toBe(200);
+    expect(response.body.query).toBe("ojota");
+    expect(response.body.counts).toEqual({ routes: 1, stops: 1, total: 2 });
+    expect(response.body.routes[0].name).toBe("Ojota -> CMS");
+    expect(response.body.stops[0].name).toBe("Ojota");
+    expect(response.body.stops[0].route.name).toBe("Ojota -> CMS");
+
+    expect(Route.find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isActive: true,
+        $or: expect.any(Array),
+      }),
+    );
+    expect(Stop.find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: expect.any(RegExp),
+      }),
+    );
   });
 });

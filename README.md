@@ -26,6 +26,7 @@ This repository is being built strictly from:
 - [x] Phase 2 / Task 2.4: `GET /stops?near=lng,lat&radius=500` implemented with geospatial query
 - [x] Phase 2 / Task 2.5: Fare estimate service layer added (`fareService.ts`) with route lookup + time/traffic multipliers
 - [x] Phase 2 / Task 2.6: `GET /fare/estimate` endpoint implemented with route/time query support and fare breakdown response
+- [x] Phase 2 / Task 2.7: `GET /search?q=` endpoint implemented to aggregate route + stop matches
 - [x] Phase 2 / Frontend MVP View: Route search + RouteView (ordered stops) + FareEstimate panel wired to backend API
 - [x] Phase 2 / Integration Tests: Supertest flow added for login, routes list, and fare estimate endpoints
 - [x] Phase 2 / Map Rendering: Selected route polyline + stop markers now render in RouteView (Mapbox)

@@ -161,6 +161,17 @@ Status: complete. Implemented:
   - invalid input -> `400`
   - unknown route -> `404`
 
+### Task 2.7
+- Implement `GET /search?q=` aggregating stops + routes matches
+
+Status: complete. Implemented:
+- added `GET /api/v1/search` and alias `GET /search`
+- `q` query validation (`400` when missing)
+- route matching across `name`, `origin`, `destination`, `corridor`, `aliases`
+- stop matching by stop name and populated route metadata
+- combined response includes `routes`, `stops`, and `counts` summary
+- added integration tests in `backend/tests/phase2.integration.test.ts`
+
 ### Phase 2 Frontend MVP View
 - Build RouteView page section showing selected route + ordered stops
 - Build FareEstimate component calling `GET /fare/estimate`
