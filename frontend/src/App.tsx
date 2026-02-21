@@ -94,6 +94,7 @@ function App() {
         <p>
           Search Lagos routes, inspect ordered stops, and pull a live fare estimate with multiplier breakdown.
         </p>
+        <p className="brand-note">A VerityWave Solutions product</p>
       </header>
 
       <section className="layout">
