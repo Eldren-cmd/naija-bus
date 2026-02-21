@@ -5,6 +5,7 @@ jest.mock("../src/models", () => {
   const User = {
     findOne: jest.fn(),
     findById: jest.fn(),
+    findByIdAndUpdate: jest.fn(),
     create: jest.fn(),
   };
 
@@ -306,6 +307,91 @@ describe("Phase 2 integration endpoints", () => {
       expect.objectContaining({
         name: expect.any(RegExp),
       }),
+    );
+  });
+
+  it("GET /api/v1/routes/saved returns 401 when auth header is missing", async () => {
+    const response = await request(app).get("/api/v1/routes/saved");
+    expect(response.status).toBe(401);
+  });
+
+  it("GET /api/v1/routes/saved returns saved routes for authenticated user", async () => {
+    mockAuthenticatedUser();
+
+    const savedLean = jest.fn().mockResolvedValue({
+      savedRoutes: [
+        {
+          _id: FIXTURE_ROUTE_ID,
+          name: "Ojota -> CMS",
+          origin: "Ojota",
+          destination: "CMS",
+          corridor: "Ikorodu Road",
+          aliases: ["Ojota CMS"],
+          transportType: "danfo",
+          baseFare: 300,
+          confidenceScore: 0.72,
+          isActive: true,
+        },
+      ],
+    });
+    const savedPopulate = jest.fn().mockReturnValue({ lean: savedLean });
+    const savedSelect = jest.fn().mockReturnValue({ populate: savedPopulate });
+    (User.findOne as unknown as jest.Mock).mockReturnValue({ select: savedSelect });
+
+    const response = await request(app)
+      .get("/api/v1/routes/saved")
+      .set("Authorization", `Bearer ${createUserToken()}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveLength(1);
+    expect(response.body[0]._id).toBe(FIXTURE_ROUTE_ID);
+    expect(response.body[0].name).toBe("Ojota -> CMS");
+  });
+
+  it("POST /api/v1/routes/saved saves a route for authenticated user", async () => {
+    mockAuthenticatedUser();
+
+    const routeLean = jest.fn().mockResolvedValue({ _id: FIXTURE_ROUTE_ID });
+    const routeSelect = jest.fn().mockReturnValue({ lean: routeLean });
+    (Route.findOne as unknown as jest.Mock).mockReturnValue({ select: routeSelect });
+
+    const userLean = jest.fn().mockResolvedValue({ savedRoutes: [FIXTURE_ROUTE_ID] });
+    const userSelect = jest.fn().mockReturnValue({ lean: userLean });
+    (User.findByIdAndUpdate as unknown as jest.Mock).mockReturnValue({ select: userSelect });
+
+    const response = await request(app)
+      .post("/api/v1/routes/saved")
+      .set("Authorization", `Bearer ${createUserToken()}`)
+      .send({ routeId: FIXTURE_ROUTE_ID });
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.routeId).toBe(FIXTURE_ROUTE_ID);
+    expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+      FIXTURE_USER_ID,
+      { $addToSet: { savedRoutes: FIXTURE_ROUTE_ID } },
+      { new: true },
+    );
+  });
+
+  it("DELETE /api/v1/routes/saved/:routeId removes a saved route", async () => {
+    mockAuthenticatedUser();
+
+    const userLean = jest.fn().mockResolvedValue({ savedRoutes: [] });
+    const userSelect = jest.fn().mockReturnValue({ lean: userLean });
+    (User.findByIdAndUpdate as unknown as jest.Mock).mockReturnValue({ select: userSelect });
+
+    const response = await request(app)
+      .delete(`/api/v1/routes/saved/${FIXTURE_ROUTE_ID}`)
+      .set("Authorization", `Bearer ${createUserToken()}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.routeId).toBe(FIXTURE_ROUTE_ID);
+    expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+      FIXTURE_USER_ID,
+      { $pull: { savedRoutes: FIXTURE_ROUTE_ID } },
+      { new: true },
     );
   });
 

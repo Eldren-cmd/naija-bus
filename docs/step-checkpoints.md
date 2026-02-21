@@ -896,3 +896,42 @@ Status: complete. Implemented:
 
 ### Next Tasks
 - Continue Phase 5 in strict order: `5.8` (saved routes endpoint + home integration).
+
+### Task 5.8
+- Implement saved routes endpoint and integrate into Home (Route Finder)
+
+Status: complete. Implemented:
+- added backend saved routes endpoints in `backend/src/server.ts`:
+  - `GET /api/v1/routes/saved`
+  - `POST /api/v1/routes/saved`
+  - `DELETE /api/v1/routes/saved/:routeId`
+  - alias routes also exposed under `/routes/saved`
+- backend behavior:
+  - all saved-routes endpoints require authentication
+  - add endpoint validates `routeId` and verifies route exists/active before save
+  - add uses `$addToSet` to prevent duplicate saved route IDs
+  - remove uses `$pull` to remove saved route ID
+  - list endpoint populates saved route metadata and filters inactive/unusable entries
+- added frontend saved-routes API helpers in `frontend/src/lib/api.ts`:
+  - `getSavedRoutes`
+  - `addSavedRoute`
+  - `removeSavedRoute`
+- integrated saved routes into Home (`frontend/src/App.tsx`):
+  - loads saved routes for signed-in users
+  - renders "Saved Routes" panel in Route Finder sidebar
+  - supports save/unsave actions from route list with immediate UI update
+  - route selection from saved list navigates to route detail view
+- added UI styling for saved routes and save button state in `frontend/src/App.css`
+- added backend integration tests in `backend/tests/phase2.integration.test.ts`:
+  - auth required for saved routes list
+  - saved routes list retrieval success
+  - save route success flow
+  - remove saved route success flow
+- validation checks passed:
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
+### Next Tasks
+- Continue Phase 5 in strict order: `5.9` (mobile responsive audit/fixes for Home, RouteView, and MyTrips).

@@ -528,6 +528,11 @@
   gap: 0.5rem;
 }
 
+.route-list-item {
+  display: grid;
+  gap: 0.4rem;
+}
+
 .route-list button {
   width: 100%;
   text-align: left;
@@ -555,6 +560,86 @@
   border-color: var(--orange);
   background: #fff5ec;
   box-shadow: 0 0 0 2px rgba(204, 85, 0, 0.11);
+}
+
+.saved-routes-panel {
+  border: 1px solid #e6d7c4;
+  border-radius: 0.9rem;
+  background: #fffaf4;
+  padding: 0.65rem;
+  margin-bottom: 0.8rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.saved-routes-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.saved-routes-panel .panel-title {
+  margin: 0;
+  font-size: 0.96rem;
+}
+
+.saved-route-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.saved-route-list button {
+  width: 100%;
+  text-align: left;
+  border-radius: 0.75rem;
+  border: 1px solid #e6d7c4;
+  background: #fff;
+  color: var(--ink);
+  padding: 0.55rem 0.62rem;
+  cursor: pointer;
+  display: grid;
+  gap: 0.12rem;
+}
+
+.saved-route-list button strong {
+  font-family: var(--font-display);
+  font-size: 0.94rem;
+}
+
+.saved-route-list button span {
+  color: #4d5a6a;
+  font-size: 0.8rem;
+}
+
+.saved-route-list button.active {
+  border-color: var(--orange);
+  background: #fff5ec;
+}
+
+.route-save-btn {
+  border: 1px solid #d8c3aa;
+  border-radius: 0.7rem;
+  background: #fff8ef;
+  color: #1f3a56;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.42rem 0.5rem;
+  cursor: pointer;
+}
+
+.route-save-btn.saved {
+  border-color: #a8d9c7;
+  background: #edf9f4;
+  color: #136046;
+}
+
+.route-save-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .right-panel {

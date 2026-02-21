@@ -74,6 +74,31 @@ export const getRoutes = async (query?: string): Promise<RouteSummary[]> => {
   return apiGet<RouteSummary[]>(suffix);
 };
 
+export const getSavedRoutes = async (authToken: string): Promise<RouteSummary[]> => {
+  return apiGet<RouteSummary[]>("/api/v1/routes/saved", authToken);
+};
+
+export const addSavedRoute = async (
+  routeId: string,
+  authToken: string,
+): Promise<{ success: boolean; routeId: string; savedCount: number }> => {
+  return apiPost<{ success: boolean; routeId: string; savedCount: number }>(
+    "/api/v1/routes/saved",
+    { routeId },
+    authToken,
+  );
+};
+
+export const removeSavedRoute = async (
+  routeId: string,
+  authToken: string,
+): Promise<{ success: boolean; routeId: string; savedCount: number }> => {
+  return apiDelete<{ success: boolean; routeId: string; savedCount: number }>(
+    `/api/v1/routes/saved/${encodeURIComponent(routeId)}`,
+    authToken,
+  );
+};
+
 export const getRouteById = async (routeId: string): Promise<RouteDetail> => {
   return apiGet<RouteDetail>(`/api/v1/routes/${encodeURIComponent(routeId)}`);
 };

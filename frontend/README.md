@@ -28,6 +28,7 @@ React + TypeScript + Vite frontend for Naija Transport.
 - Admin-only `/admin` page now lists routes and supports inline edit/delete via protected backend admin endpoints
 - Admin route creation form now posts full payload to protected `POST /api/v1/routes`
 - Admin stop creation form now posts validated stop payloads to protected `POST /api/v1/stops`
+- Home now includes signed-in saved routes panel with save/unsave route actions via `GET/POST/DELETE /api/v1/routes/saved`
 
 ## Environment
 Create `frontend/.env` with:

@@ -6,7 +6,7 @@ import { rateLimit } from "express-rate-limit";
 import { createServer } from "http";
 import { isValidObjectId } from "mongoose";
 import { connectToDatabase, ensureCoreIndexes, getDatabaseStatus } from "./config/db";
-import { Fare, Report, Route, Stop, TripRecord } from "./models";
+import { Fare, Report, Route, Stop, TripRecord, User } from "./models";
 import { authMiddleware, requireRoles } from "./middleware/authMiddleware";
 import {
   emitFareReported,
@@ -269,6 +269,12 @@ const validateStopCreatePayload = (body: unknown): string | null => {
   return validated.success ? null : validated.error;
 };
 
+const parseRouteIdFromBody = (body: unknown): string | null => {
+  if (!isObject(body)) return null;
+  const routeId = typeof body.routeId === "string" ? body.routeId.trim() : "";
+  return isValidObjectId(routeId) ? routeId : null;
+};
+
 const getRoutesHandler = async (req: Request, res: Response) => {
   try {
     const filters: Record<string, unknown> = { isActive: true };
@@ -323,6 +329,136 @@ const getRoutesHandler = async (req: Request, res: Response) => {
 
 app.get("/api/v1/routes", routesRateLimiter, getRoutesHandler);
 app.get("/routes", routesRateLimiter, getRoutesHandler);
+
+const getSavedRoutesHandler = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "authentication required" });
+    }
+
+    const userDoc = await User.findOne({ _id: req.user.id, isActive: true })
+      .select("savedRoutes")
+      .populate(
+        "savedRoutes",
+        "name origin destination corridor aliases transportType baseFare confidenceScore isActive",
+      )
+      .lean();
+
+    if (!userDoc) {
+      return res.status(404).json({ error: "user not found" });
+    }
+
+    const savedRouteRefs = Array.isArray(userDoc.savedRoutes) ? userDoc.savedRoutes : [];
+    const savedRoutes = savedRouteRefs
+      .map((route) => {
+        if (!isObject(route)) return null;
+        if (route.isActive === false) return null;
+        if (
+          typeof route.name !== "string" ||
+          typeof route.origin !== "string" ||
+          typeof route.destination !== "string"
+        ) {
+          return null;
+        }
+
+        return {
+          _id: String(route._id),
+          name: route.name,
+          origin: route.origin,
+          destination: route.destination,
+          corridor: typeof route.corridor === "string" ? route.corridor : "",
+          aliases: Array.isArray(route.aliases)
+            ? route.aliases.map((alias) => String(alias))
+            : [],
+          transportType: isTransportType(route.transportType) ? route.transportType : "danfo",
+          baseFare: Number.isFinite(route.baseFare) ? Number(route.baseFare) : 0,
+          confidenceScore:
+            Number.isFinite(route.confidenceScore) && Number(route.confidenceScore) >= 0
+              ? Number(route.confidenceScore)
+              : 0.5,
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null)
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    return res.status(200).json(savedRoutes);
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to fetch saved routes" });
+  }
+};
+
+const addSavedRouteHandler = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "authentication required" });
+    }
+
+    const routeId = parseRouteIdFromBody(req.body);
+    if (!routeId) {
+      return res.status(400).json({ error: "routeId is required and must be a valid id" });
+    }
+
+    const route = await Route.findOne({ _id: routeId, isActive: true }).select("_id").lean();
+    if (!route) {
+      return res.status(404).json({ error: "route not found" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { $addToSet: { savedRoutes: routeId } },
+      { new: true },
+    )
+      .select("savedRoutes")
+      .lean();
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "user not found" });
+    }
+
+    const savedCount = Array.isArray(updatedUser.savedRoutes) ? updatedUser.savedRoutes.length : 0;
+    return res.status(200).json({ success: true, routeId, savedCount });
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to save route" });
+  }
+};
+
+const removeSavedRouteHandler = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "authentication required" });
+    }
+
+    const routeId = typeof req.params.routeId === "string" ? req.params.routeId.trim() : "";
+    if (!isValidObjectId(routeId)) {
+      return res.status(400).json({ error: "invalid routeId" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { $pull: { savedRoutes: routeId } },
+      { new: true },
+    )
+      .select("savedRoutes")
+      .lean();
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "user not found" });
+    }
+
+    const savedCount = Array.isArray(updatedUser.savedRoutes) ? updatedUser.savedRoutes.length : 0;
+    return res.status(200).json({ success: true, routeId, savedCount });
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to remove saved route" });
+  }
+};
+
+app.get("/api/v1/routes/saved", authMiddleware, getSavedRoutesHandler);
+app.post("/api/v1/routes/saved", authMiddleware, addSavedRouteHandler);
+app.delete("/api/v1/routes/saved/:routeId", authMiddleware, removeSavedRouteHandler);
+
+app.get("/routes/saved", authMiddleware, getSavedRoutesHandler);
+app.post("/routes/saved", authMiddleware, addSavedRouteHandler);
+app.delete("/routes/saved/:routeId", authMiddleware, removeSavedRouteHandler);
 
 const getSearchHandler = async (req: Request, res: Response) => {
   try {

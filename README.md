@@ -64,6 +64,7 @@ This repository is being built strictly from:
 - [x] Phase 5 / Task 5.5: Admin-only route management panel added with route table, edit, and delete actions
 - [x] Phase 5 / Task 5.6: Admin panel route creation form added and wired to `POST /routes` with full payload validation
 - [x] Phase 5 / Task 5.7: Admin panel stop creation form added and wired to protected `POST /stops` endpoint
+- [x] Phase 5 / Task 5.8: Saved routes endpoints added and Home now supports saved route list plus save/unsave actions
 
 ## Working Rules for This Build
 - Move step-by-step in task order.

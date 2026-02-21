@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactElement } from "react";
 import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "./auth/AuthContext";
@@ -13,7 +13,15 @@ import { ToastStack } from "./components/ToastStack";
 import { TrafficReportModal } from "./components/TrafficReportModal";
 import { TripRecorder } from "./components/TripRecorder";
 import { MyTripMap } from "./components/MyTripMap";
-import { getAuthProfile, getRouteById, getRoutes, getTripsByUser } from "./lib/api";
+import {
+  addSavedRoute,
+  getAuthProfile,
+  getRouteById,
+  getRoutes,
+  getSavedRoutes,
+  getTripsByUser,
+  removeSavedRoute,
+} from "./lib/api";
 import type { RouteDetail, RouteSummary, TripCheckpoint, TripRecordResponse } from "./types";
 import type { ToastItem, ToastTone } from "./components/ToastStack";
 import "./App.css";
@@ -107,6 +115,10 @@ function RouteFinderPage() {
   const [routes, setRoutes] = useState<RouteSummary[]>([]);
   const [routesLoading, setRoutesLoading] = useState(false);
   const [routesError, setRoutesError] = useState<string | null>(null);
+  const [savedRoutes, setSavedRoutes] = useState<RouteSummary[]>([]);
+  const [savedRoutesLoading, setSavedRoutesLoading] = useState(false);
+  const [savedRoutesError, setSavedRoutesError] = useState<string | null>(null);
+  const [savingRouteId, setSavingRouteId] = useState<string | null>(null);
 
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(routeId ?? null);
   const [selectedRoute, setSelectedRoute] = useState<RouteDetail | null>(null);
@@ -116,6 +128,7 @@ function RouteFinderPage() {
   const [fareRefreshNonce, setFareRefreshNonce] = useState(0);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const toastTimersRef = useRef<number[]>([]);
+  const savedRouteIds = useMemo(() => new Set(savedRoutes.map((route) => route._id)), [savedRoutes]);
 
   useEffect(() => {
     return () => {
@@ -164,6 +177,39 @@ function RouteFinderPage() {
       cancelled = true;
     };
   }, [activeQuery]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const token = accessToken?.trim();
+    if (!token) {
+      setSavedRoutes([]);
+      setSavedRoutesError(null);
+      setSavedRoutesLoading(false);
+      return;
+    }
+
+    const loadSavedRoutes = async () => {
+      setSavedRoutesLoading(true);
+      setSavedRoutesError(null);
+      try {
+        const data = await getSavedRoutes(token);
+        if (cancelled) return;
+        setSavedRoutes(data);
+      } catch (requestError) {
+        if (cancelled) return;
+        const message =
+          requestError instanceof Error ? requestError.message : "Failed to fetch saved routes";
+        setSavedRoutesError(message);
+      } finally {
+        if (!cancelled) setSavedRoutesLoading(false);
+      }
+    };
+
+    void loadSavedRoutes();
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken]);
 
   useEffect(() => {
     let cancelled = false;
@@ -220,6 +266,39 @@ function RouteFinderPage() {
     navigate(`/route/${routeId}`);
   };
 
+  const onToggleSavedRoute = async (route: RouteSummary) => {
+    const token = accessToken?.trim();
+    if (!token) {
+      notify("error", "Login required to save routes.");
+      return;
+    }
+
+    setSavingRouteId(route._id);
+    setSavedRoutesError(null);
+    try {
+      if (savedRouteIds.has(route._id)) {
+        await removeSavedRoute(route._id, token);
+        setSavedRoutes((previous) => previous.filter((item) => item._id !== route._id));
+        notify("info", `Removed ${route.name} from saved routes.`);
+      } else {
+        await addSavedRoute(route._id, token);
+        setSavedRoutes((previous) => {
+          if (previous.some((item) => item._id === route._id)) return previous;
+          const next = [...previous, route];
+          next.sort((a, b) => a.name.localeCompare(b.name));
+          return next;
+        });
+        notify("success", `Saved ${route.name}.`);
+      }
+    } catch (requestError) {
+      const message = requestError instanceof Error ? requestError.message : "Failed to update saved routes";
+      setSavedRoutesError(message);
+      notify("error", message);
+    } finally {
+      setSavingRouteId(null);
+    }
+  };
+
   const dismissToast = (id: number) => {
     setToasts((previous) => previous.filter((toast) => toast.id !== id));
   };
@@ -257,12 +336,41 @@ function RouteFinderPage() {
             onSelectRoute={onSelectRouteFromSearch}
           />
 
+          {accessToken?.trim() && (
+            <section className="saved-routes-panel">
+              <div className="saved-routes-head">
+                <h3 className="panel-title">Saved Routes</h3>
+                {savedRoutesLoading && <span className="muted small">Loading...</span>}
+              </div>
+              {savedRoutesError && <p className="error-text">{savedRoutesError}</p>}
+              {!savedRoutesLoading && savedRoutes.length === 0 && (
+                <p className="muted">No saved routes yet.</p>
+              )}
+              <ul className="saved-route-list">
+                {savedRoutes.map((route) => (
+                  <li key={route._id}>
+                    <button
+                      type="button"
+                      className={route._id === selectedRouteId ? "active" : ""}
+                      onClick={() => onSelectRouteFromList(route._id)}
+                    >
+                      <strong>{route.name}</strong>
+                      <span>
+                        {route.origin} to {route.destination}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           {routesError && <p className="error-text">{routesError}</p>}
           {routesLoading && <p className="muted">Loading routes...</p>}
 
           <ul className="route-list">
             {routes.map((route) => (
-              <li key={route._id}>
+              <li key={route._id} className="route-list-item">
                 <button
                   type="button"
                   className={route._id === selectedRouteId ? "active" : ""}
@@ -273,6 +381,20 @@ function RouteFinderPage() {
                     {route.origin} to {route.destination}
                   </span>
                 </button>
+                {accessToken?.trim() && (
+                  <button
+                    type="button"
+                    className={`route-save-btn ${savedRouteIds.has(route._id) ? "saved" : ""}`}
+                    onClick={() => void onToggleSavedRoute(route)}
+                    disabled={savingRouteId === route._id}
+                  >
+                    {savingRouteId === route._id
+                      ? "Updating..."
+                      : savedRouteIds.has(route._id)
+                        ? "Saved"
+                        : "Save"}
+                  </button>
+                )}
               </li>
             ))}
           </ul>
