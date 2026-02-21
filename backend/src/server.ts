@@ -14,8 +14,10 @@ import {
   emitTripRecorded,
   initRealtimeServer,
 } from "./realtime/reportsSocket";
+import { startWhatsAppWebBot } from "./bots/whatsappWebBot";
 import { authRouter } from "./routes/auth";
 import { FareServiceError, estimateRouteFare } from "./services/fareService";
+import type { BotContext, BotIngestResult, BotReportPayload } from "./types/bot";
 import {
   validateFareReportBody,
   validateIncidentReportBody,
@@ -67,6 +69,8 @@ const ROUTES_RATE_LIMIT_WINDOW_MS = parsePositiveInteger(
   60_000,
 );
 const ROUTES_RATE_LIMIT_MAX = parsePositiveInteger(process.env.ROUTES_RATE_LIMIT_MAX, 120);
+const BOT_INGEST_TOKEN = (process.env.BOT_INGEST_TOKEN || "").trim();
+const BOT_REPORT_USER_ID = (process.env.BOT_REPORT_USER_ID || "").trim();
 
 const createRateLimiter = (windowMs: number, max: number) =>
   rateLimit({
@@ -274,6 +278,15 @@ const parseRouteIdFromBody = (body: unknown): string | null => {
   const routeId = typeof body.routeId === "string" ? body.routeId.trim() : "";
   return isValidObjectId(routeId) ? routeId : null;
 };
+
+const readBotToken = (req: Request): string => {
+  const header = req.header("x-bot-token");
+  return typeof header === "string" ? header.trim() : "";
+};
+
+type IncidentCreateResult =
+  | { success: true; created: unknown }
+  | { success: false; status: number; error: string };
 
 const getRoutesHandler = async (req: Request, res: Response) => {
   try {
@@ -864,6 +877,49 @@ const getReportsByBboxHandler = async (req: Request, res: Response) => {
 app.get("/api/v1/reports", getReportsByBboxHandler);
 app.get("/reports", getReportsByBboxHandler);
 
+const createIncidentReportFromPayload = async (
+  payload: BotReportPayload,
+  userId: string,
+): Promise<IncidentCreateResult> => {
+  if (!isValidObjectId(userId)) {
+    return { success: false, status: 500, error: "invalid report user configuration" };
+  }
+
+  const routeId = payload.routeId?.trim();
+  if (routeId) {
+    if (!isValidObjectId(routeId)) {
+      return { success: false, status: 400, error: "routeId must be a valid id when provided" };
+    }
+    const route = await Route.findOne({ _id: routeId, isActive: true }).select("_id").lean();
+    if (!route) {
+      return { success: false, status: 404, error: "route not found" };
+    }
+  }
+
+  const created = await Report.create({
+    routeId: routeId || undefined,
+    userId,
+    type: payload.type,
+    severity: isReportSeverity(payload.severity) ? payload.severity : ("medium" as const),
+    description: typeof payload.description === "string" ? payload.description.trim() : "",
+    coords: payload.coords,
+    isActive: true,
+  });
+
+  emitReportCreated({
+    id: String(created._id),
+    routeId: created.routeId ? String(created.routeId) : undefined,
+    userId: String(created.userId),
+    type: created.type,
+    severity: created.severity,
+    description: created.description,
+    coords: created.coords,
+    createdAt: created.createdAt,
+  });
+
+  return { success: true, created };
+};
+
 const createIncidentReportHandler = async (req: Request, res: Response) => {
   try {
     if (!req.user) {
@@ -875,41 +931,45 @@ const createIncidentReportHandler = async (req: Request, res: Response) => {
       return res.status(400).json({ error: validationError });
     }
 
-    const body = req.body as Record<string, unknown>;
-    const routeId = typeof body.routeId === "string" ? body.routeId.trim() : undefined;
-    const reportType = body.type as ReportType;
-    const severity = isReportSeverity(body.severity) ? body.severity : ("medium" as const);
-    const description = typeof body.description === "string" ? body.description.trim() : "";
-    if (routeId) {
-      const route = await Route.findOne({ _id: routeId, isActive: true }).select("_id").lean();
-      if (!route) {
-        return res.status(404).json({ error: "route not found" });
-      }
+    const body = req.body as BotReportPayload;
+    const result = await createIncidentReportFromPayload(body, req.user.id);
+    if (!result.success) {
+      return res.status(result.status).json({ error: result.error });
     }
 
-    const coords = body.coords as { type: "Point"; coordinates: [number, number] };
-    const created = await Report.create({
-      routeId: routeId || undefined,
-      userId: req.user.id,
-      type: reportType,
-      severity,
-      description,
-      coords,
-      isActive: true,
-    });
+    return res.status(201).json(result.created);
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to save report" });
+  }
+};
 
-    emitReportCreated({
-      id: String(created._id),
-      routeId: created.routeId ? String(created.routeId) : undefined,
-      userId: String(created.userId),
-      type: created.type,
-      severity: created.severity,
-      description: created.description,
-      coords: created.coords,
-      createdAt: created.createdAt,
-    });
+const createBotIncidentReportHandler = async (req: Request, res: Response) => {
+  try {
+    if (!BOT_INGEST_TOKEN) {
+      return res.status(503).json({ error: "bot ingestion is not configured" });
+    }
 
-    return res.status(201).json(created);
+    const token = readBotToken(req);
+    if (!token || token !== BOT_INGEST_TOKEN) {
+      return res.status(401).json({ error: "invalid bot token" });
+    }
+
+    if (!BOT_REPORT_USER_ID) {
+      return res.status(503).json({ error: "BOT_REPORT_USER_ID is not configured" });
+    }
+
+    const validationError = validateIncidentReportPayload(req.body);
+    if (validationError) {
+      return res.status(400).json({ error: validationError });
+    }
+
+    const body = req.body as BotReportPayload;
+    const result = await createIncidentReportFromPayload(body, BOT_REPORT_USER_ID);
+    if (!result.success) {
+      return res.status(result.status).json({ error: result.error });
+    }
+
+    return res.status(201).json(result.created);
   } catch (_error) {
     return res.status(500).json({ error: "failed to save report" });
   }
@@ -917,6 +977,8 @@ const createIncidentReportHandler = async (req: Request, res: Response) => {
 
 app.post("/api/v1/reports", authMiddleware, createIncidentReportHandler);
 app.post("/reports", authMiddleware, createIncidentReportHandler);
+app.post("/api/v1/reports/bot", createBotIncidentReportHandler);
+app.post("/reports/bot", createBotIncidentReportHandler);
 
 const createTripRecordHandler = async (req: Request, res: Response) => {
   try {
@@ -1040,6 +1102,25 @@ const startServer = async (): Promise<void> => {
     initRealtimeServer(httpServer, corsOrigin);
     httpServer.listen(port, () => {
       console.log(`Backend listening on http://localhost:${port}`);
+    });
+
+    void startWhatsAppWebBot({
+      onReport: async (payload: BotReportPayload, context: BotContext): Promise<BotIngestResult> => {
+        const result = await createIncidentReportFromPayload(payload, context.userId);
+        if (!result.success) {
+          return {
+            ok: false,
+            message: `Report rejected: ${result.error}`,
+          };
+        }
+
+        return {
+          ok: true,
+          message: "Report saved.",
+        };
+      },
+    }).catch((botError) => {
+      console.error("WhatsApp bot startup failed:", botError);
     });
   } catch (error) {
     console.error("Failed to start backend:", error);

@@ -75,6 +75,7 @@ Status labels:
 - Design alignment for completed UI tasks in these phases is generally in place.
 - Engagement alignment is partial:
   - reporting loop features are implemented
-  - WhatsApp/bot-origin ingestion features from engagement guidance remain pending
+  - bot-origin ingestion baseline is now implemented (`POST /api/v1/reports/bot` + `whatsapp-web.js` listener)
+  - broader rewards/gamification systems are still pending for later phases
 - Full retrospective + forward plan tracking is maintained in:
   - `docs/cross-phase-compliance-audit.md`

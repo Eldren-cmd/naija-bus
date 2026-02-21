@@ -8,7 +8,7 @@ type MyTripMapProps = {
   trip: TripRecordResponse | null;
 };
 
-const MAP_STYLE = "mapbox://styles/mapbox/streets-v12";
+const MAP_STYLE = "mapbox://styles/mapbox/navigation-night-v1";
 const TRIP_SOURCE_ID = "mytrip-source";
 const TRIP_LAYER_ID = "mytrip-layer";
 const MAPBOX_TOKEN = (import.meta.env.VITE_MAPBOX_KEY || "").trim();

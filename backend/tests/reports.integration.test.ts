@@ -50,16 +50,20 @@ import { Report, Route, User } from "../src/models";
 import { emitReportCreated } from "../src/realtime/reportsSocket";
 import { app } from "../src/server";
 
+const FIXTURE_USER_ID = "111111111111111111111111";
+const FIXTURE_ROUTE_ID = "444444444444444444444444";
+const FIXTURE_BOT_TOKEN = "test_bot_ingest_token";
+
 const createUserToken = (): string =>
   signAccessToken({
-    sub: "699935ccba2963016871bba6",
+    sub: FIXTURE_USER_ID,
     email: "rider@example.com",
     role: "user",
   });
 
 const mockAuthenticatedUser = () => {
   const lean = jest.fn().mockResolvedValue({
-    _id: "699935ccba2963016871bba6",
+    _id: FIXTURE_USER_ID,
     email: "rider@example.com",
     role: "user",
     isActive: true,
@@ -145,7 +149,7 @@ describe("incident reports endpoint", () => {
 
   it("returns 404 when routeId is provided but not found", async () => {
     mockAuthenticatedUser();
-    const routeId = "699935ccba2963016871bba6";
+    const routeId = FIXTURE_ROUTE_ID;
     const lean = jest.fn().mockResolvedValue(null);
     const select = jest.fn().mockReturnValue({ lean });
     (Route.findOne as unknown as jest.Mock).mockReturnValue({ select });
@@ -166,7 +170,7 @@ describe("incident reports endpoint", () => {
 
   it("returns 201 and saves report for valid payload", async () => {
     mockAuthenticatedUser();
-    const routeId = "699935ccba2963016871bba6";
+    const routeId = FIXTURE_ROUTE_ID;
     const lean = jest.fn().mockResolvedValue({ _id: routeId });
     const select = jest.fn().mockReturnValue({ lean });
     (Route.findOne as unknown as jest.Mock).mockReturnValue({ select });
@@ -174,7 +178,7 @@ describe("incident reports endpoint", () => {
     (Report.create as unknown as jest.Mock).mockResolvedValue({
       _id: "rep-1",
       routeId,
-      userId: "699935ccba2963016871bba6",
+      userId: FIXTURE_USER_ID,
       type: "traffic",
       severity: "high",
       description: "Heavy at Ojodu",
@@ -197,7 +201,7 @@ describe("incident reports endpoint", () => {
     expect(response.body.type).toBe("traffic");
     expect(Report.create).toHaveBeenCalledWith({
       routeId,
-      userId: "699935ccba2963016871bba6",
+      userId: FIXTURE_USER_ID,
       type: "traffic",
       severity: "high",
       description: "Heavy at Ojodu",
@@ -212,5 +216,64 @@ describe("incident reports endpoint", () => {
         severity: "high",
       }),
     );
+  });
+
+  it("returns 401 for bot ingest when x-bot-token is missing", async () => {
+    const response = await request(app).post("/api/v1/reports/bot").send({
+      type: "traffic",
+      severity: "medium",
+      coords: { type: "Point", coordinates: [3.37, 6.52] },
+    });
+
+    expect(response.status).toBe(401);
+    expect(response.body.error).toBe("invalid bot token");
+  });
+
+  it("returns 401 for bot ingest when x-bot-token is invalid", async () => {
+    const response = await request(app)
+      .post("/api/v1/reports/bot")
+      .set("x-bot-token", "wrong_token")
+      .send({
+        type: "traffic",
+        severity: "medium",
+        coords: { type: "Point", coordinates: [3.37, 6.52] },
+      });
+
+    expect(response.status).toBe(401);
+    expect(response.body.error).toBe("invalid bot token");
+  });
+
+  it("returns 201 and saves report for valid bot ingest payload", async () => {
+    (Report.create as unknown as jest.Mock).mockResolvedValue({
+      _id: "rep-bot-1",
+      routeId: undefined,
+      userId: FIXTURE_USER_ID,
+      type: "traffic",
+      severity: "medium",
+      description: "Bot report",
+      coords: { type: "Point", coordinates: [3.37, 6.52] },
+      isActive: true,
+    });
+
+    const response = await request(app)
+      .post("/api/v1/reports/bot")
+      .set("x-bot-token", FIXTURE_BOT_TOKEN)
+      .send({
+        type: "traffic",
+        severity: "medium",
+        description: "Bot report",
+        coords: { type: "Point", coordinates: [3.37, 6.52] },
+      });
+
+    expect(response.status).toBe(201);
+    expect(Report.create).toHaveBeenCalledWith({
+      routeId: undefined,
+      userId: FIXTURE_USER_ID,
+      type: "traffic",
+      severity: "medium",
+      description: "Bot report",
+      coords: { type: "Point", coordinates: [3.37, 6.52] },
+      isActive: true,
+    });
   });
 });

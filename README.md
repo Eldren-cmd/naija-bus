@@ -65,6 +65,8 @@ This repository is being built strictly from:
 - [x] Phase 5 / Task 5.6: Admin panel route creation form added and wired to `POST /routes` with full payload validation
 - [x] Phase 5 / Task 5.7: Admin panel stop creation form added and wired to protected `POST /stops` endpoint
 - [x] Phase 5 / Task 5.8: Saved routes endpoints added and Home now supports saved route list plus save/unsave actions
+- [x] Engagement Gap Remediation: Added bot-auth report ingestion endpoint (`POST /api/v1/reports/bot`) and `whatsapp-web.js` listener flow
+- [x] Design Gap Remediation: MyTrips replay map style aligned with RouteView (`navigation-night-v1`)
 
 ## Working Rules for This Build
 - Move step-by-step in task order.
@@ -97,6 +99,12 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 - `JWT_REFRESH_SECRET`: refresh token signing secret (falls back to `JWT_SECRET` if omitted).
 - `JWT_REFRESH_EXPIRES_IN`: refresh token expiry (default `30d`).
 - `REFRESH_TOKEN_COOKIE_NAME`: cookie key used for refresh token storage (`naija_refresh_token` default).
+- `BOT_INGEST_TOKEN`: shared token for internal bot ingestion endpoint (`x-bot-token`).
+- `BOT_REPORT_USER_ID`: user id attributed to bot-created reports.
+- `WHATSAPP_BOT_ENABLED`: enable `whatsapp-web.js` ingestion bot (`true`/`false`).
+- `WHATSAPP_ALLOWED_SENDERS`: comma-separated sender MSISDN allowlist for bot commands.
+- `WHATSAPP_SESSION_PATH`: local session storage path for WhatsApp auth state.
+- `WHATSAPP_PUPPETEER_EXECUTABLE_PATH`: optional local Chrome path when Puppeteer download is skipped.
 
 ### Frontend Keys
 - `VITE_API_BASE`: backend base URL used by frontend API calls.

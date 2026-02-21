@@ -37,9 +37,11 @@ Reference: `NaijaTransport_EngagementGuide.docx`
 - Community reporting loop is partially aligned:
   - fare reports and traffic reports are live
   - realtime visibility of reports is live
-- Engagement guide items not yet implemented in this phase:
-  - WhatsApp bot integration
-  - bot-auth report ingestion path
+- Engagement guide bot-ingestion baseline now implemented:
+  - bot-auth ingestion endpoint: `POST /api/v1/reports/bot` with `x-bot-token`
+  - `whatsapp-web.js` listener accepts structured report commands and ingests as reports
+- Remaining phase-3 engagement expansion (optional):
+  - richer WhatsApp command grammar and moderation workflows
 
 ### Phase 4
 - Trip recording and history improve retention signals but do not yet include rewards/gamification loops.

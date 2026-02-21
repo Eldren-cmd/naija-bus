@@ -15,24 +15,22 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - RouteView map style switched to `mapbox://styles/mapbox/navigation-night-v1`.
 - Route polyline now includes glow + stronger layered line styling in `frontend/src/components/RouteMap.tsx`.
 - Route list cards and saved-route cards now include hover lift + shadow motion in `frontend/src/App.css`.
+- MyTrips replay map style aligned to `mapbox://styles/mapbox/navigation-night-v1` in `frontend/src/components/MyTripMap.tsx`.
 
 ## High-Impact Gaps To Implement Next
 
-1. Route map visual style follow-through
-- MyTrips replay map still uses `streets-v12`; keep or align with RouteView style if we want full visual consistency.
-
-2. Search and card interaction polish
+1. Search and card interaction polish
 - Search focus ring + typeahead dropdown behavior implemented.
 - Route cards now apply hover lift + shadow motion.
 
-3. Feedback interactions
+2. Feedback interactions
 - Guide-recommended toast feedback for submissions is now implemented.
 
-4. Realtime map signals
+3. Realtime map signals
 - Severity-based report marker colors are now present on the map.
 - Live marker updates over Socket.IO are now implemented.
 
 ## Implementation Note
 
 Remaining design-only polish still open:
-- Decide whether to align MyTrips map style with RouteView map style for full consistency
+- No unresolved high-impact design gaps currently tracked from earlier phases.

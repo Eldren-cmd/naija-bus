@@ -947,3 +947,15 @@ Status: complete. Implemented:
 ### Next Tasks
 - Continue Phase 5 in strict order: `5.9` (mobile responsive audit/fixes for Home, RouteView, and MyTrips).
 - Include mandatory Design + Engagement applicability checks in the `5.9` completion record.
+
+### Historical Gap Remediation (Design + Engagement)
+- Implemented missed prior-phase guide items before continuing:
+  - Added bot-auth ingestion endpoint:
+    - `POST /api/v1/reports/bot` (also `/reports/bot`) with `x-bot-token`
+  - Added `whatsapp-web.js` bot listener for structured report command ingestion
+  - Aligned MyTrips replay map style with RouteView map style (`navigation-night-v1`)
+- Validation checks passed:
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`

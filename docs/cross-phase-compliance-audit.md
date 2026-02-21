@@ -17,8 +17,8 @@ Status labels:
 | --- | --- | --- | --- | --- | --- |
 | 1 | complete | N/A (mostly backend/setup) | schema foundations implemented | aligned | roles + engagement fields implemented in user model. |
 | 2 | complete | major UI baseline implemented | N/A for core MVP | aligned | route search/map/fare UX established and refined. |
-| 3 | complete | realtime map/report UX implemented | report loop implemented, bot channels pending | partial | WhatsApp/bot-origin ingestion from engagement guide remains pending. |
-| 4 | complete | trip UX and replay implemented | retention support improved | partial | optional visual consistency gap remained in map style alignment. |
+| 3 | complete | realtime map/report UX implemented | report loop + bot-ingest baseline implemented | partial | `whatsapp-web.js` + bot token ingestion added; deeper automation/reward loops remain pending. |
+| 4 | complete | trip UX and replay implemented | retention support improved | aligned | map style parity gap for replay map has been closed. |
 | 5 (through 5.8) | complete through 5.8 | major polish updates applied | saved-routes retention loop implemented | partial | remaining engagement items tracked for later phase-5 tasks or phase 6. |
 
 ## Forward Plan (Future Phases/Tasks)
