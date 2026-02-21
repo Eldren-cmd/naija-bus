@@ -14,6 +14,7 @@ jest.mock("../src/models", () => {
 
   const TripRecord = {
     create: jest.fn(),
+    find: jest.fn(),
   };
 
   const Fare = {
@@ -48,18 +49,24 @@ jest.mock("../src/models", () => {
 import { Route, TripRecord, User } from "../src/models";
 import { app } from "../src/server";
 
-const createUserToken = (): string =>
+const createUserToken = (
+  userId = "699935ccba2963016871bba6",
+  role: "user" | "admin" = "user",
+): string =>
   signAccessToken({
-    sub: "699935ccba2963016871bba6",
+    sub: userId,
     email: "rider@example.com",
-    role: "user",
+    role,
   });
 
-const mockAuthenticatedUser = () => {
+const mockAuthenticatedUser = (
+  userId = "699935ccba2963016871bba6",
+  role: "user" | "admin" = "user",
+) => {
   const lean = jest.fn().mockResolvedValue({
-    _id: "699935ccba2963016871bba6",
+    _id: userId,
     email: "rider@example.com",
-    role: "user",
+    role,
     isActive: true,
   });
   const select = jest.fn().mockReturnValue({ lean });
@@ -77,6 +84,95 @@ describe("trip record endpoint", () => {
     });
 
     expect(response.status).toBe(401);
+  });
+
+  it("returns 400 when userId query is missing on GET /trips", async () => {
+    mockAuthenticatedUser();
+
+    const response = await request(app)
+      .get("/api/v1/trips")
+      .set("Authorization", `Bearer ${createUserToken()}`);
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain("userId query is required");
+  });
+
+  it("returns 400 when userId query is invalid on GET /trips", async () => {
+    mockAuthenticatedUser();
+
+    const response = await request(app)
+      .get("/api/v1/trips?userId=bad-id")
+      .set("Authorization", `Bearer ${createUserToken()}`);
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain("userId must be a valid id");
+  });
+
+  it("returns 403 when non-admin requests another user's trips", async () => {
+    mockAuthenticatedUser("699935ccba2963016871bba6", "user");
+
+    const response = await request(app)
+      .get("/api/v1/trips?userId=699935ccba2963016871bba7")
+      .set("Authorization", `Bearer ${createUserToken("699935ccba2963016871bba6", "user")}`);
+
+    expect(response.status).toBe(403);
+    expect(response.body.error).toBe("forbidden");
+  });
+
+  it("returns 200 with trip history for requested user", async () => {
+    const userId = "699935ccba2963016871bba6";
+    mockAuthenticatedUser(userId, "user");
+
+    const lean = jest.fn().mockResolvedValue([
+      {
+        _id: "trip-2",
+        userId,
+        distanceMeters: 2200,
+        durationSeconds: 510,
+        startedAt: "2026-02-21T11:00:00.000Z",
+      },
+      {
+        _id: "trip-1",
+        userId,
+        distanceMeters: 1500,
+        durationSeconds: 380,
+        startedAt: "2026-02-20T10:00:00.000Z",
+      },
+    ]);
+    const populate = jest.fn().mockReturnValue({ lean });
+    const limit = jest.fn().mockReturnValue({ populate });
+    const sort = jest.fn().mockReturnValue({ limit });
+    (TripRecord.find as unknown as jest.Mock).mockReturnValue({ sort });
+
+    const response = await request(app)
+      .get(`/api/v1/trips?userId=${userId}`)
+      .set("Authorization", `Bearer ${createUserToken(userId)}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveLength(2);
+    expect(TripRecord.find).toHaveBeenCalledWith({ userId });
+    expect(sort).toHaveBeenCalledWith({ startedAt: -1 });
+    expect(limit).toHaveBeenCalledWith(200);
+    expect(populate).toHaveBeenCalledWith("routeId", "name origin destination transportType");
+  });
+
+  it("allows admin to request another user's trips", async () => {
+    const adminId = "699935ccba2963016871bba8";
+    const targetUserId = "699935ccba2963016871bba6";
+    mockAuthenticatedUser(adminId, "admin");
+
+    const lean = jest.fn().mockResolvedValue([]);
+    const populate = jest.fn().mockReturnValue({ lean });
+    const limit = jest.fn().mockReturnValue({ populate });
+    const sort = jest.fn().mockReturnValue({ limit });
+    (TripRecord.find as unknown as jest.Mock).mockReturnValue({ sort });
+
+    const response = await request(app)
+      .get(`/api/v1/trips?userId=${targetUserId}`)
+      .set("Authorization", `Bearer ${createUserToken(adminId, "admin")}`);
+
+    expect(response.status).toBe(200);
+    expect(TripRecord.find).toHaveBeenCalledWith({ userId: targetUserId });
   });
 
   it("returns 400 for invalid payload", async () => {

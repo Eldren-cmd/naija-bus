@@ -486,5 +486,31 @@ Status: complete. Implemented:
   - `npm --prefix backend run test`
   - `npm --prefix backend run build`
 
+### Task 4.2
+- Implement `GET /trips?userId=` returning user's trip history
+
+Status: complete. Implemented:
+- added backend trip history endpoint:
+  - `GET /api/v1/trips?userId=...`
+  - `GET /trips?userId=...`
+- auth and access control in `backend/src/server.ts`:
+  - auth required (`401` when missing)
+  - `userId` query required and validated (`400` when missing/invalid)
+  - non-admin users can only request their own `userId` (`403` otherwise)
+  - admin users can request other users' histories
+- query behavior:
+  - fetches trips by `userId`
+  - sorts by newest `startedAt` first
+  - limits to 200 records
+  - populates route metadata (`name`, `origin`, `destination`, `transportType`)
+- test coverage added in `backend/tests/trips.integration.test.ts`:
+  - missing/invalid `userId`
+  - forbidden cross-user access
+  - success for same-user request
+  - success for admin cross-user request
+- validation checks passed:
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+
 ### Next Tasks
-- Continue Phase 4 in strict order: `4.2` (`GET /trips?userId=` trip history)
+- Continue Phase 4 in strict order: `4.3` (`TripRecorder` component with watchPosition flow)

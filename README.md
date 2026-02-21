@@ -49,6 +49,7 @@ This repository is being built strictly from:
 - [x] Phase 3 / Task 3.11: Reusable toast notifications now provide report submission success/error feedback
 - [x] Phase 3 / Task 3.13: Two-browser realtime marker demo validated (see `docs/phase3-step313-validation.md`)
 - [x] Phase 4 / Task 4.1: Backend trip recording endpoint (`POST /trips`) implemented with computed polyline, distance, and duration
+- [x] Phase 4 / Task 4.2: Backend trip history endpoint (`GET /trips?userId=`) implemented with auth and role-aware access control
 
 ## Working Rules for This Build
 - Move step-by-step in task order.

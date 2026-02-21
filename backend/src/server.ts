@@ -801,6 +801,40 @@ const createTripRecordHandler = async (req: Request, res: Response) => {
 app.post("/api/v1/trips", authMiddleware, createTripRecordHandler);
 app.post("/trips", authMiddleware, createTripRecordHandler);
 
+const getTripsHistoryHandler = async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "authentication required" });
+    }
+
+    const userId = typeof req.query.userId === "string" ? req.query.userId.trim() : "";
+    if (!userId) {
+      return res.status(400).json({ error: "userId query is required" });
+    }
+    if (!isValidObjectId(userId)) {
+      return res.status(400).json({ error: "userId must be a valid id" });
+    }
+
+    const isAdmin = req.user.role === "admin";
+    if (!isAdmin && req.user.id !== userId) {
+      return res.status(403).json({ error: "forbidden" });
+    }
+
+    const trips = await TripRecord.find({ userId })
+      .sort({ startedAt: -1 })
+      .limit(200)
+      .populate("routeId", "name origin destination transportType")
+      .lean();
+
+    return res.status(200).json(trips);
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to fetch trip history" });
+  }
+};
+
+app.get("/api/v1/trips", authMiddleware, getTripsHistoryHandler);
+app.get("/trips", authMiddleware, getTripsHistoryHandler);
+
 const startServer = async (): Promise<void> => {
   try {
     await connectToDatabase();
