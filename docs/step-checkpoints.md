@@ -139,6 +139,16 @@ Status: complete. Live checks confirm:
 - invalid `near` -> `400`
 - invalid `radius` -> `400`
 
+### Task 2.5
+- Implement fare engine service for estimate endpoint
+- Base formula: `baseFare x trafficMultiplier x timeMultiplier`
+
+Status: complete. Implemented:
+- `backend/src/services/fareService.ts`
+- route-aware fare estimate service with validation
+- time-band resolver (`off_peak`, `normal`, `rush_hour`)
+- traffic-level resolver (`low`, `medium`, `high`)
+- service-level helper tests in `backend/tests/fareService.test.ts`
+
 ### Next Tasks
-- 2.5 Implement fare engine service for estimate endpoint
 - 2.6 Implement `GET /fare/estimate` using fare engine
