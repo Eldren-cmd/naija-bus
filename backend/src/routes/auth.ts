@@ -4,10 +4,9 @@ import { authMiddleware } from "../middleware/authMiddleware";
 import { User } from "../models";
 import { signAccessToken } from "../lib/auth";
 import { AppUserRole } from "../types/auth";
+import { validateLoginBody, validateRegisterBody } from "../validation/requestSchemas";
 
 const authRouter = Router();
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const sanitizeUser = (user: {
   _id: unknown;
@@ -23,40 +22,22 @@ const sanitizeUser = (user: {
 
 authRouter.post("/register", async (req: Request, res: Response) => {
   try {
-    const { fullName, email, password } = req.body ?? {};
-
-    if (
-      typeof fullName !== "string" ||
-      typeof email !== "string" ||
-      typeof password !== "string"
-    ) {
-      return res.status(400).json({ error: "fullName, email, and password are required" });
+    const validated = validateRegisterBody(req.body);
+    if (!validated.success) {
+      return res.status(400).json({ error: validated.error });
     }
 
-    const cleanName = fullName.trim();
-    const cleanEmail = email.trim().toLowerCase();
+    const { fullName, email, password } = validated.data;
 
-    if (!cleanName) {
-      return res.status(400).json({ error: "fullName cannot be empty" });
-    }
-
-    if (!EMAIL_REGEX.test(cleanEmail)) {
-      return res.status(400).json({ error: "email is invalid" });
-    }
-
-    if (password.length < 8) {
-      return res.status(400).json({ error: "password must be at least 8 characters" });
-    }
-
-    const existing = await User.findOne({ email: cleanEmail }).lean();
+    const existing = await User.findOne({ email }).lean();
     if (existing) {
       return res.status(409).json({ error: "email already exists" });
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
     const created = await User.create({
-      fullName: cleanName,
-      email: cleanEmail,
+      fullName,
+      email,
       passwordHash,
       role: "user",
       isActive: true,
@@ -78,15 +59,14 @@ authRouter.post("/register", async (req: Request, res: Response) => {
 
 authRouter.post("/login", async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body ?? {};
-
-    if (typeof email !== "string" || typeof password !== "string") {
-      return res.status(400).json({ error: "email and password are required" });
+    const validated = validateLoginBody(req.body);
+    if (!validated.success) {
+      return res.status(400).json({ error: validated.error });
     }
 
-    const cleanEmail = email.trim().toLowerCase();
+    const { email, password } = validated.data;
 
-    const user = await User.findOne({ email: cleanEmail });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ error: "invalid email or password" });
     }

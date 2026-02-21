@@ -187,6 +187,24 @@ Status: complete. Implemented:
   - `ROUTES_RATE_LIMIT_WINDOW_MS`
   - `ROUTES_RATE_LIMIT_MAX`
 
+### Task 2.9
+- Add input validation (`zod`) on all POST/PUT body schemas
+
+Status: complete. Implemented:
+- added `zod` dependency in backend
+- added centralized validation module:
+  - `backend/src/validation/requestSchemas.ts`
+- applied zod validation to auth POST schemas:
+  - `POST /auth/register`
+  - `POST /auth/login`
+- applied zod validation to API POST/PUT schemas:
+  - `POST /api/v1/routes`
+  - `PUT /api/v1/routes/:routeId`
+  - `POST /api/v1/fare/report`
+  - `POST /api/v1/reports`
+- added schema unit tests:
+  - `backend/tests/requestSchemas.test.ts`
+
 ### Phase 2 Frontend MVP View
 - Build RouteView page section showing selected route + ordered stops
 - Build FareEstimate component calling `GET /fare/estimate`
@@ -335,5 +353,5 @@ Status: complete. Implemented:
 - saves JWT token locally in browser storage for repeated report submissions
 
 ### Next Tasks
-- DevPlan alignment backlog from Phase 2: `2.9`, `2.11`, `2.15` (see `docs/devplan-audit-phase1-3.md`)
+- DevPlan alignment backlog from Phase 2: `2.11`, `2.15` (see `docs/devplan-audit-phase1-3.md`)
 - 3.8 Build traffic report modal: type, severity, description, auto-fill location

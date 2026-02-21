@@ -10,6 +10,12 @@ import { authMiddleware, requireRoles } from "./middleware/authMiddleware";
 import { emitFareReported, emitReportCreated, initRealtimeServer } from "./realtime/reportsSocket";
 import { authRouter } from "./routes/auth";
 import { FareServiceError, estimateRouteFare } from "./services/fareService";
+import {
+  validateFareReportBody,
+  validateIncidentReportBody,
+  validateRouteCreateBody,
+  validateRouteUpdateBody,
+} from "./validation/requestSchemas";
 
 dotenv.config();
 
@@ -161,110 +167,18 @@ const isPolylinePayload = (
 };
 
 const validateRouteCreatePayload = (body: unknown): string | null => {
-  if (!isObject(body)) return "request body must be an object";
-
-  if (typeof body.name !== "string" || !body.name.trim()) return "name is required";
-  if (typeof body.origin !== "string" || !body.origin.trim()) return "origin is required";
-  if (typeof body.destination !== "string" || !body.destination.trim())
-    return "destination is required";
-  if (!Number.isFinite(body.baseFare) || Number(body.baseFare) < 0)
-    return "baseFare must be a non-negative number";
-  if (!isPolylinePayload(body.polyline))
-    return "polyline must be a valid GeoJSON LineString with at least 2 coordinates";
-  if (
-    body.transportType !== undefined &&
-    !isTransportType(body.transportType)
-  ) {
-    return "transportType is invalid";
-  }
-  if (
-    body.confidenceScore !== undefined &&
-    (!Number.isFinite(body.confidenceScore) ||
-      Number(body.confidenceScore) < 0 ||
-      Number(body.confidenceScore) > 1)
-  ) {
-    return "confidenceScore must be between 0 and 1";
-  }
-  if (
-    body.aliases !== undefined &&
-    (!Array.isArray(body.aliases) || body.aliases.some((alias) => typeof alias !== "string"))
-  ) {
-    return "aliases must be an array of strings";
-  }
-
-  return null;
+  const validated = validateRouteCreateBody(body);
+  return validated.success ? null : validated.error;
 };
 
 const validateRouteUpdatePayload = (body: unknown): string | null => {
-  if (!isObject(body)) return "request body must be an object";
-  if (Object.keys(body).length === 0) return "at least one field is required";
-
-  if (body.name !== undefined && (typeof body.name !== "string" || !body.name.trim())) {
-    return "name must be a non-empty string";
-  }
-  if (body.origin !== undefined && (typeof body.origin !== "string" || !body.origin.trim())) {
-    return "origin must be a non-empty string";
-  }
-  if (
-    body.destination !== undefined &&
-    (typeof body.destination !== "string" || !body.destination.trim())
-  ) {
-    return "destination must be a non-empty string";
-  }
-  if (
-    body.baseFare !== undefined &&
-    (!Number.isFinite(body.baseFare) || Number(body.baseFare) < 0)
-  ) {
-    return "baseFare must be a non-negative number";
-  }
-  if (
-    body.transportType !== undefined &&
-    !isTransportType(body.transportType)
-  ) {
-    return "transportType is invalid";
-  }
-  if (
-    body.confidenceScore !== undefined &&
-    (!Number.isFinite(body.confidenceScore) ||
-      Number(body.confidenceScore) < 0 ||
-      Number(body.confidenceScore) > 1)
-  ) {
-    return "confidenceScore must be between 0 and 1";
-  }
-  if (body.polyline !== undefined && !isPolylinePayload(body.polyline)) {
-    return "polyline must be a valid GeoJSON LineString with at least 2 coordinates";
-  }
-  if (
-    body.aliases !== undefined &&
-    (!Array.isArray(body.aliases) || body.aliases.some((alias) => typeof alias !== "string"))
-  ) {
-    return "aliases must be an array of strings";
-  }
-  if (body.isActive !== undefined && typeof body.isActive !== "boolean") {
-    return "isActive must be boolean";
-  }
-
-  return null;
+  const validated = validateRouteUpdateBody(body);
+  return validated.success ? null : validated.error;
 };
 
 const validateFareReportPayload = (body: unknown): string | null => {
-  if (!isObject(body)) return "request body must be an object";
-  if (typeof body.routeId !== "string" || !isValidObjectId(body.routeId.trim())) {
-    return "routeId is required and must be a valid id";
-  }
-  if (!Number.isFinite(body.reportedFare) || Number(body.reportedFare) <= 0) {
-    return "reportedFare must be a positive number";
-  }
-  if (body.trafficLevel !== undefined && !isTrafficLevel(body.trafficLevel)) {
-    return "trafficLevel must be one of: low, medium, high";
-  }
-  if (body.notes !== undefined && typeof body.notes !== "string") {
-    return "notes must be a string";
-  }
-  if (body.source !== undefined && !isFareReportSource(body.source)) {
-    return "source must be one of: system, user_report, admin_update";
-  }
-  return null;
+  const validated = validateFareReportBody(body);
+  return validated.success ? null : validated.error;
 };
 
 const isPointCoordsPayload = (value: unknown): value is { type: "Point"; coordinates: [number, number] } => {
@@ -277,25 +191,8 @@ const isPointCoordsPayload = (value: unknown): value is { type: "Point"; coordin
 };
 
 const validateIncidentReportPayload = (body: unknown): string | null => {
-  if (!isObject(body)) return "request body must be an object";
-  if (body.routeId !== undefined) {
-    if (typeof body.routeId !== "string" || !isValidObjectId(body.routeId.trim())) {
-      return "routeId must be a valid id when provided";
-    }
-  }
-  if (!isReportType(body.type)) {
-    return "type must be one of: traffic, police, roadblock, accident, hazard, other";
-  }
-  if (body.severity !== undefined && !isReportSeverity(body.severity)) {
-    return "severity must be one of: low, medium, high";
-  }
-  if (!isPointCoordsPayload(body.coords)) {
-    return "coords must be GeoJSON Point with [lng, lat]";
-  }
-  if (body.description !== undefined && typeof body.description !== "string") {
-    return "description must be a string";
-  }
-  return null;
+  const validated = validateIncidentReportBody(body);
+  return validated.success ? null : validated.error;
 };
 
 const getRoutesHandler = async (req: Request, res: Response) => {
