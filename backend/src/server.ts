@@ -2,6 +2,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import { connectToDatabase, ensureCoreIndexes, getDatabaseStatus } from "./config/db";
+import { Route } from "./models";
 import { authRouter } from "./routes/auth";
 
 dotenv.config();
@@ -23,8 +24,13 @@ app.get("/api/v1/health", (_req, res) => {
   });
 });
 
-app.get("/api/v1/routes", (_req, res) => {
-  res.status(200).json([]);
+app.get("/api/v1/routes", async (_req, res) => {
+  try {
+    const routes = await Route.find({ isActive: true }).sort({ name: 1 }).lean();
+    return res.status(200).json(routes);
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to fetch routes" });
+  }
 });
 
 const startServer = async (): Promise<void> => {

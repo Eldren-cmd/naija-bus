@@ -19,7 +19,7 @@ This repository is being built strictly from:
 - [x] Phase 1 / Task 1.11: Executed seed script and verified 5 routes in Atlas
 - [x] Phase 1 / Task 1.12: Added first unit test suite (fare engine base logic) with Jest
 - [x] Social post archive initialized (`social_posts/`)
-- [ ] Remaining checklist: Milestone Gate 1 verification
+- [x] Milestone Gate 1 verification complete (`register` returns JWT, `GET /api/v1/routes` returns seeded routes)
 
 ## Working Rules for This Build
 - Move step-by-step in task order.
@@ -59,3 +59,7 @@ Commands:
 Latest seed verification:
 - Routes in Atlas: `5`
 - Stops in Atlas: `25`
+
+## Phase 1 Gate 1 Result
+- `POST /auth/register`: `201` with JWT
+- `GET /api/v1/routes`: `200` with `5` seeded routes

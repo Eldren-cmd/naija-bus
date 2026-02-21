@@ -92,5 +92,13 @@ Status: complete. Seed execution successful with `5` routes and `25` stops verif
 
 Status: complete. Jest suite added (`tests/fareEngine.test.ts`) and passes (`5/5` tests).
 
-## Next Tasks
-- Gate 1 verification: register returns JWT, routes endpoint returns seeded routes
+## Milestone Gate 1
+- `POST /auth/register` -> `201` with JWT: PASS
+- `GET /api/v1/routes` -> `200` with seeded routes: PASS (`5` routes)
+
+Status: Gate 1 passed. Phase 1 foundation is complete.
+
+## Next Phase (Phase 2)
+- 2.1 Implement `GET /routes` with text + bbox query support
+- 2.2 Implement `GET /routes/:routeId`
+- 2.3 Implement admin `POST/PUT/DELETE /routes`
