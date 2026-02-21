@@ -1,6 +1,7 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import { connectToDatabase, getDatabaseStatus } from "./config/db";
 
 dotenv.config();
 
@@ -12,13 +13,27 @@ app.use(cors({ origin: corsOrigin }));
 app.use(express.json());
 
 app.get("/api/v1/health", (_req, res) => {
-  res.status(200).json({ status: "ok", service: "backend" });
+  res.status(200).json({
+    status: "ok",
+    service: "backend",
+    database: getDatabaseStatus(),
+  });
 });
 
 app.get("/api/v1/routes", (_req, res) => {
   res.status(200).json([]);
 });
 
-app.listen(port, () => {
-  console.log(`Backend listening on http://localhost:${port}`);
-});
+const startServer = async (): Promise<void> => {
+  try {
+    await connectToDatabase();
+    app.listen(port, () => {
+      console.log(`Backend listening on http://localhost:${port}`);
+    });
+  } catch (error) {
+    console.error("Failed to start backend:", error);
+    process.exit(1);
+  }
+};
+
+void startServer();

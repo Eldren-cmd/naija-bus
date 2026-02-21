@@ -19,7 +19,14 @@ Status: complete. Build successful and dev server port check passed.
 
 Status: complete. `npm run build` passes and backend responds on `/api/v1/health` and `/api/v1/routes`.
 
+## Task 1.4
+- Create MongoDB Atlas cluster
+- Set `MONGO_URI`
+- Test connection from backend
+
+Status: complete. Backend health check now reports `"database":"connected"`.
+
 ## Next Tasks
-- 1.4 MongoDB Atlas setup + connection test
 - 1.5 Create all 6 Mongoose models
 - 1.6 Create 2dsphere + TTL indexes
+- 1.7 Implement auth routes with bcrypt + JWT

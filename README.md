@@ -8,8 +8,9 @@ This repository is being built strictly from:
 - [x] Phase 1 / Task 1.1: Monorepo skeleton created (`frontend/`, `backend/`, `seed/`, `scripts/`)
 - [x] Phase 1 / Task 1.2: Frontend initialized (Vite + React + TypeScript + Tailwind CSS)
 - [x] Phase 1 / Task 1.3: Backend initialized (Node + Express + TypeScript + ts-node-dev)
+- [x] Phase 1 / Task 1.4: MongoDB Atlas connection tested from backend
 - [x] Social post archive initialized (`social_posts/`)
-- [ ] Remaining Phase 1 tasks (1.4 to 1.12)
+- [ ] Remaining Phase 1 tasks (1.5 to 1.12)
 
 ## Working Rules for This Build
 - Move step-by-step in task order.
