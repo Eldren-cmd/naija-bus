@@ -221,3 +221,25 @@ export const createRouteAdmin = async (
 ): Promise<RouteDetail> => {
   return apiPost<RouteDetail>("/api/v1/routes", input, authToken);
 };
+
+type StopAdminCreateInput = {
+  routeId: string;
+  name: string;
+  order: number;
+  isMajor?: boolean;
+  coords: {
+    type: "Point";
+    coordinates: [number, number];
+  };
+};
+
+export const createStopAdmin = async (
+  input: StopAdminCreateInput,
+  authToken: string,
+): Promise<{ _id: string; name: string; routeId: string; order: number }> => {
+  return apiPost<{ _id: string; name: string; routeId: string; order: number }>(
+    "/api/v1/stops",
+    input,
+    authToken,
+  );
+};

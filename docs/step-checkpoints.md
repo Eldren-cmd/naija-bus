@@ -863,3 +863,36 @@ Status: complete. Implemented:
 
 ### Next Tasks
 - Continue Phase 5 in strict order: `5.7` (stop creation form in AdminPanel, requires backend `POST /stops` endpoint alignment).
+
+### Task 5.7
+- Add stop creation form in AdminPanel; calls `POST /stops`
+
+Status: complete. Implemented:
+- added backend stop creation validation in `backend/src/validation/requestSchemas.ts`:
+  - `stopCreateSchema`
+  - `validateStopCreateBody`
+- added backend stop creation handler + routes in `backend/src/server.ts`:
+  - `POST /api/v1/stops`
+  - `POST /stops`
+  - protected with `authMiddleware` + `requireRoles(["admin"])`
+  - validates payload, verifies route existence, then creates stop record
+- added backend integration tests in `backend/tests/phase2.integration.test.ts`:
+  - `401` when auth header missing
+  - `201` for admin stop creation flow
+- added frontend admin API helper in `frontend/src/lib/api.ts`:
+  - `createStopAdmin` -> `POST /api/v1/stops`
+- added stop creation UI in `frontend/src/components/AdminPanel.tsx`:
+  - route selector
+  - stop name
+  - stop order
+  - major stop toggle
+  - longitude/latitude inputs
+  - submit action with client-side validation
+- validation checks passed:
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+
+### Next Tasks
+- Continue Phase 5 in strict order: `5.8` (saved routes endpoint + home integration).

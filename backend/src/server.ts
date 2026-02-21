@@ -20,6 +20,7 @@ import {
   validateFareReportBody,
   validateIncidentReportBody,
   validateRouteCreateBody,
+  validateStopCreateBody,
   validateRouteUpdateBody,
   validateTripCreateBody,
 } from "./validation/requestSchemas";
@@ -260,6 +261,11 @@ const simplifyPathCoordinates = (coordinates: [number, number][]): [number, numb
 
 const validateIncidentReportPayload = (body: unknown): string | null => {
   const validated = validateIncidentReportBody(body);
+  return validated.success ? null : validated.error;
+};
+
+const validateStopCreatePayload = (body: unknown): string | null => {
+  const validated = validateStopCreateBody(body);
   return validated.success ? null : validated.error;
 };
 
@@ -571,6 +577,37 @@ const getStopsNearHandler = async (req: Request, res: Response) => {
 
 app.get("/api/v1/stops", getStopsNearHandler);
 app.get("/stops", getStopsNearHandler);
+
+const createStopHandler = async (req: Request, res: Response) => {
+  try {
+    const validationError = validateStopCreatePayload(req.body);
+    if (validationError) {
+      return res.status(400).json({ error: validationError });
+    }
+
+    const body = req.body as Record<string, unknown>;
+    const routeId = String(body.routeId).trim();
+    const route = await Route.findOne({ _id: routeId, isActive: true }).select("_id").lean();
+    if (!route) {
+      return res.status(404).json({ error: "route not found" });
+    }
+
+    const created = await Stop.create({
+      routeId,
+      name: String(body.name).trim(),
+      order: Number(body.order),
+      isMajor: Boolean(body.isMajor),
+      coords: body.coords as { type: "Point"; coordinates: [number, number] },
+    });
+
+    return res.status(201).json(created);
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to create stop" });
+  }
+};
+
+app.post("/api/v1/stops", authMiddleware, requireRoles(["admin"]), createStopHandler);
+app.post("/stops", authMiddleware, requireRoles(["admin"]), createStopHandler);
 
 const getFareEstimateHandler = async (req: Request, res: Response) => {
   try {

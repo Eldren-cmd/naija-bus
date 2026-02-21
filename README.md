@@ -63,6 +63,7 @@ This repository is being built strictly from:
 - [x] Phase 5 / Task 5.4: Protected route wrapper added; unauthenticated users are redirected to `/login`
 - [x] Phase 5 / Task 5.5: Admin-only route management panel added with route table, edit, and delete actions
 - [x] Phase 5 / Task 5.6: Admin panel route creation form added and wired to `POST /routes` with full payload validation
+- [x] Phase 5 / Task 5.7: Admin panel stop creation form added and wired to protected `POST /stops` endpoint
 
 ## Working Rules for This Build
 - Move step-by-step in task order.

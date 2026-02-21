@@ -27,6 +27,7 @@ React + TypeScript + Vite frontend for Naija Transport.
 - Protected route wrapper now redirects signed-out users from `/my-trips` to `/login`
 - Admin-only `/admin` page now lists routes and supports inline edit/delete via protected backend admin endpoints
 - Admin route creation form now posts full payload to protected `POST /api/v1/routes`
+- Admin stop creation form now posts validated stop payloads to protected `POST /api/v1/stops`
 
 ## Environment
 Create `frontend/.env` with:
@@ -43,7 +44,7 @@ VITE_MAPBOX_KEY=replace_with_mapbox_token_when_phase2_starts
 
 ## Report Fare UI Note
 - The report panel requires a valid JWT from backend login/register.
-- Paste token into the UI once; it is stored in browser local storage for repeat submissions.
+- Token is provided automatically from in-memory auth session after login/signup.
 
 ## Traffic Report UI Note
 - The traffic report modal also requires a valid JWT token.

@@ -19,6 +19,7 @@ jest.mock("../src/models", () => {
   const Stop = {
     find: jest.fn(),
     deleteMany: jest.fn(),
+    create: jest.fn(),
   };
 
   const Report = {
@@ -58,7 +59,29 @@ jest.mock("../src/services/fareService", () => {
 import { Route, Stop, User } from "../src/models";
 import { app } from "../src/server";
 import { estimateRouteFare, FareServiceError } from "../src/services/fareService";
-import { signRefreshToken } from "../src/lib/auth";
+import { signAccessToken, signRefreshToken } from "../src/lib/auth";
+
+const FIXTURE_USER_ID = "111111111111111111111111";
+const FIXTURE_ROUTE_ID = "444444444444444444444444";
+const FIXTURE_MISSING_ROUTE_ID = "555555555555555555555555";
+
+const createUserToken = (role: "user" | "admin" = "user"): string =>
+  signAccessToken({
+    sub: FIXTURE_USER_ID,
+    email: "rider@example.com",
+    role,
+  });
+
+const mockAuthenticatedUser = (role: "user" | "admin" = "user") => {
+  const lean = jest.fn().mockResolvedValue({
+    _id: FIXTURE_USER_ID,
+    email: "rider@example.com",
+    role,
+    isActive: true,
+  });
+  const select = jest.fn().mockReturnValue({ lean });
+  (User.findById as unknown as jest.Mock).mockReturnValue({ select });
+};
 
 describe("Phase 2 integration endpoints", () => {
   beforeEach(() => {
@@ -121,13 +144,13 @@ describe("Phase 2 integration endpoints", () => {
 
   it("POST /api/v1/auth/refresh returns new access token when refresh cookie is valid", async () => {
     const refreshToken = signRefreshToken({
-      sub: "699935ccba2963016871bba6",
+      sub: FIXTURE_USER_ID,
       email: "rider@example.com",
       role: "user",
     });
 
     const select = jest.fn().mockResolvedValue({
-      _id: "699935ccba2963016871bba6",
+      _id: FIXTURE_USER_ID,
       fullName: "Test Rider",
       email: "rider@example.com",
       role: "user",
@@ -177,7 +200,7 @@ describe("Phase 2 integration endpoints", () => {
 
   it("GET /api/v1/fare/estimate returns fare breakdown", async () => {
     const mockEstimate = {
-      routeId: "699935ceba2963016871bbaa",
+      routeId: FIXTURE_ROUTE_ID,
       routeName: "Ojota -> CMS",
       origin: "Ojota",
       destination: "CMS",
@@ -196,13 +219,13 @@ describe("Phase 2 integration endpoints", () => {
 
     const response = await request(app)
       .get("/api/v1/fare/estimate")
-      .query({ routeId: "699935ceba2963016871bbaa", time: "08:30" });
+      .query({ routeId: FIXTURE_ROUTE_ID, time: "08:30" });
 
     expect(response.status).toBe(200);
     expect(response.body.estimatedFare).toBe(810);
     expect(response.body.timeBand).toBe("rush_hour");
     expect(estimateRouteFare).toHaveBeenCalledWith({
-      routeId: "699935ceba2963016871bbaa",
+      routeId: FIXTURE_ROUTE_ID,
       time: "08:30",
       trafficLevel: undefined,
     });
@@ -215,7 +238,7 @@ describe("Phase 2 integration endpoints", () => {
 
     const response = await request(app)
       .get("/api/v1/fare/estimate")
-      .query({ routeId: "507f1f77bcf86cd799439011", time: "08:30" });
+      .query({ routeId: FIXTURE_MISSING_ROUTE_ID, time: "08:30" });
 
     expect(response.status).toBe(404);
     expect(response.body.error).toBe("route not found");
@@ -284,5 +307,55 @@ describe("Phase 2 integration endpoints", () => {
         name: expect.any(RegExp),
       }),
     );
+  });
+
+  it("POST /api/v1/stops returns 401 when auth header is missing", async () => {
+    const response = await request(app).post("/api/v1/stops").send({
+      routeId: FIXTURE_ROUTE_ID,
+      name: "Ojodu",
+      order: 1,
+      coords: { type: "Point", coordinates: [3.38, 6.58] },
+    });
+
+    expect(response.status).toBe(401);
+  });
+
+  it("POST /api/v1/stops allows admin to create a stop", async () => {
+    mockAuthenticatedUser("admin");
+    const routeId = FIXTURE_ROUTE_ID;
+
+    const routeLean = jest.fn().mockResolvedValue({ _id: routeId });
+    const routeSelect = jest.fn().mockReturnValue({ lean: routeLean });
+    (Route.findOne as unknown as jest.Mock).mockReturnValue({ select: routeSelect });
+
+    (Stop.create as unknown as jest.Mock).mockResolvedValue({
+      _id: "s-create-1",
+      routeId,
+      name: "Ojodu",
+      order: 1,
+      isMajor: true,
+      coords: { type: "Point", coordinates: [3.38, 6.58] },
+    });
+
+    const response = await request(app)
+      .post("/api/v1/stops")
+      .set("Authorization", `Bearer ${createUserToken("admin")}`)
+      .send({
+        routeId,
+        name: "Ojodu",
+        order: 1,
+        isMajor: true,
+        coords: { type: "Point", coordinates: [3.38, 6.58] },
+      });
+
+    expect(response.status).toBe(201);
+    expect(response.body.name).toBe("Ojodu");
+    expect(Stop.create).toHaveBeenCalledWith({
+      routeId,
+      name: "Ojodu",
+      order: 1,
+      isMajor: true,
+      coords: { type: "Point", coordinates: [3.38, 6.58] },
+    });
   });
 });

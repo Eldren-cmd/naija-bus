@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
-import { createRouteAdmin, deleteRouteAdmin, getRoutes, updateRouteAdmin } from "../lib/api";
+import {
+  createRouteAdmin,
+  createStopAdmin,
+  deleteRouteAdmin,
+  getRoutes,
+  updateRouteAdmin,
+} from "../lib/api";
 import type { RouteSummary, TransportType } from "../types";
 
 type EditableRoute = {
@@ -25,6 +31,15 @@ type CreateRouteForm = {
   polyline: string;
 };
 
+type CreateStopForm = {
+  routeId: string;
+  name: string;
+  order: string;
+  isMajor: boolean;
+  lng: string;
+  lat: string;
+};
+
 const DEFAULT_CREATE_FORM: CreateRouteForm = {
   name: "",
   origin: "",
@@ -35,6 +50,15 @@ const DEFAULT_CREATE_FORM: CreateRouteForm = {
   confidenceScore: "0.7",
   aliases: "",
   polyline: "3.3788,6.5839 | 3.3900,6.5600 | 3.4100,6.5300",
+};
+
+const DEFAULT_STOP_FORM: CreateStopForm = {
+  routeId: "",
+  name: "",
+  order: "0",
+  isMajor: false,
+  lng: "3.3788",
+  lat: "6.5839",
 };
 
 const parsePolyline = (input: string): [number, number][] | null => {
@@ -72,8 +96,10 @@ export function AdminPanel() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [creatingStop, setCreatingStop] = useState(false);
   const [editing, setEditing] = useState<EditableRoute | null>(null);
   const [createForm, setCreateForm] = useState<CreateRouteForm>(DEFAULT_CREATE_FORM);
+  const [stopForm, setStopForm] = useState<CreateStopForm>(DEFAULT_STOP_FORM);
 
   const canManageRoutes = user?.role === "admin" && Boolean(accessToken?.trim());
 
@@ -88,12 +114,71 @@ export function AdminPanel() {
     try {
       const data = await getRoutes();
       setRoutes(data);
+      setStopForm((previous) => ({
+        ...previous,
+        routeId: previous.routeId || data[0]?._id || "",
+      }));
     } catch (requestError) {
       const message = requestError instanceof Error ? requestError.message : "Failed to load routes";
       setError(message);
       setRoutes([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const onCreateStop = async () => {
+    const token = accessToken?.trim();
+    if (!token) {
+      setError("Admin token missing. Sign in again.");
+      return;
+    }
+
+    const order = Number(stopForm.order);
+    const lng = Number(stopForm.lng);
+    const lat = Number(stopForm.lat);
+    if (!stopForm.routeId.trim()) {
+      setError("Select a route for this stop.");
+      return;
+    }
+    if (!stopForm.name.trim()) {
+      setError("Stop name is required.");
+      return;
+    }
+    if (!Number.isInteger(order) || order < 0) {
+      setError("Stop order must be a non-negative integer.");
+      return;
+    }
+    if (!Number.isFinite(lng) || !Number.isFinite(lat) || lng < -180 || lng > 180 || lat < -90 || lat > 90) {
+      setError("Valid stop coordinates are required.");
+      return;
+    }
+
+    setCreatingStop(true);
+    setError(null);
+    try {
+      await createStopAdmin(
+        {
+          routeId: stopForm.routeId,
+          name: stopForm.name.trim(),
+          order,
+          isMajor: stopForm.isMajor,
+          coords: {
+            type: "Point",
+            coordinates: [lng, lat],
+          },
+        },
+        token,
+      );
+      setStopForm((previous) => ({
+        ...DEFAULT_STOP_FORM,
+        routeId: previous.routeId,
+      }));
+    } catch (requestError) {
+      const message = requestError instanceof Error ? requestError.message : "Failed to create stop";
+      setError(message);
+    } finally {
+      setCreatingStop(false);
     }
   };
 
@@ -368,6 +453,85 @@ export function AdminPanel() {
           </label>
           <button type="button" className="estimate-btn" onClick={() => void onCreateRoute()} disabled={creating}>
             {creating ? "Creating..." : "Create Route"}
+          </button>
+        </section>
+
+        <section className="admin-create-form">
+          <h3 className="panel-title">Create Stop</h3>
+          <div className="admin-create-grid">
+            <label>
+              Route
+              <select
+                value={stopForm.routeId}
+                onChange={(event) =>
+                  setStopForm((previous) => ({ ...previous, routeId: event.target.value }))
+                }
+              >
+                {sortedRoutes.map((route) => (
+                  <option key={route._id} value={route._id}>
+                    {route.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Stop Name
+              <input
+                value={stopForm.name}
+                onChange={(event) =>
+                  setStopForm((previous) => ({ ...previous, name: event.target.value }))
+                }
+                placeholder="Ojodu"
+              />
+            </label>
+            <label>
+              Order
+              <input
+                type="number"
+                inputMode="numeric"
+                min={0}
+                step={1}
+                value={stopForm.order}
+                onChange={(event) =>
+                  setStopForm((previous) => ({ ...previous, order: event.target.value }))
+                }
+              />
+            </label>
+            <label>
+              Is Major
+              <select
+                value={stopForm.isMajor ? "yes" : "no"}
+                onChange={(event) =>
+                  setStopForm((previous) => ({ ...previous, isMajor: event.target.value === "yes" }))
+                }
+              >
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </label>
+            <label>
+              Longitude
+              <input
+                value={stopForm.lng}
+                onChange={(event) =>
+                  setStopForm((previous) => ({ ...previous, lng: event.target.value }))
+                }
+                placeholder="3.3788"
+              />
+            </label>
+            <label>
+              Latitude
+              <input
+                value={stopForm.lat}
+                onChange={(event) =>
+                  setStopForm((previous) => ({ ...previous, lat: event.target.value }))
+                }
+                placeholder="6.5839"
+              />
+            </label>
+          </div>
+          <button type="button" className="estimate-btn" onClick={() => void onCreateStop()} disabled={creatingStop}>
+            {creatingStop ? "Creating..." : "Create Stop"}
           </button>
         </section>
 
