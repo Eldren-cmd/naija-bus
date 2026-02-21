@@ -14,8 +14,9 @@ This repository is being built strictly from:
 - [x] Phase 1 / Task 1.6: Created 2dsphere + TTL indexes for route/stop/report collections
 - [x] Phase 1 / Task 1.7: Implemented auth routes (`POST /auth/register`, `POST /auth/login`) with bcrypt + JWT
 - [x] Phase 1 / Task 1.8: Added JWT auth middleware for protected routes
+- [x] Phase 1 / Task 1.9: Added `.env.example` files and documented required env keys
 - [x] Social post archive initialized (`social_posts/`)
-- [ ] Remaining Phase 1 tasks (1.9 to 1.12)
+- [ ] Remaining Phase 1 tasks (1.10 to 1.12)
 
 ## Working Rules for This Build
 - Move step-by-step in task order.
@@ -26,3 +27,20 @@ This repository is being built strictly from:
 
 ## Note on GitHub Visibility
 The project uses a **private** GitHub repository at `origin` with `main` pushed.
+
+## Environment Setup
+1. Copy `backend/.env.example` to `backend/.env`.
+2. Copy `frontend/.env.example` to `frontend/.env` when frontend API/map integration begins.
+3. Never commit real secrets.
+
+### Backend Required Keys
+- `PORT`: API port (`5000` for local dev).
+- `NODE_ENV`: runtime mode (`development` for local work).
+- `MONGO_URI`: MongoDB Atlas connection string.
+- `JWT_SECRET`: long random secret used to sign/verify access tokens.
+- `JWT_EXPIRES_IN`: token duration (for example `7d`).
+- `CORS_ORIGIN`: allowed frontend origin (local default `http://localhost:5173`).
+
+### Frontend Keys
+- `VITE_API_BASE`: backend base URL used by frontend API calls.
+- `VITE_MAPBOX_KEY`: Mapbox token (required from Phase 2 map work onward).

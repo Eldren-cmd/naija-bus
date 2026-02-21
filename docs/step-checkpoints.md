@@ -68,7 +68,13 @@ Status: complete. Live checks confirm:
 - valid bearer token returns `200`
 - invalid token returns `401`
 
+## Task 1.9
+- Create `.env.example` files for backend and frontend
+- Document required environment keys in README
+
+Status: complete. Added `backend/.env.example`, `frontend/.env.example`, and README env key documentation.
+
 ## Next Tasks
-- 1.9 Create `.env.example` files and document required keys
 - 1.10 Write seed script for 5 Lagos corridors
 - 1.11 Run seed script and verify seeded routes
+- 1.12 Write first unit test (fare engine) and ensure CI-ready test pass
