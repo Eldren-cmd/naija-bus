@@ -12,7 +12,14 @@ Status: complete.
 
 Status: complete. Build successful and dev server port check passed.
 
+## Task 1.3
+- Initialize backend: Node + Express + TypeScript
+- Add ts-node-dev
+- Verify server runs
+
+Status: complete. `npm run build` passes and backend responds on `/api/v1/health` and `/api/v1/routes`.
+
 ## Next Tasks
-- 1.3 Init backend (Node + Express + TS + ts-node-dev)
 - 1.4 MongoDB Atlas setup + connection test
 - 1.5 Create all 6 Mongoose models
+- 1.6 Create 2dsphere + TTL indexes

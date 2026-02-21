@@ -7,8 +7,9 @@ This repository is being built strictly from:
 ## Current Progress
 - [x] Phase 1 / Task 1.1: Monorepo skeleton created (`frontend/`, `backend/`, `seed/`, `scripts/`)
 - [x] Phase 1 / Task 1.2: Frontend initialized (Vite + React + TypeScript + Tailwind CSS)
+- [x] Phase 1 / Task 1.3: Backend initialized (Node + Express + TypeScript + ts-node-dev)
 - [x] Social post archive initialized (`social_posts/`)
-- [ ] Remaining Phase 1 tasks (1.3 to 1.12)
+- [ ] Remaining Phase 1 tasks (1.4 to 1.12)
 
 ## Working Rules for This Build
 - Move step-by-step in task order.
@@ -18,4 +19,4 @@ This repository is being built strictly from:
 - Keep secrets out of git.
 
 ## Note on GitHub Visibility
-The project must use a **private** GitHub repository. Local git has been initialized; remote private repo setup is the next GitHub step.
+The project uses a **private** GitHub repository at `origin` with `main` pushed.
