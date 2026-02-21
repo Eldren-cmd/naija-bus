@@ -51,8 +51,13 @@ import { Route, TripRecord, User } from "../src/models";
 import { emitTripRecorded } from "../src/realtime/reportsSocket";
 import { app } from "../src/server";
 
+const FIXTURE_USER_ID = "111111111111111111111111";
+const FIXTURE_OTHER_USER_ID = "222222222222222222222222";
+const FIXTURE_ADMIN_ID = "333333333333333333333333";
+const FIXTURE_ROUTE_ID = "444444444444444444444444";
+
 const createUserToken = (
-  userId = "699935ccba2963016871bba6",
+  userId = FIXTURE_USER_ID,
   role: "user" | "admin" = "user",
 ): string =>
   signAccessToken({
@@ -62,7 +67,7 @@ const createUserToken = (
   });
 
 const mockAuthenticatedUser = (
-  userId = "699935ccba2963016871bba6",
+  userId = FIXTURE_USER_ID,
   role: "user" | "admin" = "user",
 ) => {
   const lean = jest.fn().mockResolvedValue({
@@ -111,18 +116,18 @@ describe("trip record endpoint", () => {
   });
 
   it("returns 403 when non-admin requests another user's trips", async () => {
-    mockAuthenticatedUser("699935ccba2963016871bba6", "user");
+    mockAuthenticatedUser(FIXTURE_USER_ID, "user");
 
     const response = await request(app)
-      .get("/api/v1/trips?userId=699935ccba2963016871bba7")
-      .set("Authorization", `Bearer ${createUserToken("699935ccba2963016871bba6", "user")}`);
+      .get(`/api/v1/trips?userId=${FIXTURE_OTHER_USER_ID}`)
+      .set("Authorization", `Bearer ${createUserToken(FIXTURE_USER_ID, "user")}`);
 
     expect(response.status).toBe(403);
     expect(response.body.error).toBe("forbidden");
   });
 
   it("returns 200 with trip history for requested user", async () => {
-    const userId = "699935ccba2963016871bba6";
+    const userId = FIXTURE_USER_ID;
     mockAuthenticatedUser(userId, "user");
 
     const lean = jest.fn().mockResolvedValue([
@@ -159,8 +164,8 @@ describe("trip record endpoint", () => {
   });
 
   it("allows admin to request another user's trips", async () => {
-    const adminId = "699935ccba2963016871bba8";
-    const targetUserId = "699935ccba2963016871bba6";
+    const adminId = FIXTURE_ADMIN_ID;
+    const targetUserId = FIXTURE_USER_ID;
     mockAuthenticatedUser(adminId, "admin");
 
     const lean = jest.fn().mockResolvedValue([]);
@@ -193,7 +198,7 @@ describe("trip record endpoint", () => {
 
   it("returns 404 when routeId is provided but route is missing", async () => {
     mockAuthenticatedUser();
-    const routeId = "699935ccba2963016871bba6";
+    const routeId = FIXTURE_ROUTE_ID;
     const lean = jest.fn().mockResolvedValue(null);
     const select = jest.fn().mockReturnValue({ lean });
     (Route.findOne as unknown as jest.Mock).mockReturnValue({ select });
@@ -221,14 +226,14 @@ describe("trip record endpoint", () => {
 
   it("returns 201 and stores trip with computed polyline + distance", async () => {
     mockAuthenticatedUser();
-    const routeId = "699935ccba2963016871bba6";
+    const routeId = FIXTURE_ROUTE_ID;
     const lean = jest.fn().mockResolvedValue({ _id: routeId });
     const select = jest.fn().mockReturnValue({ lean });
     (Route.findOne as unknown as jest.Mock).mockReturnValue({ select });
 
     (TripRecord.create as unknown as jest.Mock).mockResolvedValue({
       _id: "trip-1",
-      userId: "699935ccba2963016871bba6",
+      userId: FIXTURE_USER_ID,
       routeId,
       checkpoints: [
         {
@@ -283,7 +288,7 @@ describe("trip record endpoint", () => {
     expect(response.body._id).toBe("trip-1");
     expect(TripRecord.create).toHaveBeenCalledWith(
       expect.objectContaining({
-        userId: "699935ccba2963016871bba6",
+        userId: FIXTURE_USER_ID,
         routeId,
         polyline: expect.objectContaining({
           type: "LineString",
