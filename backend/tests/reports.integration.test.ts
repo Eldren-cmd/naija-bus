@@ -14,6 +14,7 @@ jest.mock("../src/models", () => {
 
   const Report = {
     create: jest.fn(),
+    find: jest.fn(),
     createIndexes: jest.fn(),
   };
 
@@ -79,6 +80,50 @@ describe("incident reports endpoint", () => {
     });
 
     expect(response.status).toBe(401);
+  });
+
+  it("returns 400 when bbox is missing on GET /reports", async () => {
+    const response = await request(app).get("/api/v1/reports");
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain("bbox query is required");
+  });
+
+  it("returns 400 for invalid bbox on GET /reports", async () => {
+    const response = await request(app).get("/api/v1/reports?bbox=invalid");
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toContain("bbox must be");
+  });
+
+  it("returns active reports for a valid viewport bbox", async () => {
+    const lean = jest.fn().mockResolvedValue([
+      {
+        _id: "rep-viewport-1",
+        type: "traffic",
+        severity: "high",
+        coords: { type: "Point", coordinates: [3.37, 6.52] },
+        isActive: true,
+      },
+    ]);
+    const limit = jest.fn().mockReturnValue({ lean });
+    const sort = jest.fn().mockReturnValue({ limit });
+    (Report.find as unknown as jest.Mock).mockReturnValue({ sort });
+
+    const response = await request(app).get("/api/v1/reports?bbox=3.2,6.4,3.5,6.7");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveLength(1);
+    expect(Report.find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isActive: true,
+        coords: expect.objectContaining({
+          $geoWithin: expect.any(Object),
+        }),
+      }),
+    );
+    expect(sort).toHaveBeenCalledWith({ createdAt: -1 });
+    expect(limit).toHaveBeenCalledWith(200);
   });
 
   it("returns 400 for invalid payload", async () => {

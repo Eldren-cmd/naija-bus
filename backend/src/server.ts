@@ -550,6 +550,56 @@ const createFareReportHandler = async (req: Request, res: Response) => {
 app.post("/api/v1/fare/report", authMiddleware, createFareReportHandler);
 app.post("/fare/report", authMiddleware, createFareReportHandler);
 
+const getReportsByBboxHandler = async (req: Request, res: Response) => {
+  try {
+    const bbox = typeof req.query.bbox === "string" ? req.query.bbox.trim() : "";
+    if (!bbox) {
+      return res.status(400).json({
+        error: "bbox query is required as minLng,minLat,maxLng,maxLat",
+      });
+    }
+
+    const parsed = parseBbox(bbox);
+    if (!parsed) {
+      return res.status(400).json({
+        error:
+          "bbox must be minLng,minLat,maxLng,maxLat with valid numeric bounds (WGS84).",
+      });
+    }
+
+    const [minLng, minLat, maxLng, maxLat] = parsed;
+    const reports = await Report.find({
+      isActive: true,
+      coords: {
+        $geoWithin: {
+          $geometry: {
+            type: "Polygon",
+            coordinates: [
+              [
+                [minLng, minLat],
+                [maxLng, minLat],
+                [maxLng, maxLat],
+                [minLng, maxLat],
+                [minLng, minLat],
+              ],
+            ],
+          },
+        },
+      },
+    })
+      .sort({ createdAt: -1 })
+      .limit(200)
+      .lean();
+
+    return res.status(200).json(reports);
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to fetch reports" });
+  }
+};
+
+app.get("/api/v1/reports", getReportsByBboxHandler);
+app.get("/reports", getReportsByBboxHandler);
+
 const createIncidentReportHandler = async (req: Request, res: Response) => {
   try {
     if (!req.user) {

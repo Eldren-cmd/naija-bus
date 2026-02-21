@@ -243,6 +243,18 @@ Status: complete. Implemented:
   - valid auth + payload -> `201`
 
 ### Task 3.3
+- Implement `GET /reports?bbox=` returning active reports in viewport
+
+Status: complete. Implemented:
+- added `GET /api/v1/reports?bbox=minLng,minLat,maxLng,maxLat` and alias `GET /reports`
+- added viewport geospatial filter using GeoJSON polygon + `$geoWithin`
+- sorted by newest first and limited response size
+- added integration test coverage for:
+  - missing bbox -> `400`
+  - invalid bbox -> `400`
+  - valid bbox -> `200` with filtered reports
+
+### Task 3.4
 - Set up Socket.IO server (`/reports`) and emit `report:created` + `fare:reported`
 
 Status: complete. Implemented:
@@ -252,7 +264,7 @@ Status: complete. Implemented:
 - emit `report:created` after successful `POST /reports`
 - integration tests now assert emit calls on successful submissions
 
-### Task 3.4
+### Task 3.6
 - Update fare estimate logic to incorporate recent crowdsourced fare reports
 
 Status: complete. Implemented:
@@ -269,7 +281,7 @@ Status: complete. Implemented:
 - added tests in `backend/tests/fareServiceCrowdsource.test.ts`
 - live check confirmed blended output after submitting a new fare report
 
-### Task 3.5
+### Task 3.7
 - Build Report Fare UI flow on RouteView and connect to `POST /fare/report`
 
 Status: complete. Implemented:
@@ -281,4 +293,4 @@ Status: complete. Implemented:
 - saves JWT token locally in browser storage for repeated report submissions
 
 ### Next Tasks
-- 3.6 Continue with next Phase 3 frontend/realtime task from the dev plan sequence
+- 3.5 Implement server-side bbox filtering for socket events (only emit to relevant clients)
