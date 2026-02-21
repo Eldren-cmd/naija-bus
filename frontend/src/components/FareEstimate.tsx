@@ -15,7 +15,7 @@ const getCurrentClockTime = (): string => {
 };
 
 const formatNaira = (value: number): string =>
-  `NGN ${new Intl.NumberFormat("en-NG", { maximumFractionDigits: 0 }).format(value)}`;
+  `\u20A6${new Intl.NumberFormat("en-NG", { maximumFractionDigits: 0 }).format(value)}`;
 
 const AnimatedFare = ({ target }: { target: number }) => {
   const [value, setValue] = useState(target);
