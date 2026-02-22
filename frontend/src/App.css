@@ -1,12 +1,33 @@
 :root {
-  --navy: #0d1b2a;
-  --orange: #cc5500;
-  --sand: #fff8f0;
-  --ink: #132336;
-  --line: #e7d6c2;
-  --soft: #f5e9dc;
-  --good: #2c9c74;
-  --warn: #d47c00;
+  /* Canonical tokens */
+  --c-orange: #ff6b00;
+  --c-orange-dk: #cc5500;
+  --c-orange-lt: #fff3e8;
+  --c-navy: #0d1b2a;
+  --c-navy-md: #1a2c3f;
+  --c-navy-lt: #ebf0f7;
+  --c-jade: #00a878;
+  --c-jade-lt: #e0f7f2;
+  --c-gold: #e8a020;
+  --c-gold-lt: #fef9e7;
+  --c-danger: #e74c3c;
+  --c-danger-lt: #fdedec;
+  --c-cream: #fff8f0;
+  --c-sand: #f5e6d3;
+  --c-border: #e8d5c0;
+  --c-text-1: #0d1b2a;
+  --c-text-2: #4a5568;
+  --c-text-3: #9aa5b4;
+
+  /* Compatibility aliases for existing classes */
+  --navy: var(--c-navy);
+  --orange: var(--c-orange);
+  --sand: var(--c-cream);
+  --ink: var(--c-text-1);
+  --line: var(--c-border);
+  --soft: var(--c-sand);
+  --good: var(--c-jade);
+  --warn: var(--c-gold);
 }
 
 #root {

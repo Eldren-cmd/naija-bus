@@ -3,6 +3,35 @@
 @tailwind utilities;
 
 :root {
+  /* Brand */
+  --c-orange: #ff6b00;
+  --c-orange-dk: #cc5500;
+  --c-orange-lt: #fff3e8;
+
+  /* Structure */
+  --c-navy: #0d1b2a;
+  --c-navy-md: #1a2c3f;
+  --c-navy-lt: #ebf0f7;
+
+  /* Semantic */
+  --c-jade: #00a878;
+  --c-jade-lt: #e0f7f2;
+  --c-gold: #e8a020;
+  --c-gold-lt: #fef9e7;
+  --c-danger: #e74c3c;
+  --c-danger-lt: #fdedec;
+
+  /* Surfaces */
+  --c-cream: #fff8f0;
+  --c-sand: #f5e6d3;
+  --c-border: #e8d5c0;
+
+  /* Text */
+  --c-text-1: #0d1b2a;
+  --c-text-2: #4a5568;
+  --c-text-3: #9aa5b4;
+
+  /* Fonts */
   --font-display: "Clash Display", "Georgia", serif;
   --font-body: "DM Sans", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", "Courier New", monospace;
@@ -18,6 +47,211 @@ body {
   margin: 0;
   min-width: 320px;
   font-family: var(--font-body);
-  background: #fff8f0;
-  color: #0d1b2a;
+  background: var(--c-cream);
+  color: var(--c-text-1);
+}
+
+body,
+p,
+input,
+button,
+label,
+textarea,
+select {
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono,
+time,
+.route-id {
+  font-family: var(--font-mono);
+}
+
+/* iOS zoom fix: keep touch inputs >= 16px */
+input,
+select,
+textarea {
+  font-size: 16px !important;
+}
+
+@media (min-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 0.875rem !important;
+  }
+}
+
+/* Animation library */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeslide {
+  animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes slideRight {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-right {
+  animation: slideRight 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  to {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+}
+
+@keyframes skeleton {
+  0%,
+  100% {
+    background-color: #f0e6d8;
+  }
+  50% {
+    background-color: #e8d5c0;
+  }
+}
+
+.skeleton {
+  animation: skeleton 1.4s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.report-pulse::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: pulseRing 1.8s ease-out infinite;
+}
+
+@keyframes fareFlash {
+  0%,
+  100% {
+    background: transparent;
+  }
+  30% {
+    background: rgba(255, 107, 0, 0.15);
+    border-radius: 8px;
+  }
+}
+
+.fare-flash {
+  animation: fareFlash 1.2s ease;
+}
+
+.stagger-list > * {
+  opacity: 0;
+  animation: fadeSlideUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.stagger-list > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.stagger-list > *:nth-child(2) {
+  animation-delay: 70ms;
+}
+
+.stagger-list > *:nth-child(3) {
+  animation-delay: 140ms;
+}
+
+.stagger-list > *:nth-child(4) {
+  animation-delay: 210ms;
+}
+
+.stagger-list > *:nth-child(5) {
+  animation-delay: 280ms;
+}
+
+.stagger-list > *:nth-child(n + 6) {
+  animation-delay: 350ms;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
