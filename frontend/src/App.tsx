@@ -48,6 +48,7 @@ import type {
 } from "./types";
 import type { ToastItem, ToastTone } from "./components/ToastStack";
 import { Home } from "./pages/Home";
+import { QuickReportPage } from "./pages/QuickReport";
 import "./App.css";
 
 const formatDistance = (meters: number): string => {
@@ -846,6 +847,7 @@ function App() {
       <Route path="/map" element={<RouteFinderPage />} />
       <Route path="/search" element={<RouteFinderPage />} />
       <Route path="/route/:routeId" element={<RouteFinderPage />} />
+      <Route path="/quick-report" element={<QuickReportPage />} />
       <Route
         path="/trips"
         element={

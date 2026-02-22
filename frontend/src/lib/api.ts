@@ -9,6 +9,8 @@ import type {
   FareReportResponse,
   IncidentReportInput,
   IncidentReportResponse,
+  QuickFareReportInput,
+  QuickReportBootstrapResponse,
   RouteDetail,
   RouteSummary,
   SearchResponse,
@@ -124,6 +126,20 @@ export const reportFare = async (
   authToken: string,
 ): Promise<FareReportResponse> => {
   return apiPost<FareReportResponse>("/api/v1/fare/report", input, authToken);
+};
+
+export const getQuickReportBootstrap = async (
+  token: string,
+): Promise<QuickReportBootstrapResponse> => {
+  return apiGet<QuickReportBootstrapResponse>(
+    `/api/v1/reports/quick/bootstrap?token=${encodeURIComponent(token.trim())}`,
+  );
+};
+
+export const submitQuickFareReport = async (
+  input: QuickFareReportInput,
+): Promise<FareReportResponse> => {
+  return apiPost<FareReportResponse>("/api/v1/reports/quick", input);
 };
 
 export const searchRoutesAndStops = async (query: string): Promise<SearchResponse> => {

@@ -60,6 +60,14 @@ export type FareReportInput = {
   notes?: string;
 };
 
+export type QuickFareReportInput = {
+  token: string;
+  routeId: string;
+  reportedFare: number;
+  trafficLevel?: TrafficLevel;
+  notes?: string;
+};
+
 export type FareReportResponse = {
   _id: string;
   routeId: string;
@@ -70,6 +78,24 @@ export type FareReportResponse = {
   notes: string;
   createdAt: string;
   updatedAt: string;
+};
+
+export type QuickAssignedRoute = {
+  routeId: string;
+  name: string;
+  origin: string;
+  destination: string;
+  corridor: string;
+  transportType: TransportType;
+  baseFare: number;
+};
+
+export type QuickReportBootstrapResponse = {
+  conductor: {
+    userId: string;
+    fullName: string;
+  };
+  assignedRoutes: QuickAssignedRoute[];
 };
 
 export type SearchRouteHit = {
