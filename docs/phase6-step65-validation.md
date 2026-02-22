@@ -27,11 +27,18 @@ Preflight checks:
 1. Allowed origin preflight
    - Request origin: `https://naijatransport.vercel.app`
    - Expected: CORS response includes allow-origin for requested origin
+   - Observed: `HTTP/1.1 204 No Content` + `access-control-allow-origin: https://naijatransport.vercel.app`
    - Result: pass
 
 2. Disallowed origin preflight
    - Request origin: `https://evil.example`
    - Expected: no permissive allow-origin for disallowed origin
+   - Observed: `HTTP/1.1 200 OK` with `Allow: GET, HEAD` and no `access-control-allow-origin` header
+   - Result: pass
+
+3. Additional allowlisted origins
+   - `https://ultima-pi.vercel.app`: `204` + allow-origin echoed correctly
+   - `https://ultima.vercel.app`: `204` + allow-origin echoed correctly
    - Result: pass
 
 ## Notes
