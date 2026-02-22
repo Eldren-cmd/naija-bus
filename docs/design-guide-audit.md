@@ -1,6 +1,6 @@
 # Design Guide Audit (Current UI)
 
-Audit date: 2026-02-21  
+Audit date: 2026-02-22  
 Reference: `NaijaTransport_DesignGuide.docx`
 
 ## Already Implemented
@@ -22,6 +22,9 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Saved-routes empty state card now includes clear guidance copy and action buttons, improving first-time usability.
 - Global error fallback screen now matches existing typography/card styling and keeps primary/secondary action hierarchy consistent.
 - Playwright E2E coverage added for core Phase 5 UX paths to reduce regressions during ongoing polish.
+- Phase 5 UAT remediation applied for perceived performance:
+  - `RouteMap`, `MyTripMap`, and `AdminPanel` now load lazily
+  - Vite build now uses manual chunk splitting to reduce initial app payload
 
 ## High-Impact Gaps To Implement Next
 

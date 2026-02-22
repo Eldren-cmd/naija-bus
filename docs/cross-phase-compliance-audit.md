@@ -1,6 +1,6 @@
 # Cross-Phase Compliance Audit
 
-Audit date: 2026-02-21  
+Audit date: 2026-02-22  
 References:
 - `NaijaTransport_DevPlan.docx`
 - `NaijaTransport_DesignGuide.docx`
@@ -19,7 +19,7 @@ Status labels:
 | 2 | complete | major UI baseline implemented | N/A for core MVP | aligned | route search/map/fare UX established and refined. |
 | 3 | complete | realtime map/report UX implemented | report loop + bot-ingest baseline implemented | aligned | phase-3 scoped requirements are compliant; deeper automation/reward expansion is tracked for later phases. |
 | 4 | complete | trip UX and replay implemented | retention + gamification baseline implemented | aligned | phase-4 engagement gap now closed with points/streaks/badges/leaderboard surface. |
-| 5 (through 5.13) | complete through 5.13 | major polish updates + mobile responsiveness + loading skeleton + empty-state + global error fallback + E2E guardrails applied | saved-routes retention loop + mobile usability + loading/empty-state + trust fallback + verified report flow support implemented | partial | final phase-5 UAT/fix loop remains before full closure. |
+| 5 (through 5.14) | complete through 5.14 | major polish updates + mobile responsiveness + loading skeleton + empty-state + global error fallback + E2E guardrails + UAT remediation applied | saved-routes retention loop + mobile usability + loading/empty-state + trust fallback + report loop + UAT engagement acceptance checks completed | aligned | phase-5 closure evidence is recorded in `docs/phase5-step514-validation.md`. |
 
 ## Compliance Recheck (Previous Phases)
 
@@ -31,9 +31,8 @@ Status labels:
 
 ## Forward Plan (Future Phases/Tasks)
 
-### Remaining Phase 5 (`5.14`)
-- Apply Design + Engagement checks in each completion entry.
-- Ensure no task is marked final without explicit cross-guide applicability note.
+### Phase 5 Closure
+- `5.14` is complete with explicit DevPlan, Design Guide, and Engagement Guide acceptance checks.
 
 ### Phase 6+
 - Execute deferred engagement systems:

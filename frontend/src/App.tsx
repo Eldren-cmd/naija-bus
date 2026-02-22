@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactElement } from "react";
 import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "./auth/AuthContext";
-import { AdminPanel } from "./components/AdminPanel";
 import { FareEstimate } from "./components/FareEstimate";
 import { LoginPage } from "./components/LoginPage";
 import { ReportFarePanel } from "./components/ReportFarePanel";
@@ -12,7 +11,6 @@ import { SignupPage } from "./components/SignupPage";
 import { ToastStack } from "./components/ToastStack";
 import { TrafficReportModal } from "./components/TrafficReportModal";
 import { TripRecorder } from "./components/TripRecorder";
-import { MyTripMap } from "./components/MyTripMap";
 import {
   addSavedRoute,
   getAuthProfile,
@@ -59,6 +57,16 @@ const formatBadgeLabel = (value: string): string =>
     .split("_")
     .map((part) => (part ? `${part[0].toUpperCase()}${part.slice(1)}` : part))
     .join(" ");
+
+const LazyAdminPanel = lazy(async () => {
+  const module = await import("./components/AdminPanel");
+  return { default: module.AdminPanel };
+});
+
+const LazyMyTripMap = lazy(async () => {
+  const module = await import("./components/MyTripMap");
+  return { default: module.MyTripMap };
+});
 
 function PrimaryNav({ active }: { active: "routes" | "my-trips" | "admin" }) {
   const { isAuthenticated, user, clearSession } = useAuth();
@@ -788,7 +796,9 @@ function MyTripsPage() {
                 Select a trip card to replay its stored checkpoints as a route line.
               </p>
             </div>
-            <MyTripMap trip={selectedTrip} />
+            <Suspense fallback={<div className="map-placeholder skeleton-block" aria-hidden="true" />}>
+              <LazyMyTripMap trip={selectedTrip} />
+            </Suspense>
           </section>
         </section>
       </section>
@@ -815,7 +825,18 @@ function App() {
         path="/admin"
         element={
           <AdminRoute>
-            <AdminPanel />
+            <Suspense
+              fallback={
+                <main className="app-shell">
+                  <section className="card">
+                    <h2 className="panel-title">Admin Panel</h2>
+                    <p className="muted">Loading admin controls...</p>
+                  </section>
+                </main>
+              }
+            >
+              <LazyAdminPanel />
+            </Suspense>
           </AdminRoute>
         }
       />

@@ -1,5 +1,10 @@
+import { Suspense, lazy } from "react";
 import type { RouteDetail, TripCheckpoint } from "../types";
-import { RouteMap } from "./RouteMap";
+
+const LazyRouteMap = lazy(async () => {
+  const module = await import("./RouteMap");
+  return { default: module.RouteMap };
+});
 
 type RouteViewProps = {
   route: RouteDetail | null;
@@ -73,7 +78,9 @@ export function RouteView({ route, loading, error, tripCheckpoints }: RouteViewP
         <span>Stops: {route.stops.length}</span>
         <span>Path points: {route.polyline.coordinates.length}</span>
       </div>
-      <RouteMap route={route} tripCheckpoints={tripCheckpoints} />
+      <Suspense fallback={<div className="map-placeholder skeleton-block" aria-hidden="true" />}>
+        <LazyRouteMap route={route} tripCheckpoints={tripCheckpoints} />
+      </Suspense>
       <h3 className="panel-title">Stops</h3>
       <ol className="stops-list">
         {route.stops.map((stop) => (

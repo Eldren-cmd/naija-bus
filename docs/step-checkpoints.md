@@ -1149,3 +1149,42 @@ Status: complete. Implemented:
 
 ### Next Tasks
 - Continue Phase 5 in strict order: `5.14` (user acceptance test + fixes).
+
+### Task 5.14
+- Run user acceptance test (UAT) for completed Phase 5 scope and apply fixes
+
+Status: complete. Implemented:
+- UAT validation run completed and documented:
+  - `docs/phase5-step514-validation.md`
+- acceptance checks covered:
+  - auth session flow and protected route behavior
+  - saved-route retention loop
+  - report submission loop
+  - admin route surface availability
+  - production build quality checks
+- fix applied from UAT findings:
+  - reduced initial frontend payload pressure by lazy-loading heavy modules:
+    - `RouteMap` (`frontend/src/components/RouteView.tsx`)
+    - `MyTripMap` (`frontend/src/App.tsx`)
+    - `AdminPanel` (`frontend/src/App.tsx`)
+  - added Vite manual chunk strategy in:
+    - `frontend/vite.config.ts`
+  - build output now splits large dependencies into dedicated chunks while preserving behavior
+- Design Guide applicability check:
+  - improved first-load UX by reducing up-front JS execution pressure on core route finder shell
+  - added loading fallbacks for lazy modules to avoid abrupt blank states
+- Engagement Guide applicability check:
+  - repeat-use loops remain validated through UAT:
+    - saved-route retention path
+    - incident report submission path
+  - reduced load-time friction on route discovery supports engagement continuity
+- validation checks passed:
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+  - `npm --prefix frontend run test:e2e`
+
+### Next Tasks
+- Phase 5 is complete through `5.14`.
+- Continue with Phase 6 in strict order after confirmation.

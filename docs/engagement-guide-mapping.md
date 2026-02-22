@@ -1,6 +1,6 @@
 # Engagement Guide Mapping
 
-Audit date: 2026-02-21  
+Audit date: 2026-02-22  
 Reference: `NaijaTransport_EngagementGuide.docx`
 
 ## Implemented Foundations (Phase 1)
@@ -51,7 +51,7 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - level progression + airtime accrual are computed from engagement points
   - MyTrips now surfaces points/level progress, badges, and leaderboard preview
 
-### Phase 5 (through Task 5.13)
+### Phase 5 (through Task 5.14)
 - Added saved routes retention loop:
   - authenticated save/unsave route actions
   - saved routes surfaced directly on Home
@@ -73,11 +73,12 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - authenticated login path
   - saved-route retention action flow
   - incident report submission flow
+- Added Phase 5 UAT acceptance verification and remediation:
+  - verified repeat-use retention flow for saved routes
+  - verified report loop remains intact after UX/performance changes
+  - applied lazy-load/perf fix to reduce first-load friction on engagement surfaces
 
 ## Future Compliance Plan
-
-### Remaining Phase 5
-- `5.14`: UAT should include engagement acceptance checks (repeat-use loop and report loop).
 
 ### Phase 6 and Beyond
 - Twitter/X auto-feed bot

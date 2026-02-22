@@ -70,6 +70,7 @@ This repository is being built strictly from:
 - [x] Phase 5 / Task 5.11: Saved-routes empty state UX now includes clear guidance and CTA actions
 - [x] Phase 5 / Task 5.12: Global error boundary added with recovery actions and incident fallback screen
 - [x] Phase 5 / Task 5.13: Playwright E2E coverage added for auth login, saved-route actions, and report submission flow
+- [x] Phase 5 / Task 5.14: UAT loop executed with fixes; lazy-loaded heavy map/admin modules and added Vite chunk splitting to reduce initial load pressure
 - [x] Engagement Gap Remediation: Added bot-auth report ingestion endpoint (`POST /api/v1/reports/bot`) and `whatsapp-web.js` listener flow
 - [x] Engagement Gap Remediation: Added Phase 4 gamification baseline (points, streaks, badges, leaderboard surface)
 - [x] Design Gap Remediation: MyTrips replay map style aligned with RouteView (`navigation-night-v1`)

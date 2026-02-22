@@ -38,6 +38,7 @@ React + TypeScript + Vite frontend for Naija Transport.
   - auth login redirect flow
   - saved-route save action and panel update
   - traffic report submission modal flow
+- Phase 5 UAT remediation now includes lazy-loaded `RouteMap`, `MyTripMap`, and `AdminPanel` plus Vite manual chunk splitting for better first-load behavior
 
 ## Environment
 Create `frontend/.env` with:
