@@ -43,6 +43,9 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Phase 6 task `6.7` CI quality-gate baseline completed:
   - GitHub Actions workflow now enforces frontend lint/build and backend test/build on `push` and `pull_request`
   - reduces risk of design/UI regressions being merged without passing baseline checks
+- Phase 6 task `6.8` frontend CD baseline completed:
+  - GitHub Actions workflow now deploys frontend to Vercel production on `main`
+  - automated deploy flow reduces manual release drift against approved UI/design states
 - Productization pass completed for public-first UX:
   - added conversion-focused homepage at `/` with clear hero search, feature highlights, and "How it works" sections
   - Route Finder moved to `/map` to separate marketing surface from operational app surface

@@ -137,6 +137,15 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - reduces deployment risk for engagement-critical paths by catching regressions before merge
   - improves confidence that report loops, saved routes, trip flows, and auth surfaces remain functional release-to-release
 
+### Phase 6 (Task 6.8)
+- frontend production CD baseline completed:
+  - GitHub Actions workflow now deploys frontend to Vercel on `main` pushes
+  - deployment workflow includes lint/build gates before deploy
+  - deploy uses repository secrets for project-scoped Vercel auth
+- Engagement applicability:
+  - reduces release latency for engagement-facing UI refinements
+  - improves reliability of updates affecting first-use and repeat-use commuter flows
+
 ## Future Compliance Plan
 
 ### Phase 6 and Beyond

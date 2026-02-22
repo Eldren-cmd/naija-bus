@@ -1480,6 +1480,49 @@ Engagement Guide applicability check:
 ### Next Tasks
 - Continue Phase 6 in strict order: `6.8` (CD workflow for frontend deploy on `main`).
 
+### Task 6.8
+- Add frontend CD workflow for production deploy on `main`
+
+Status: complete. Implemented:
+- added GitHub Actions frontend deployment workflow:
+  - `.github/workflows/deploy-frontend.yml`
+- trigger and scope:
+  - `push` on `main`
+  - path-filtered to:
+    - `frontend/**`
+    - `vercel.json`
+    - workflow file updates
+- deployment pipeline in workflow:
+  - install frontend dependencies (`npm --prefix frontend ci`)
+  - run frontend lint (`npm --prefix frontend run lint`)
+  - run frontend build (`npm --prefix frontend run build`)
+  - install Vercel CLI
+  - pull Vercel production project context
+  - deploy to Vercel production (`vercel deploy --prod --yes`)
+- required repository secrets (already provisioned):
+  - `VERCEL_TOKEN`
+  - `VERCEL_ORG_ID`
+  - `VERCEL_PROJECT_ID`
+
+validation checks passed:
+- `npm --prefix frontend run lint`
+- `npm --prefix frontend run build`
+- `npm --prefix backend run test`
+- `npm --prefix backend run build`
+- evidence documented in:
+  - `docs/phase6-step68-validation.md`
+
+Design Guide applicability check:
+- no direct UI component changes in this task.
+- deployment automation reduces manual drift risk for shipped UI polish and layout behavior.
+
+Engagement Guide applicability check:
+- reliable production release flow supports faster and safer engagement-feature iteration.
+- reduces operational friction for updates to report, trip, auth, and saved-route loops.
+
+### Next Tasks
+- Continue Phase 6 in strict order: `6.9` (CD workflow for backend deploy hook on `main`).
+
 ## Supplemental UX Productization Pass
 
 Status: complete. Implemented:

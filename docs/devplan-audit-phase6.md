@@ -23,7 +23,7 @@ Cross-guide enforcement (mandatory):
 | 6.5 | complete | Backend now enforces explicit CORS allowlist via `CORS_ALLOWED_ORIGINS` (with legacy fallback `CORS_ORIGIN`), blocks wildcard `*`, and fails fast in production when allowlist is missing. Socket.IO realtime namespace now uses the same allowlist matcher. Render env allowlist set and validated live with allowed and disallowed origins. |
 | 6.6 | complete | Backend now applies production HTTPS redirect + HSTS with proxy-aware secure detection and configurable trust-proxy hops. Refresh-token cookies are now production-safe (`Secure`, `HttpOnly`, `SameSite=None`) with optional domain override for custom-domain deployment patterns. |
 | 6.7 | complete | Added GitHub Actions CI workflow for `push` + `pull_request` with separate backend and frontend jobs. Backend job runs `npm ci`, `npm run test`, and `npm run build` in `backend/`; frontend job runs `npm ci`, `npm run lint`, and `npm run build` in `frontend/`. |
-| 6.8 | missing | Pending: CD workflow for frontend deploy on `main`. |
+| 6.8 | complete | Added GitHub Actions CD workflow for frontend production deploy on `main` (`.github/workflows/deploy-frontend.yml`). Workflow runs frontend lint/build, then deploys to Vercel production using `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`. |
 | 6.9 | missing | Pending: CD workflow for backend deploy hook on `main`. |
 | 6.10 | missing | Pending: Sentry integration and capture validation. |
 | 6.11 | missing | Pending: structured server logging + sink integration. |
@@ -130,7 +130,44 @@ Cross-guide compliance:
 - Design Guide: no direct visual redesign in CI setup; quality gates reduce risk of regressions in shipped UI experiences.
 - Engagement Guide: CI guardrails reduce release risk for engagement loops (auth, reports, trips, saved routes) by blocking broken builds before merge/deploy.
 
+## Task 6.8 Completion Note
+
+Status: complete.
+
+Implemented:
+- added frontend CD workflow:
+  - `.github/workflows/deploy-frontend.yml`
+- workflow trigger scope:
+  - `push` on `main`
+  - path-filtered to frontend deployment surface:
+    - `frontend/**`
+    - `vercel.json`
+    - workflow file
+- workflow behavior:
+  - installs frontend dependencies
+  - runs frontend lint and build gates
+  - installs Vercel CLI
+  - pulls Vercel project settings (`vercel pull`)
+  - deploys to production (`vercel deploy --prod`)
+- required GitHub Actions secrets:
+  - `VERCEL_TOKEN`
+  - `VERCEL_ORG_ID`
+  - `VERCEL_PROJECT_ID`
+
+Validation:
+- local quality gates:
+  - `npm --prefix frontend run lint` passed
+  - `npm --prefix frontend run build` passed
+  - `npm --prefix backend run test` passed
+  - `npm --prefix backend run build` passed
+- evidence document:
+  - `docs/phase6-step68-validation.md`
+
+Cross-guide compliance:
+- Design Guide: no direct visual redesign; release automation helps preserve production design consistency by reducing manual deploy drift.
+- Engagement Guide: production deploy automation improves iteration speed and reliability for engagement loops shipped in previous phases.
+
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `6.8` next.
+1. Continue with `6.9` next.
 2. Keep phase-6 tasks in strict sequence with step-level validation and compliance notes.
