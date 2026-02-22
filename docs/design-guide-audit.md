@@ -34,6 +34,9 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Phase 6 task `6.4` production seed + hosted SPA reliability completed:
   - Vercel build/output config now serves the frontend app correctly from monorepo root
   - SPA route refresh rewrite now preserves route-detail page access after direct URL reloads
+- Phase 6 task `6.5` backend CORS allowlist hardening completed:
+  - explicit allowlist matching now protects HTTP and realtime channels from unintended cross-origin access
+  - production startup now fails fast when allowlist is missing, reducing silent misconfiguration risk
 - Productization pass completed for public-first UX:
   - added conversion-focused homepage at `/` with clear hero search, feature highlights, and "How it works" sections
   - Route Finder moved to `/map` to separate marketing surface from operational app surface

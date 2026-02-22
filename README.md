@@ -73,6 +73,10 @@ This repository is being built strictly from:
 - [x] Phase 5 / Task 5.14: UAT loop executed with fixes; lazy-loaded heavy map/admin modules and added Vite chunk splitting to reduce initial load pressure
 - [x] Phase 6 / Task 6.1: Vercel project linked to repo and frontend env vars configured (`VITE_MAPBOX_KEY`, `VITE_API_BASE`) for production/preview/development
 - [x] Phase 6 / Task 6.2: Render backend service provisioned and configured; hosted frontend API base now points to live backend URL
+- [x] Phase 6 / Task 6.5: Production CORS allowlist hardening shipped for HTTP + Socket.IO (`CORS_ALLOWED_ORIGINS` with wildcard rejection)
+- [x] UX refresh: public homepage (`/`) added with conversion-first hero flow and Route Finder moved to `/map` (with `/search` alias)
+- [x] UX fix: removed internal "Phase 2 Core MVP" label from user-facing page copy (now subtle `Beta`)
+- [x] UX fix: route list API no longer auto-fires on first page load without explicit user search
 - [x] Engagement Gap Remediation: Added bot-auth report ingestion endpoint (`POST /api/v1/reports/bot`) and `whatsapp-web.js` listener flow
 - [x] Engagement Gap Remediation: Added Phase 4 gamification baseline (points, streaks, badges, leaderboard surface)
 - [x] Design Gap Remediation: MyTrips replay map style aligned with RouteView (`navigation-night-v1`)
@@ -98,7 +102,7 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 - `MONGO_URI`: MongoDB Atlas connection string.
 - `JWT_SECRET`: long random secret used to sign/verify access tokens.
 - `JWT_EXPIRES_IN`: token duration (for example `7d`).
-- `CORS_ORIGIN`: allowed frontend origin (local default `http://localhost:5173`).
+- `CORS_ALLOWED_ORIGINS`: comma-separated frontend origin allowlist (for example `http://localhost:5173,http://127.0.0.1:5173`).
 
 ### Backend Optional Keys
 - `SEARCH_RATE_LIMIT_WINDOW_MS`: window size for `/search` rate limit.
@@ -108,6 +112,7 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 - `JWT_REFRESH_SECRET`: refresh token signing secret (falls back to `JWT_SECRET` if omitted).
 - `JWT_REFRESH_EXPIRES_IN`: refresh token expiry (default `30d`).
 - `REFRESH_TOKEN_COOKIE_NAME`: cookie key used for refresh token storage (`naija_refresh_token` default).
+- `CORS_ORIGIN`: backward-compatible single-origin key (used when `CORS_ALLOWED_ORIGINS` is not set).
 - `BOT_INGEST_TOKEN`: shared token for internal bot ingestion endpoint (`x-bot-token`).
 - `BOT_REPORT_USER_ID`: user id attributed to bot-created reports.
 - `WHATSAPP_BOT_ENABLED`: enable `whatsapp-web.js` ingestion bot (`true`/`false`).

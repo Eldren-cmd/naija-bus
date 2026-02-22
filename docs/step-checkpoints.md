@@ -1367,6 +1367,43 @@ validation checks passed:
 ### Next Tasks
 - Continue Phase 6 in strict order: `6.5` (production CORS allowlist hardening).
 
+### Task 6.5
+- Harden production CORS allowlist behavior for HTTP and realtime channels
+
+Status: complete. Implemented:
+- backend HTTP CORS hardening in `backend/src/server.ts`:
+  - added explicit comma-separated allowlist resolver (`CORS_ALLOWED_ORIGINS`)
+  - retained backward-compatible single-origin fallback (`CORS_ORIGIN`)
+  - added production fail-fast guard when no allowlist is configured
+  - blocked wildcard `*` allowlist usage
+  - normalized origins before membership checks
+- realtime CORS hardening in `backend/src/realtime/reportsSocket.ts`:
+  - Socket.IO now uses allowlist matcher aligned with HTTP CORS policy
+  - credentials support retained
+- environment/doc updates:
+  - `backend/.env.example` now documents preferred `CORS_ALLOWED_ORIGINS`
+  - root `README.md` CORS docs updated for allowlist-first behavior
+
+validation checks passed:
+- `npm --prefix backend run test`
+- `npm --prefix backend run build`
+- live preflight checks against Render backend:
+  - allowlisted origin responds with expected `access-control-allow-origin`
+  - non-allowlisted origin no longer receives permissive static/wildcard CORS behavior
+- evidence documented in:
+  - `docs/phase6-step65-validation.md`
+
+Design Guide applicability check:
+- no direct UI component changes in this step.
+- API/realtime reliability hardening reduces cross-origin integration breakage in user-facing map/report flows.
+
+Engagement Guide applicability check:
+- protects engagement-critical endpoints (auth, report, trip, realtime) from unauthorized cross-origin access patterns.
+- improves trust and operational stability for repeat commuter interactions.
+
+### Next Tasks
+- Continue Phase 6 in strict order: `6.6` (HTTPS/HSTS/cookie security hardening).
+
 ## Supplemental UX Productization Pass
 
 Status: complete. Implemented:

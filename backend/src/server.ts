@@ -1,4 +1,4 @@
-import cors from "cors";
+import cors, { type CorsOptions } from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
@@ -37,11 +37,50 @@ dotenv.config();
 
 export const app = express();
 const port = Number(process.env.PORT || 5000);
-const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
+const DEV_DEFAULT_CORS_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"] as const;
+
+const normalizeOrigin = (origin: string): string => origin.trim().replace(/\/+$/, "");
+
+const parseCorsOriginList = (value: string | undefined): string[] => {
+  if (!value) return [];
+  return [...new Set(value.split(",").map((item) => normalizeOrigin(item)).filter(Boolean))];
+};
+
+const resolveCorsAllowedOrigins = (): string[] => {
+  const explicitAllowlist = parseCorsOriginList(process.env.CORS_ALLOWED_ORIGINS);
+  if (explicitAllowlist.length > 0) return explicitAllowlist;
+
+  const legacyAllowlist = parseCorsOriginList(process.env.CORS_ORIGIN);
+  if (legacyAllowlist.length > 0) return legacyAllowlist;
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "CORS allowlist missing in production. Set CORS_ALLOWED_ORIGINS (preferred) or CORS_ORIGIN.",
+    );
+  }
+
+  return [...DEV_DEFAULT_CORS_ORIGINS];
+};
+
+const corsAllowedOrigins = resolveCorsAllowedOrigins();
+if (corsAllowedOrigins.includes("*")) {
+  throw new Error("Wildcard CORS origin (*) is not allowed. Use explicit allowlisted origins.");
+}
+
+const corsAllowedOriginSet = new Set(corsAllowedOrigins);
+const corsOriginMatcher: CorsOptions["origin"] = (requestOrigin, callback) => {
+  if (!requestOrigin) {
+    callback(null, true);
+    return;
+  }
+
+  const normalizedOrigin = normalizeOrigin(requestOrigin);
+  callback(null, corsAllowedOriginSet.has(normalizedOrigin));
+};
 
 app.use(
   cors({
-    origin: corsOrigin,
+    origin: corsOriginMatcher,
     credentials: true,
   }),
 );
@@ -1161,7 +1200,7 @@ const startServer = async (): Promise<void> => {
     await connectToDatabase();
     await ensureCoreIndexes();
     const httpServer = createServer(app);
-    initRealtimeServer(httpServer, corsOrigin);
+    initRealtimeServer(httpServer, corsAllowedOrigins);
     httpServer.listen(port, () => {
       console.log(`Backend listening on http://localhost:${port}`);
     });

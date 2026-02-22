@@ -109,6 +109,15 @@ Reference: `NaijaTransport_EngagementGuide.docx`
 - Deferred to later in phase 6:
   - uptime keep-warm monitoring for free-tier cold starts (`6.13`)
 
+### Phase 6 (Task 6.5)
+- production CORS allowlist hardening completed:
+  - backend now enforces explicit allowlisted origins via `CORS_ALLOWED_ORIGINS` (legacy `CORS_ORIGIN` fallback retained)
+  - wildcard CORS usage is explicitly rejected
+  - Socket.IO realtime channel now uses same allowlist logic as HTTP routes
+- Engagement applicability:
+  - protects auth/report/trip/realtime engagement paths from unintended cross-origin requests
+  - improves trust posture for repeated commuter submissions and session-based flows
+
 ## Future Compliance Plan
 
 ### Phase 6 and Beyond

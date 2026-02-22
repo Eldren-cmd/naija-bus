@@ -123,6 +123,8 @@ const parseRouteSubscription = (value: unknown): string | null => {
   return null;
 };
 
+const normalizeOrigin = (origin: string): string => origin.trim().replace(/\/+$/, "");
+
 const getSocketState = (socket: Socket): ReportsSocketState =>
   socket.data as ReportsSocketState;
 
@@ -172,11 +174,27 @@ const handleRouteUnsubscribe = (socket: Socket, payload: unknown, ack?: SocketAc
   ack?.({ ok: true, routeId, routes: state.routeSubscriptions });
 };
 
-export const initRealtimeServer = (httpServer: HttpServer, corsOrigin: string): Server => {
+export const initRealtimeServer = (httpServer: HttpServer, corsAllowedOrigins: string[]): Server => {
+  const allowedOriginSet = new Set(
+    corsAllowedOrigins.map((origin) => normalizeOrigin(origin)).filter(Boolean),
+  );
+  const socketOriginMatcher = (
+    requestOrigin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void,
+  ): void => {
+    if (!requestOrigin) {
+      callback(null, true);
+      return;
+    }
+
+    callback(null, allowedOriginSet.has(normalizeOrigin(requestOrigin)));
+  };
+
   ioServer = new Server(httpServer, {
     cors: {
-      origin: corsOrigin,
+      origin: socketOriginMatcher,
       methods: ["GET", "POST"],
+      credentials: true,
     },
   });
 
