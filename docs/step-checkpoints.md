@@ -1113,5 +1113,39 @@ Status: complete. Implemented:
   - `npm --prefix frontend run lint`
   - `npm --prefix frontend run build`
 
+### Task 5.13
+- Add Playwright E2E coverage for Phase 5 critical user flows
+
+Status: complete. Implemented:
+- Playwright test tooling added in frontend:
+  - dependency: `@playwright/test`
+  - config: `frontend/playwright.config.ts`
+  - scripts:
+    - `npm run test:e2e:list`
+    - `npm run test:e2e`
+- E2E suite added:
+  - `frontend/e2e/phase5-auth-save-report.spec.ts`
+  - covered flows:
+    - auth login redirect path
+    - saved-route save action and saved panel update
+    - incident report submission via traffic modal
+- deterministic API mocking strategy:
+  - mocked `/api/v1/**` responses in test file for reliable local runs
+  - CORS/preflight handling included in mocked responses
+- runtime test hygiene:
+  - added `playwright-report/` and `test-results/` to `frontend/.gitignore`
+  - installed Chromium via Playwright for local execution
+- Design Guide applicability check:
+  - E2E flows target polished user-facing journeys to prevent UI regressions in completed phase-5 scope
+- Engagement Guide applicability check:
+  - E2E coverage explicitly validates key engagement loops:
+    - login access path
+    - saved-route retention action
+    - report submission action
+- validation checks passed:
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+  - `npm --prefix frontend run test:e2e`
+
 ### Next Tasks
-- Continue Phase 5 in strict order: `5.13` (Playwright E2E coverage).
+- Continue Phase 5 in strict order: `5.14` (user acceptance test + fixes).

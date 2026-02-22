@@ -21,6 +21,7 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - MyTrips engagement panel added with styled level/progress, badges, and leaderboard card components aligned to existing palette and typography.
 - Saved-routes empty state card now includes clear guidance copy and action buttons, improving first-time usability.
 - Global error fallback screen now matches existing typography/card styling and keeps primary/secondary action hierarchy consistent.
+- Playwright E2E coverage added for core Phase 5 UX paths to reduce regressions during ongoing polish.
 
 ## High-Impact Gaps To Implement Next
 

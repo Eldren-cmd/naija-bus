@@ -28,12 +28,12 @@ Cross-guide enforcement (mandatory for remaining tasks):
 | 5.10 | complete | Loading skeleton states implemented across Route Finder, RouteView, Fare Estimate, Search typeahead, and MyTrips list surfaces. |
 | 5.11 | complete | Saved-routes empty state now includes clear action copy and CTA controls (save selected route / browse routes). |
 | 5.12 | complete | Global React error boundary added at app root with fallback screen and recovery actions (retry/home/reload). |
-| 5.13 | missing | Playwright E2E coverage for Phase 5 flows is not implemented yet. |
+| 5.13 | complete | Playwright E2E suite now covers auth login, saved-route action, and report submission flows with deterministic API mocks. |
 | 5.14 | missing | User acceptance test + fixes is not executed yet. |
 
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `5.13` next.
+1. Continue with `5.14` next.
 2. Progress sequentially through Phase 5 tasks.
 
 ## Cross-Phase Compliance Tracking

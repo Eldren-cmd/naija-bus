@@ -34,6 +34,10 @@ React + TypeScript + Vite frontend for Naija Transport.
 - Loading skeleton states added for high-frequency views (search suggestions, route list, route detail, fare card, and MyTrips history)
 - MyTrips now includes engagement panel (points, level progress, trip streak, badges, and leaderboard)
 - Global React error boundary now wraps app root with fallback recovery actions (try again, route finder, reload)
+- Playwright E2E suite now covers Phase 5 critical flows:
+  - auth login redirect flow
+  - saved-route save action and panel update
+  - traffic report submission modal flow
 
 ## Environment
 Create `frontend/.env` with:
@@ -46,6 +50,8 @@ VITE_MAPBOX_KEY=replace_with_mapbox_token_when_phase2_starts
 ## Commands
 - `npm run dev`
 - `npm run build`
+- `npm run test:e2e:list`
+- `npm run test:e2e`
 - `node scripts/phase3-step313-realtime-check.mjs` (Task 3.13 realtime demo validation)
 
 ## Report Fare UI Note
