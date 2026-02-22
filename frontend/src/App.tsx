@@ -373,7 +373,6 @@ function RouteFinderPage() {
         <header className="routefinder-hero">
           <div className="routefinder-hero-inner">
             <div className="routefinder-hero-copy">
-              <p className="routefinder-hero-kicker">Lagos Transport Intelligence</p>
               <h1>Route Finder</h1>
               <p>Search any Lagos route to see stops, map, and live fare.</p>
             </div>
