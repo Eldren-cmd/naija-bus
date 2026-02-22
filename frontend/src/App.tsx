@@ -16,6 +16,7 @@ import { LoginPage } from "./components/LoginPage";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { Nav } from "./components/Nav";
 import { EmptyState } from "./components/EmptyState";
+import { OfflineBanner } from "./components/OfflineBanner";
 import { ReportFarePanel } from "./components/ReportFarePanel";
 import { RouteCardSkeleton } from "./components/RouteCardSkeleton";
 import { RouteView } from "./components/RouteView";
@@ -24,6 +25,7 @@ import { SignupPage } from "./components/SignupPage";
 import { ToastStack } from "./components/ToastStack";
 import { TrafficReportModal } from "./components/TrafficReportModal";
 import { TripRecorder } from "./components/TripRecorder";
+import { usePullToRefresh } from "./hooks/usePullToRefresh";
 import {
   addSavedRoute,
   getAuthProfile,
@@ -132,6 +134,7 @@ function RouteFinderPage() {
   const [routeError, setRouteError] = useState<string | null>(null);
   const [tripCheckpoints, setTripCheckpoints] = useState<TripCheckpoint[]>([]);
   const [fareRefreshNonce, setFareRefreshNonce] = useState(0);
+  const [dataRefreshNonce, setDataRefreshNonce] = useState(0);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const toastTimersRef = useRef<number[]>([]);
   const savedRouteIds = useMemo(() => new Set(savedRoutes.map((route) => route._id)), [savedRoutes]);
@@ -199,7 +202,7 @@ function RouteFinderPage() {
     return () => {
       cancelled = true;
     };
-  }, [activeQuery, hasSearched]);
+  }, [activeQuery, hasSearched, dataRefreshNonce]);
 
   useEffect(() => {
     let cancelled = false;
@@ -232,7 +235,7 @@ function RouteFinderPage() {
     return () => {
       cancelled = true;
     };
-  }, [accessToken]);
+  }, [accessToken, dataRefreshNonce]);
 
   useEffect(() => {
     let cancelled = false;
@@ -261,7 +264,7 @@ function RouteFinderPage() {
     return () => {
       cancelled = true;
     };
-  }, [selectedRouteId]);
+  }, [selectedRouteId, dataRefreshNonce]);
 
   useEffect(() => {
     if (!routeId) return;
@@ -335,10 +338,32 @@ function RouteFinderPage() {
     toastTimersRef.current.push(timer);
   };
 
+  const pullRefresh = usePullToRefresh({
+    enabled: true,
+    onRefresh: async () => {
+      setDataRefreshNonce((previous) => previous + 1);
+      notify("info", "Refreshing latest route data...");
+      await new Promise<void>((resolve) => {
+        window.setTimeout(() => resolve(), 700);
+      });
+    },
+  });
+
   return (
     <>
       <Nav />
-      <main className="app-shell">
+      <OfflineBanner />
+      <main className="app-shell pull-refresh-shell" {...pullRefresh.bind}>
+        <div
+          className={`pull-refresh-indicator state-${pullRefresh.pullState}`}
+          style={pullRefresh.indicatorHeight > 0 ? { height: `${pullRefresh.indicatorHeight}px` } : undefined}
+          aria-hidden={pullRefresh.pullState === "idle"}
+        >
+          <span className="pull-refresh-icon" aria-hidden="true">
+            {pullRefresh.pullState === "refreshing" ? "RF" : "↻"}
+          </span>
+          <p>{pullRefresh.hint}</p>
+        </div>
         <header className="routefinder-hero">
           <div className="routefinder-hero-inner">
             <div className="routefinder-hero-copy">
@@ -594,6 +619,7 @@ function MyTripsPage() {
   return (
     <>
       <Nav />
+      <OfflineBanner />
       <main className="app-shell">
       <header className="hero card">
         <p className="kicker">Trip History</p>
