@@ -128,6 +128,15 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - reduces login/session drop-off risk when frontend and backend are deployed on different domains
   - strengthens trust and continuity for recurring report, trip, and saved-route participation loops
 
+### Phase 6 (Task 6.7)
+- CI pipeline baseline completed:
+  - GitHub Actions workflow now runs on `push` and `pull_request`
+  - backend quality gates: `test` + `build`
+  - frontend quality gates: `lint` + `build`
+- Engagement applicability:
+  - reduces deployment risk for engagement-critical paths by catching regressions before merge
+  - improves confidence that report loops, saved routes, trip flows, and auth surfaces remain functional release-to-release
+
 ## Future Compliance Plan
 
 ### Phase 6 and Beyond

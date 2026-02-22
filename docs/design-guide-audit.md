@@ -40,6 +40,9 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Phase 6 task `6.6` transport and cookie security hardening completed:
   - backend now supports production HTTPS redirect + HSTS headers with proxy-aware secure detection
   - refresh-token cookie policy now uses production-safe settings (`Secure`, `HttpOnly`, `SameSite=None`) for hosted frontend/backend split deployments
+- Phase 6 task `6.7` CI quality-gate baseline completed:
+  - GitHub Actions workflow now enforces frontend lint/build and backend test/build on `push` and `pull_request`
+  - reduces risk of design/UI regressions being merged without passing baseline checks
 - Productization pass completed for public-first UX:
   - added conversion-focused homepage at `/` with clear hero search, feature highlights, and "How it works" sections
   - Route Finder moved to `/map` to separate marketing surface from operational app surface

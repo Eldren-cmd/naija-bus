@@ -1438,6 +1438,48 @@ Engagement Guide applicability check:
 ### Next Tasks
 - Continue Phase 6 in strict order: `6.7` (CI workflow for lint/test/build on push/PR).
 
+### Task 6.7
+- Add CI workflow for lint/test/build checks on push and pull requests
+
+Status: complete. Implemented:
+- added GitHub Actions workflow:
+  - `.github/workflows/ci.yml`
+- configured triggers:
+  - `push`
+  - `pull_request`
+- configured Node runtime and dependency cache:
+  - Node `20` via `actions/setup-node@v4`
+  - npm cache keyed by:
+    - `backend/package-lock.json`
+    - `frontend/package-lock.json`
+- backend CI job (`Backend Test and Build`):
+  - `npm ci`
+  - `npm run test`
+  - `npm run build`
+- frontend CI job (`Frontend Lint and Build`):
+  - `npm ci`
+  - `npm run lint`
+  - `npm run build`
+
+validation checks passed:
+- `npm --prefix backend run test`
+- `npm --prefix backend run build`
+- `npm --prefix frontend run lint`
+- `npm --prefix frontend run build`
+- evidence documented in:
+  - `docs/phase6-step67-validation.md`
+
+Design Guide applicability check:
+- no direct UI component updates in this task.
+- CI quality gates reduce risk of design/UX regressions reaching production.
+
+Engagement Guide applicability check:
+- CI guardrails protect engagement-critical flows (auth, report, trips, saved routes) by blocking broken merges earlier.
+- improves release reliability for recurring commuter actions across future phase deliveries.
+
+### Next Tasks
+- Continue Phase 6 in strict order: `6.8` (CD workflow for frontend deploy on `main`).
+
 ## Supplemental UX Productization Pass
 
 Status: complete. Implemented:

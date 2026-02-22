@@ -22,7 +22,7 @@ Cross-guide enforcement (mandatory):
 | 6.4 | complete | Production seed executed against `MONGO_URI_PROD` with `5` routes and `25` stops; live backend route IDs match seeded production IDs; Vercel frontend deployed on `ultima-pi.vercel.app` with SPA rewrite support and route-refresh verification (`/route/:routeId` returns `200`). |
 | 6.5 | complete | Backend now enforces explicit CORS allowlist via `CORS_ALLOWED_ORIGINS` (with legacy fallback `CORS_ORIGIN`), blocks wildcard `*`, and fails fast in production when allowlist is missing. Socket.IO realtime namespace now uses the same allowlist matcher. Render env allowlist set and validated live with allowed and disallowed origins. |
 | 6.6 | complete | Backend now applies production HTTPS redirect + HSTS with proxy-aware secure detection and configurable trust-proxy hops. Refresh-token cookies are now production-safe (`Secure`, `HttpOnly`, `SameSite=None`) with optional domain override for custom-domain deployment patterns. |
-| 6.7 | missing | Pending: CI workflow for lint/test/build on push/PR. |
+| 6.7 | complete | Added GitHub Actions CI workflow for `push` + `pull_request` with separate backend and frontend jobs. Backend job runs `npm ci`, `npm run test`, and `npm run build` in `backend/`; frontend job runs `npm ci`, `npm run lint`, and `npm run build` in `frontend/`. |
 | 6.8 | missing | Pending: CD workflow for frontend deploy on `main`. |
 | 6.9 | missing | Pending: CD workflow for backend deploy hook on `main`. |
 | 6.10 | missing | Pending: Sentry integration and capture validation. |
@@ -93,7 +93,44 @@ Cross-guide compliance:
 - Design Guide: no direct visual redesign; transport/cookie hardening reduces auth/session failure risk in production UI flows.
 - Engagement Guide: stronger HTTPS + cookie policy improves trust and continuity for repeat login/report/trip engagement loops.
 
+## Task 6.7 Completion Note
+
+Status: complete.
+
+Implemented:
+- added CI workflow:
+  - `.github/workflows/ci.yml`
+- workflow triggers:
+  - `push`
+  - `pull_request`
+- workflow jobs:
+  - `Backend Test and Build`
+    - `npm ci`
+    - `npm run test`
+    - `npm run build`
+  - `Frontend Lint and Build`
+    - `npm ci`
+    - `npm run lint`
+    - `npm run build`
+- workflow runtime:
+  - `actions/checkout@v4`
+  - `actions/setup-node@v4` on Node `20`
+  - npm caching enabled per package lockfile
+
+Validation:
+- local quality gates:
+  - `npm --prefix backend run test` passed
+  - `npm --prefix backend run build` passed
+  - `npm --prefix frontend run lint` passed
+  - `npm --prefix frontend run build` passed
+- evidence document:
+  - `docs/phase6-step67-validation.md`
+
+Cross-guide compliance:
+- Design Guide: no direct visual redesign in CI setup; quality gates reduce risk of regressions in shipped UI experiences.
+- Engagement Guide: CI guardrails reduce release risk for engagement loops (auth, reports, trips, saved routes) by blocking broken builds before merge/deploy.
+
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `6.7` next.
+1. Continue with `6.8` next.
 2. Keep phase-6 tasks in strict sequence with step-level validation and compliance notes.
