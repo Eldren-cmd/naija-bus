@@ -146,6 +146,14 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - reduces release latency for engagement-facing UI refinements
   - improves reliability of updates affecting first-use and repeat-use commuter flows
 
+### Phase 6 (Task 6.9)
+- backend production CD baseline completed:
+  - GitHub Actions workflow now triggers backend deploys on `main` via Render deploy hook
+  - deployment workflow includes backend test/build gates before triggering production deploy
+- Engagement applicability:
+  - improves reliability of server-side engagement flows (auth, reports, trips, saved routes)
+  - reduces downtime/regression risk for recurring commuter participation loops
+
 ## Future Compliance Plan
 
 ### Phase 6 and Beyond

@@ -24,7 +24,7 @@ Cross-guide enforcement (mandatory):
 | 6.6 | complete | Backend now applies production HTTPS redirect + HSTS with proxy-aware secure detection and configurable trust-proxy hops. Refresh-token cookies are now production-safe (`Secure`, `HttpOnly`, `SameSite=None`) with optional domain override for custom-domain deployment patterns. |
 | 6.7 | complete | Added GitHub Actions CI workflow for `push` + `pull_request` with separate backend and frontend jobs. Backend job runs `npm ci`, `npm run test`, and `npm run build` in `backend/`; frontend job runs `npm ci`, `npm run lint`, and `npm run build` in `frontend/`. |
 | 6.8 | complete | Added GitHub Actions CD workflow for frontend production deploy on `main` (`.github/workflows/deploy-frontend.yml`). Workflow runs frontend lint/build, then deploys to Vercel production using `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`. |
-| 6.9 | missing | Pending: CD workflow for backend deploy hook on `main`. |
+| 6.9 | complete | Added GitHub Actions backend CD workflow for `main` (`.github/workflows/deploy-backend.yml`). Workflow runs backend test/build gates, then triggers Render deploy hook via `RENDER_DEPLOY_HOOK_URL` secret. |
 | 6.10 | missing | Pending: Sentry integration and capture validation. |
 | 6.11 | missing | Pending: structured server logging + sink integration. |
 | 6.12 | missing | Pending: Mapbox billing alerts and quota guardrails. |
@@ -167,7 +167,39 @@ Cross-guide compliance:
 - Design Guide: no direct visual redesign; release automation helps preserve production design consistency by reducing manual deploy drift.
 - Engagement Guide: production deploy automation improves iteration speed and reliability for engagement loops shipped in previous phases.
 
+## Task 6.9 Completion Note
+
+Status: complete.
+
+Implemented:
+- added backend CD workflow:
+  - `.github/workflows/deploy-backend.yml`
+- workflow trigger scope:
+  - `push` on `main`
+  - path-filtered to backend deploy surface:
+    - `backend/**`
+    - workflow file
+- workflow behavior:
+  - installs backend dependencies
+  - runs backend `test` and `build` gates
+  - triggers Render deploy hook using `RENDER_DEPLOY_HOOK_URL`
+- required GitHub Actions secret:
+  - `RENDER_DEPLOY_HOOK_URL`
+
+Validation:
+- local quality gates:
+  - `npm --prefix backend run test` passed
+  - `npm --prefix backend run build` passed
+  - `npm --prefix frontend run lint` passed
+  - `npm --prefix frontend run build` passed
+- evidence document:
+  - `docs/phase6-step69-validation.md`
+
+Cross-guide compliance:
+- Design Guide: no direct visual redesign; backend deploy automation reduces production drift and keeps UI-backed APIs in sync with reviewed behavior.
+- Engagement Guide: faster, safer backend releases improve reliability of auth/report/trip/saved-route engagement loops.
+
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `6.9` next.
+1. Continue with `6.10` next.
 2. Keep phase-6 tasks in strict sequence with step-level validation and compliance notes.

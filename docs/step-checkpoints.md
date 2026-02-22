@@ -1523,6 +1523,44 @@ Engagement Guide applicability check:
 ### Next Tasks
 - Continue Phase 6 in strict order: `6.9` (CD workflow for backend deploy hook on `main`).
 
+### Task 6.9
+- Add backend CD workflow that triggers Render deploy hook on `main`
+
+Status: complete. Implemented:
+- added GitHub Actions backend deployment workflow:
+  - `.github/workflows/deploy-backend.yml`
+- trigger and scope:
+  - `push` on `main`
+  - path-filtered to:
+    - `backend/**`
+    - workflow file updates
+- deployment pipeline in workflow:
+  - install backend dependencies (`npm --prefix backend ci`)
+  - run backend tests (`npm --prefix backend run test`)
+  - run backend build (`npm --prefix backend run build`)
+  - trigger Render deploy hook via `curl -X POST "$RENDER_DEPLOY_HOOK_URL"`
+- required repository secret (already provisioned):
+  - `RENDER_DEPLOY_HOOK_URL`
+
+validation checks passed:
+- `npm --prefix backend run test`
+- `npm --prefix backend run build`
+- `npm --prefix frontend run lint`
+- `npm --prefix frontend run build`
+- evidence documented in:
+  - `docs/phase6-step69-validation.md`
+
+Design Guide applicability check:
+- no direct UI component changes in this task.
+- backend deploy automation helps keep deployed API behavior aligned with the reviewed frontend UX.
+
+Engagement Guide applicability check:
+- reliable backend deployment pipeline improves stability of engagement-critical loops (auth, reports, trips, saved routes).
+- reduces regression risk by enforcing test/build gates before production deploy trigger.
+
+### Next Tasks
+- Continue Phase 6 in strict order: `6.10` (Sentry integration and capture validation).
+
 ## Supplemental UX Productization Pass
 
 Status: complete. Implemented:
