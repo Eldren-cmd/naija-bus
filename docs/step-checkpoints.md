@@ -1317,3 +1317,52 @@ validation checks passed:
 
 ### Next Tasks
 - Continue Phase 6 in strict order: `6.4` (seed production DB and verify on live frontend).
+
+### Task 6.4
+- Seed production DB and verify on live frontend
+
+Status: complete. Implemented:
+- seeded production data using production Atlas URI:
+  - executed `node scripts/seed.js` with temporary `MONGO_URI` override from `MONGO_URI_PROD`
+  - seed results:
+    - total routes: `5`
+    - total stops: `25`
+    - stops inserted/updated: `25`
+- verified live backend now reads the same production dataset:
+  - `GET https://naija-bus-backend.onrender.com/api/v1/routes`
+  - route IDs from live API match seeded production route IDs (`5/5`)
+  - latest route `updatedAt` reflects production reseed window
+- remediated live frontend deployment and refresh behavior:
+  - added root `vercel.json` monorepo build/output config:
+    - install: `npm --prefix frontend install`
+    - build: `npm --prefix frontend run build`
+    - output: `frontend/dist`
+  - added SPA rewrite rule to serve `index.html` on client routes
+  - added `.vercelignore` to exclude backend/runtime folders from frontend deployment payload
+    - resolved deployment failure caused by locked WhatsApp session file in `backend/.wwebjs_auth`
+  - redeployed production frontend on Vercel alias:
+    - `https://ultima-pi.vercel.app`
+- verified live frontend route-refresh behavior:
+  - `GET /` returns `200`
+  - `GET /route/:routeId` returns `200` and serves `index.html`
+  - deployed bundle contains production API base (`naija-bus-backend.onrender.com`)
+
+Design Guide applicability check:
+- no new component-level visual redesign in this step.
+- deployment and rewrite hardening ensure designed route/fare/report surfaces load consistently after direct-link refreshes.
+
+Engagement Guide applicability check:
+- no new engagement logic was introduced directly in this task.
+- production seeded data and stable hosted routing support reliable access to engagement loops already shipped (saved routes, reporting, trips).
+
+validation checks passed:
+- production seed command completed with `5` routes and `25` stops
+- live API route IDs match production-seeded IDs (`5/5`)
+- Vercel production alias health:
+  - `https://ultima-pi.vercel.app` -> `200`
+  - `https://ultima-pi.vercel.app/route/{routeId}` -> `200`
+- evidence documented in:
+  - `docs/phase6-step64-validation.md`
+
+### Next Tasks
+- Continue Phase 6 in strict order: `6.5` (production CORS allowlist hardening).

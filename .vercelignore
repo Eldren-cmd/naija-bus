@@ -1,0 +1,6 @@
+backend/
+docs/
+social_posts/
+seed/
+scripts/
+*.log

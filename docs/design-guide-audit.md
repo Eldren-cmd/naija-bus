@@ -31,6 +31,9 @@ Reference: `NaijaTransport_DesignGuide.docx`
   - live backend endpoint now supports design-level flows in non-local environments (route detail, fare estimate, reporting surfaces)
 - Phase 6 task `6.3` production backup baseline completed:
   - Atlas backup policy for production data is active, supporting reliability of user-facing route/fare/report history surfaces
+- Phase 6 task `6.4` production seed + hosted SPA reliability completed:
+  - Vercel build/output config now serves the frontend app correctly from monorepo root
+  - SPA route refresh rewrite now preserves route-detail page access after direct URL reloads
 
 ## High-Impact Gaps To Implement Next
 
