@@ -20,6 +20,7 @@ Status labels:
 | 3 | complete | realtime map/report UX implemented | report loop + bot-ingest baseline implemented | aligned | phase-3 scoped requirements are compliant; deeper automation/reward expansion is tracked for later phases. |
 | 4 | complete | trip UX and replay implemented | retention + gamification baseline implemented | aligned | phase-4 engagement gap now closed with points/streaks/badges/leaderboard surface. |
 | 5 (through 5.14) | complete through 5.14 | major polish updates + mobile responsiveness + loading skeleton + empty-state + global error fallback + E2E guardrails + UAT remediation applied | saved-routes retention loop + mobile usability + loading/empty-state + trust fallback + report loop + UAT engagement acceptance checks completed | aligned | phase-5 closure evidence is recorded in `docs/phase5-step514-validation.md`. |
+| 6 (through 6.1) | complete through 6.1 | deployment prerequisites initialized | deployment prerequisites initialized | partial | Vercel project and frontend production env setup completed; backend hosting/monitoring/security hardening steps still pending. |
 
 ## Compliance Recheck (Previous Phases)
 
@@ -40,6 +41,10 @@ Status labels:
   - airtime/reward automation
   - offline/PWA flow
   - USSD fallback and referral extensions
+- Complete production hardening/deployment sequence from `6.2` onward:
+  - backend hosting + env configuration
+  - production Atlas backups
+  - CI/CD, Sentry, logging, uptime, and security audit
 
 ## Enforcement
 

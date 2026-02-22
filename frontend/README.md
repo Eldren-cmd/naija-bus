@@ -39,6 +39,9 @@ React + TypeScript + Vite frontend for Naija Transport.
   - saved-route save action and panel update
   - traffic report submission modal flow
 - Phase 5 UAT remediation now includes lazy-loaded `RouteMap`, `MyTripMap`, and `AdminPanel` plus Vite manual chunk splitting for better first-load behavior
+- Phase 6 Task 6.1 deployment prep completed:
+  - Vercel project linked to this repo
+  - hosted frontend env vars configured (`VITE_MAPBOX_KEY`, `VITE_API_BASE`)
 
 ## Environment
 Create `frontend/.env` with:

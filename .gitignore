@@ -27,3 +27,5 @@ yarn-error.log*
 backend/.tmp/
 backend/.wwebjs_auth/
 backend/.wwebjs_cache/
+
+.vercel

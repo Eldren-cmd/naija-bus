@@ -1188,3 +1188,43 @@ Status: complete. Implemented:
 ### Next Tasks
 - Phase 5 is complete through `5.14`.
 - Continue with Phase 6 in strict order after confirmation.
+
+## Phase 6 - Production Hardening & Deployment
+
+### Task 6.1
+- Create Vercel project; link GitHub repo; set `VITE_MAPBOX_KEY` + `VITE_API_BASE` env vars
+
+Status: complete. Implemented:
+- linked repo to Vercel project:
+  - project: `eldrens-projects/ultima`
+  - local link metadata generated at `.vercel/project.json`
+- connected GitHub repository:
+  - `https://github.com/Eldren-cmd/naija-bus`
+- configured frontend runtime env vars on Vercel for:
+  - `production`
+  - `preview`
+  - `development`
+- env vars set:
+  - `VITE_MAPBOX_KEY` (from local `frontend/.env`)
+  - `VITE_API_BASE` (temporary placeholder until backend service URL exists)
+- local ignore hygiene updated:
+  - root `.gitignore` includes `.vercel`
+
+Design Guide applicability check:
+- no direct UI changes in this step.
+- production map rendering prerequisites are now in place via hosted `VITE_MAPBOX_KEY` config.
+
+Engagement Guide applicability check:
+- no direct engagement feature logic changed in this step.
+- deployment prerequisite for engagement loops (saved routes + live report surfaces) is advanced.
+
+validation checks passed:
+- `vercel --version`
+- `vercel env ls` (both required vars present in all three environments)
+- `npm --prefix frontend run build`
+
+deferred note:
+- `VITE_API_BASE` is intentionally temporary in `6.1` and will be replaced with the real backend URL in `6.2`.
+
+### Next Tasks
+- Continue Phase 6 in strict order: `6.2` (backend hosting service + backend env vars).
