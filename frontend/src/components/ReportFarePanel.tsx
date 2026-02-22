@@ -2,6 +2,7 @@ import { useState } from "react";
 import { reportFare } from "../lib/api";
 import { EmptyState } from "./EmptyState";
 import { PanelCard } from "./PanelCard";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 import type { ToastTone } from "./ToastStack";
 import type { TrafficLevel } from "../types";
 import type { FormEvent } from "react";
@@ -25,6 +26,7 @@ export function ReportFarePanel({
   const [trafficLevel, setTrafficLevel] = useState<TrafficLevel>("medium");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const authGuard = useAuthGuard({ authToken, onToast });
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -34,9 +36,11 @@ export function ReportFarePanel({
       return;
     }
 
-    const normalizedToken = authToken?.trim();
+    const normalizedToken = authGuard.requireToken({
+      action: "submit fare reports",
+      blockedMessage: "Sign in first to submit fare reports.",
+    });
     if (!normalizedToken) {
-      onToast?.("error", "Sign in first to submit fare reports.");
       return;
     }
 
@@ -87,7 +91,7 @@ export function ReportFarePanel({
         />
       )}
 
-      {!authToken?.trim() && (
+      {!authGuard.canAct && (
         <EmptyState
           tone="report"
           compact
@@ -136,7 +140,12 @@ export function ReportFarePanel({
         </label>
 
         <button type="submit" className="estimate-btn" disabled={!routeId || submitting}>
-          {submitting ? "Submitting..." : "Submit Fare Report"}
+          {submitting
+            ? "Submitting..."
+            : authGuard.getActionLabel({
+                authenticated: "Submit Fare Report",
+                unauthenticated: "Login to Submit Fare",
+              })}
         </button>
       </form>
     </PanelCard>

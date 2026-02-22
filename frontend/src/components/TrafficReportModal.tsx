@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { reportIncident } from "../lib/api";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 import type { ToastTone } from "./ToastStack";
 import type { FormEvent } from "react";
 import type { ReportSeverity, ReportType } from "../types";
@@ -34,6 +35,7 @@ export function TrafficReportModal({ routeId, routeName, authToken, onToast }: T
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const authGuard = useAuthGuard({ authToken, onToast });
 
   useEffect(() => {
     if (!isOpen) return;
@@ -77,8 +79,11 @@ export function TrafficReportModal({ routeId, routeName, authToken, onToast }: T
   };
 
   const openModal = () => {
-    if (!authToken?.trim()) {
-      onToast?.("error", "Sign in first to submit incident reports.");
+    const normalizedToken = authGuard.requireToken({
+      action: "submit incident reports",
+      blockedMessage: "Sign in first to submit incident reports.",
+    });
+    if (!normalizedToken) {
       return;
     }
     resetModalState();
@@ -93,9 +98,11 @@ export function TrafficReportModal({ routeId, routeName, authToken, onToast }: T
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const normalizedToken = authToken?.trim();
+    const normalizedToken = authGuard.requireToken({
+      action: "submit incident reports",
+      blockedMessage: "Sign in first to submit incident reports.",
+    });
     if (!normalizedToken) {
-      onToast?.("error", "Sign in first to submit incident reports.");
       return;
     }
 
@@ -147,11 +154,14 @@ export function TrafficReportModal({ routeId, routeName, authToken, onToast }: T
           ? `Report live conditions for ${routeName}.`
           : "Report traffic, police stops, roadblocks, and hazards around you."}
       </p>
-      {!authToken?.trim() && (
+      {!authGuard.canAct && (
         <p className="muted small">Sign in from `/login` to submit traffic reports.</p>
       )}
       <button type="button" className="estimate-btn report-open-btn" onClick={openModal}>
-        Open Traffic Report Modal
+        {authGuard.getActionLabel({
+          authenticated: "Open Traffic Report Modal",
+          unauthenticated: "Login to Report Traffic",
+        })}
       </button>
 
       {isOpen && (

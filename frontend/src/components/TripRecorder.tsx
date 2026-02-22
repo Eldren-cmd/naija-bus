@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createTripRecord } from "../lib/api";
 import { EmptyState } from "./EmptyState";
 import { PanelCard } from "./PanelCard";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 import type { TripCheckpoint } from "../types";
 import type { ToastTone } from "./ToastStack";
 
@@ -147,6 +148,7 @@ export function TripRecorder({
   const [permissionDenied, setPermissionDenied] = useState(false);
   const watchIdRef = useRef<number | null>(null);
   const lastCapturedAtRef = useRef<number>(0);
+  const authGuard = useAuthGuard({ authToken, onToast });
 
   useEffect(() => {
     onCheckpointsChange?.(checkpoints);
@@ -289,11 +291,12 @@ export function TripRecorder({
       return;
     }
 
-    const normalizedToken = authToken?.trim();
+    const normalizedToken = authGuard.requireToken({
+      action: "upload trip records",
+      blockedMessage: "Sign in first to upload trip records.",
+    });
     if (!normalizedToken) {
-      const message = "Sign in first to upload trip records.";
-      setError(message);
-      onToast?.("error", message);
+      setError("Sign in first to upload trip records.");
       return;
     }
 
@@ -351,7 +354,7 @@ export function TripRecorder({
       iconLabel="TR"
       className="trip-recorder-card"
     >
-      {!authToken?.trim() && (
+      {!authGuard.canAct && (
         <EmptyState
           tone="trip"
           compact
@@ -434,7 +437,12 @@ export function TripRecorder({
                 Cancel
               </button>
               <button type="button" className="estimate-btn" onClick={() => void uploadTrip()} disabled={uploading}>
-                {uploading ? "Uploading..." : "Upload Trip"}
+                {uploading
+                  ? "Uploading..."
+                  : authGuard.getActionLabel({
+                      authenticated: "Upload Trip",
+                      unauthenticated: "Login to Upload",
+                    })}
               </button>
             </div>
           </div>

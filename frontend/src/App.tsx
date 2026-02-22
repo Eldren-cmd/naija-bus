@@ -25,6 +25,7 @@ import { SignupPage } from "./components/SignupPage";
 import { ToastStack } from "./components/ToastStack";
 import { TrafficReportModal } from "./components/TrafficReportModal";
 import { TripRecorder } from "./components/TripRecorder";
+import { useAuthGuard } from "./hooks/useAuthGuard";
 import { usePullToRefresh } from "./hooks/usePullToRefresh";
 import {
   addSavedRoute,
@@ -142,6 +143,24 @@ function RouteFinderPage() {
     () => routes.find((route) => route._id === selectedRouteId) ?? null,
     [routes, selectedRouteId],
   );
+
+  const dismissToast = (id: number) => {
+    setToasts((previous) => previous.filter((toast) => toast.id !== id));
+  };
+
+  const notify = (tone: ToastTone, message: string) => {
+    const id = Date.now() + Math.floor(Math.random() * 10000);
+    setToasts((previous) => [...previous, { id, tone, message }]);
+
+    const timer = window.setTimeout(() => {
+      setToasts((previous) => previous.filter((toast) => toast.id !== id));
+      toastTimersRef.current = toastTimersRef.current.filter((activeTimer) => activeTimer !== timer);
+    }, 4500);
+
+    toastTimersRef.current.push(timer);
+  };
+
+  const authGuard = useAuthGuard({ authToken: accessToken, onToast: notify });
 
   useEffect(() => {
     return () => {
@@ -290,9 +309,11 @@ function RouteFinderPage() {
   };
 
   const onToggleSavedRoute = async (route: RouteSummary) => {
-    const token = accessToken?.trim();
+    const token = authGuard.requireToken({
+      action: "save routes",
+      blockedMessage: "Sign in to save routes to your profile.",
+    });
     if (!token) {
-      notify("error", "Login required to save routes.");
       return;
     }
 
@@ -322,22 +343,6 @@ function RouteFinderPage() {
     }
   };
 
-  const dismissToast = (id: number) => {
-    setToasts((previous) => previous.filter((toast) => toast.id !== id));
-  };
-
-  const notify = (tone: ToastTone, message: string) => {
-    const id = Date.now() + Math.floor(Math.random() * 10000);
-    setToasts((previous) => [...previous, { id, tone, message }]);
-
-    const timer = window.setTimeout(() => {
-      setToasts((previous) => previous.filter((toast) => toast.id !== id));
-      toastTimersRef.current = toastTimersRef.current.filter((activeTimer) => activeTimer !== timer);
-    }, 4500);
-
-    toastTimersRef.current.push(timer);
-  };
-
   const pullRefresh = usePullToRefresh({
     enabled: true,
     onRefresh: async () => {
@@ -360,7 +365,7 @@ function RouteFinderPage() {
           aria-hidden={pullRefresh.pullState === "idle"}
         >
           <span className="pull-refresh-icon" aria-hidden="true">
-            {pullRefresh.pullState === "refreshing" ? "RF" : "↻"}
+            {pullRefresh.pullState === "refreshing" ? "RF" : "PR"}
           </span>
           <p>{pullRefresh.hint}</p>
         </div>
@@ -448,9 +453,7 @@ function RouteFinderPage() {
 
             {routesError && <p className="error-text">{routesError}</p>}
 
-            {routesLoading && (
-              <RouteCardSkeleton count={5} includeSaveAction={Boolean(accessToken?.trim())} />
-            )}
+            {routesLoading && <RouteCardSkeleton count={5} includeSaveAction />}
 
             {!routesLoading && (
               <ul className="route-list">
@@ -470,20 +473,21 @@ function RouteFinderPage() {
                         {route.origin} to {route.destination}
                       </span>
                     </button>
-                    {accessToken?.trim() && (
-                      <button
-                        type="button"
-                        className={`route-save-btn ${savedRouteIds.has(route._id) ? "saved" : ""}`}
-                        onClick={() => void onToggleSavedRoute(route)}
-                        disabled={savingRouteId === route._id}
-                      >
-                        {savingRouteId === route._id
-                          ? "Updating..."
-                          : savedRouteIds.has(route._id)
-                            ? "Saved"
-                            : "Save"}
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      className={`route-save-btn ${savedRouteIds.has(route._id) ? "saved" : ""}`}
+                      onClick={() => void onToggleSavedRoute(route)}
+                      disabled={savingRouteId === route._id}
+                    >
+                      {savingRouteId === route._id
+                        ? "Updating..."
+                        : savedRouteIds.has(route._id)
+                          ? "Saved"
+                          : authGuard.getActionLabel({
+                              authenticated: "Save",
+                              unauthenticated: "Login to Save",
+                            })}
+                    </button>
                   </li>
                 ))}
               </ul>
