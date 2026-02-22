@@ -13,6 +13,8 @@ import {
 import { useAuth } from "./auth/AuthContext";
 import { FareEstimate } from "./components/FareEstimate";
 import { LoginPage } from "./components/LoginPage";
+import { MobileBottomNav } from "./components/MobileBottomNav";
+import { Nav } from "./components/Nav";
 import { ReportFarePanel } from "./components/ReportFarePanel";
 import { RouteView } from "./components/RouteView";
 import { SearchInput } from "./components/SearchInput";
@@ -77,43 +79,6 @@ const LazyMyTripMap = lazy(async () => {
   const module = await import("./components/MyTripMap");
   return { default: module.MyTripMap };
 });
-
-function PrimaryNav({ active }: { active: "routes" | "my-trips" | "admin" }) {
-  const { isAuthenticated, user, clearSession } = useAuth();
-
-  return (
-    <nav className="top-nav">
-      <Link to="/map" className={`top-nav-link ${active === "routes" ? "active" : ""}`}>
-        Route Finder
-      </Link>
-      <Link to="/my-trips" className={`top-nav-link ${active === "my-trips" ? "active" : ""}`}>
-        My Trips
-      </Link>
-      {isAuthenticated && user?.role === "admin" && (
-        <Link to="/admin" className={`top-nav-link ${active === "admin" ? "active" : ""}`}>
-          Admin
-        </Link>
-      )}
-      {isAuthenticated ? (
-        <>
-          <span className="top-nav-user">Signed in: {user?.fullName || user?.email || "User"}</span>
-          <button type="button" className="top-nav-link top-nav-logout" onClick={clearSession}>
-            Logout
-          </button>
-        </>
-      ) : (
-        <>
-          <Link to="/login" className="top-nav-link">
-            Login
-          </Link>
-          <Link to="/signup" className="top-nav-link">
-            Signup
-          </Link>
-        </>
-      )}
-    </nav>
-  );
-}
 
 function ProtectedRoute({ children }: { children: ReactElement }) {
   const { isAuthenticated } = useAuth();
@@ -369,7 +334,9 @@ function RouteFinderPage() {
   };
 
   return (
-    <main className="app-shell">
+    <>
+      <Nav />
+      <main className="app-shell">
       <header className="hero card">
         <p className="kicker">Beta</p>
         <h1>Find your route. Know the fare.</h1>
@@ -377,7 +344,6 @@ function RouteFinderPage() {
           Search Lagos routes, inspect ordered stops, and pull a live fare estimate with multiplier breakdown.
         </p>
         <p className="brand-note">A VerityWave Solutions product</p>
-        <PrimaryNav active="routes" />
       </header>
 
       <section className="layout">
@@ -551,7 +517,9 @@ function RouteFinderPage() {
         </section>
       </section>
       <ToastStack toasts={toasts} onDismiss={dismissToast} />
-    </main>
+      </main>
+      <MobileBottomNav />
+    </>
   );
 }
 
@@ -622,13 +590,14 @@ function MyTripsPage() {
     selectedTripId && trips.length > 0 ? trips.find((trip) => trip._id === selectedTripId) ?? null : null;
 
   return (
-    <main className="app-shell">
+    <>
+      <Nav />
+      <main className="app-shell">
       <header className="hero card">
         <p className="kicker">Trip History</p>
         <h1>My Recorded Trips</h1>
         <p>Review uploaded trips with distance and duration history for route learning insights.</p>
         <p className="brand-note">A VerityWave Solutions product</p>
-        <PrimaryNav active="my-trips" />
       </header>
 
       <section className="mytrips-layout">
@@ -830,7 +799,9 @@ function MyTripsPage() {
           </section>
         </section>
       </section>
-    </main>
+      </main>
+      <MobileBottomNav />
+    </>
   );
 }
 
@@ -844,6 +815,14 @@ function App() {
       <Route path="/search" element={<RouteFinderPage />} />
       <Route path="/route/:routeId" element={<RouteFinderPage />} />
       <Route
+        path="/trips"
+        element={
+          <ProtectedRoute>
+            <MyTripsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/my-trips"
         element={
           <ProtectedRoute>
@@ -855,18 +834,22 @@ function App() {
         path="/admin"
         element={
           <AdminRoute>
-            <Suspense
-              fallback={
-                <main className="app-shell">
-                  <section className="card">
-                    <h2 className="panel-title">Admin Panel</h2>
-                    <p className="muted">Loading admin controls...</p>
-                  </section>
-                </main>
-              }
-            >
-              <LazyAdminPanel />
-            </Suspense>
+            <>
+              <Nav />
+              <Suspense
+                fallback={
+                  <main className="app-shell">
+                    <section className="card">
+                      <h2 className="panel-title">Admin Panel</h2>
+                      <p className="muted">Loading admin controls...</p>
+                    </section>
+                  </main>
+                }
+              >
+                <LazyAdminPanel />
+              </Suspense>
+              <MobileBottomNav />
+            </>
           </AdminRoute>
         }
       />
