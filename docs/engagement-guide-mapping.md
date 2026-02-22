@@ -154,6 +154,16 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - improves reliability of server-side engagement flows (auth, reports, trips, saved routes)
   - reduces downtime/regression risk for recurring commuter participation loops
 
+### Phase 6 (Task 6.10)
+- backend observability baseline completed with Sentry:
+  - DSN-based Sentry runtime initialization
+  - process-level exception capture hooks
+  - token-gated capture validation endpoint for controlled production checks
+  - automatic mirroring of backend `>=500` JSON responses into Sentry events
+- Engagement applicability:
+  - improves reliability of recurring commuter workflows by reducing time-to-detect backend incidents
+  - strengthens trust posture for report/trip/auth flows through faster production issue triage
+
 ## Future Compliance Plan
 
 ### Phase 6 and Beyond

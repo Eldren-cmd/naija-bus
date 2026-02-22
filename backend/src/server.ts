@@ -6,6 +6,12 @@ import { rateLimit } from "express-rate-limit";
 import { createServer } from "http";
 import { isValidObjectId } from "mongoose";
 import { connectToDatabase, ensureCoreIndexes, getDatabaseStatus } from "./config/db";
+import {
+  captureServerException,
+  flushObservability,
+  initObservability,
+  isSentryEnabled,
+} from "./config/observability";
 import { Fare, Report, Route, Stop, TripRecord, User } from "./models";
 import { authMiddleware, requireRoles } from "./middleware/authMiddleware";
 import {
@@ -34,10 +40,12 @@ import {
 } from "./validation/requestSchemas";
 
 dotenv.config();
+initObservability();
 
 export const app = express();
 const port = Number(process.env.PORT || 5000);
 const isProduction = process.env.NODE_ENV === "production";
+const sentryCaptureTestToken = (process.env.SENTRY_CAPTURE_TEST_TOKEN || "").trim();
 const DEV_DEFAULT_CORS_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"] as const;
 const trustProxyHopsRaw = Number(process.env.TRUST_PROXY_HOPS || 1);
 const trustProxyHops =
@@ -59,6 +67,24 @@ const isRequestSecure = (req: Request): boolean => {
   if (req.secure) return true;
   return readForwardedProto(req) === "https";
 };
+
+let processErrorHandlersRegistered = false;
+const registerProcessErrorHandlers = (): void => {
+  if (processErrorHandlersRegistered) return;
+  if (!isSentryEnabled()) return;
+
+  process.on("unhandledRejection", (reason) => {
+    captureServerException(reason, { operation: "process_unhandled_rejection" });
+  });
+
+  process.on("uncaughtExceptionMonitor", (error) => {
+    captureServerException(error, { operation: "process_uncaught_exception" });
+  });
+
+  processErrorHandlersRegistered = true;
+};
+
+registerProcessErrorHandlers();
 
 const parseCorsOriginList = (value: string | undefined): string[] => {
   if (!value) return [];
@@ -129,6 +155,37 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+
+const getResponseErrorMessage = (payload: unknown): string => {
+  if (
+    typeof payload === "object" &&
+    payload !== null &&
+    "error" in payload &&
+    typeof payload.error === "string"
+  ) {
+    return payload.error;
+  }
+  return "internal server error response";
+};
+
+app.use((req, res, next) => {
+  const originalJson = res.json.bind(res);
+  res.json = ((body: unknown) => {
+    if (res.statusCode >= 500) {
+      captureServerException(new Error(getResponseErrorMessage(body)), {
+        operation: "http_internal_error_response",
+        tags: {
+          method: req.method,
+          path: req.originalUrl || req.path,
+          statusCode: String(res.statusCode),
+        },
+      });
+    }
+    return originalJson(body as never);
+  }) as typeof res.json;
+  next();
+});
+
 app.use("/auth", authRouter);
 app.use("/api/v1/auth", authRouter);
 
@@ -139,6 +196,41 @@ app.get("/api/v1/health", (_req, res) => {
     database: getDatabaseStatus(),
   });
 });
+
+const sentryTestCaptureHandler = async (req: Request, res: Response) => {
+  if (!isSentryEnabled()) {
+    return res.status(503).json({ error: "sentry is not configured" });
+  }
+
+  if (!sentryCaptureTestToken) {
+    return res.status(503).json({ error: "SENTRY_CAPTURE_TEST_TOKEN is not configured" });
+  }
+
+  const token = req.header("x-sentry-test-token");
+  const sentToken = typeof token === "string" ? token.trim() : "";
+  if (!sentToken || sentToken !== sentryCaptureTestToken) {
+    return res.status(401).json({ error: "invalid sentry test token" });
+  }
+
+  const validationError = new Error(`sentry capture validation event ${Date.now()}`);
+  captureServerException(validationError, {
+    operation: "manual_sentry_capture_validation",
+    tags: {
+      method: req.method,
+      path: req.originalUrl || req.path,
+    },
+  });
+  const flushed = await flushObservability(2_000);
+
+  return res.status(202).json({
+    ok: true,
+    message: "sentry test event captured",
+    flushed,
+  });
+};
+
+app.post("/api/v1/observability/sentry-test", sentryTestCaptureHandler);
+app.post("/observability/sentry-test", sentryTestCaptureHandler);
 
 const escapeRegex = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -1264,9 +1356,12 @@ const startServer = async (): Promise<void> => {
         };
       },
     }).catch((botError) => {
+      captureServerException(botError, { operation: "whatsapp_bot_startup" });
       console.error("WhatsApp bot startup failed:", botError);
     });
   } catch (error) {
+    captureServerException(error, { operation: "backend_startup" });
+    void flushObservability(2_000);
     console.error("Failed to start backend:", error);
     process.exit(1);
   }

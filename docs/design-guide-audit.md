@@ -49,6 +49,9 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Phase 6 task `6.9` backend CD baseline completed:
   - GitHub Actions workflow now triggers backend production deploy via Render deploy hook on `main`
   - backend release automation reduces mismatch risk between approved UI behavior and deployed API behavior
+- Phase 6 task `6.10` backend observability baseline completed:
+  - Sentry integration now captures backend failure signals with request context
+  - token-gated capture endpoint supports controlled production validation of alerting flow
 - Productization pass completed for public-first UX:
   - added conversion-focused homepage at `/` with clear hero search, feature highlights, and "How it works" sections
   - Route Finder moved to `/map` to separate marketing surface from operational app surface

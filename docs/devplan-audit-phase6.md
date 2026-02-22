@@ -25,7 +25,7 @@ Cross-guide enforcement (mandatory):
 | 6.7 | complete | Added GitHub Actions CI workflow for `push` + `pull_request` with separate backend and frontend jobs. Backend job runs `npm ci`, `npm run test`, and `npm run build` in `backend/`; frontend job runs `npm ci`, `npm run lint`, and `npm run build` in `frontend/`. |
 | 6.8 | complete | Added GitHub Actions CD workflow for frontend production deploy on `main` (`.github/workflows/deploy-frontend.yml`). Workflow runs frontend lint/build, then deploys to Vercel production using `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`. |
 | 6.9 | complete | Added GitHub Actions backend CD workflow for `main` (`.github/workflows/deploy-backend.yml`). Workflow runs backend test/build gates, then triggers Render deploy hook via `RENDER_DEPLOY_HOOK_URL` secret. |
-| 6.10 | missing | Pending: Sentry integration and capture validation. |
+| 6.10 | complete | Sentry backend integration added with DSN-based initialization, process-level exception hooks, and token-gated capture validation endpoint (`POST /api/v1/observability/sentry-test`). 500 responses are now mirrored to Sentry with request metadata. |
 | 6.11 | missing | Pending: structured server logging + sink integration. |
 | 6.12 | missing | Pending: Mapbox billing alerts and quota guardrails. |
 | 6.13 | missing | Pending: uptime monitoring of `/api/v1/health`. |
@@ -199,7 +199,45 @@ Cross-guide compliance:
 - Design Guide: no direct visual redesign; backend deploy automation reduces production drift and keeps UI-backed APIs in sync with reviewed behavior.
 - Engagement Guide: faster, safer backend releases improve reliability of auth/report/trip/saved-route engagement loops.
 
+## Task 6.10 Completion Note
+
+Status: complete.
+
+Implemented:
+- added backend observability module:
+  - `backend/src/config/observability.ts`
+  - DSN-based Sentry initialization (`SENTRY_DSN`)
+  - environment support (`SENTRY_ENVIRONMENT`)
+  - optional tracing sample-rate parsing (`SENTRY_TRACES_SAMPLE_RATE`)
+  - shared capture + flush helpers
+- integrated Sentry into backend runtime:
+  - `backend/src/server.ts`
+  - startup observability initialization via `initObservability()`
+  - process-level hooks for `unhandledRejection` and `uncaughtExceptionMonitor`
+  - automatic capture mirror for JSON responses with status `>=500`
+- added safe capture validation endpoint:
+  - `POST /api/v1/observability/sentry-test`
+  - alias: `POST /observability/sentry-test`
+  - protected by `x-sentry-test-token` against `SENTRY_CAPTURE_TEST_TOKEN`
+  - captures test exception and flushes Sentry client before returning `202`
+- configuration/documentation updates:
+  - `backend/.env.example`
+  - `README.md`
+
+Validation:
+- local quality gates:
+  - `npm --prefix backend run test` passed
+  - `npm --prefix backend run build` passed
+  - `npm --prefix frontend run lint` passed
+  - `npm --prefix frontend run build` passed
+- evidence document:
+  - `docs/phase6-step610-validation.md`
+
+Cross-guide compliance:
+- Design Guide: no direct visual redesign; improved backend observability reduces blind failures that would degrade user-facing UI trust.
+- Engagement Guide: faster incident detection improves stability of repeated engagement loops (auth, reporting, trip logging, saved routes).
+
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `6.10` next.
+1. Continue with `6.11` next.
 2. Keep phase-6 tasks in strict sequence with step-level validation and compliance notes.

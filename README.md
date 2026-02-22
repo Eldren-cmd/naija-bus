@@ -74,6 +74,11 @@ This repository is being built strictly from:
 - [x] Phase 6 / Task 6.1: Vercel project linked to repo and frontend env vars configured (`VITE_MAPBOX_KEY`, `VITE_API_BASE`) for production/preview/development
 - [x] Phase 6 / Task 6.2: Render backend service provisioned and configured; hosted frontend API base now points to live backend URL
 - [x] Phase 6 / Task 6.5: Production CORS allowlist hardening shipped for HTTP + Socket.IO (`CORS_ALLOWED_ORIGINS` with wildcard rejection)
+- [x] Phase 6 / Task 6.6: HTTPS redirect/HSTS and secure refresh-cookie hardening shipped for production runtime
+- [x] Phase 6 / Task 6.7: CI workflow added for backend test/build and frontend lint/build on push/PR
+- [x] Phase 6 / Task 6.8: Frontend CD workflow added for Vercel production deploy on `main`
+- [x] Phase 6 / Task 6.9: Backend CD workflow added to trigger Render deploy hook on `main`
+- [x] Phase 6 / Task 6.10: Sentry backend observability integrated with token-gated capture validation endpoint
 - [x] UX refresh: public homepage (`/`) added with conversion-first hero flow and Route Finder moved to `/map` (with `/search` alias)
 - [x] UX fix: removed internal "Phase 2 Core MVP" label from user-facing page copy (now subtle `Beta`)
 - [x] UX fix: route list API no longer auto-fires on first page load without explicit user search
@@ -102,6 +107,7 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 - `TRUST_PROXY_HOPS`: proxy hop count used for secure request detection behind Render/Cloudflare (`1` default).
 - `ENFORCE_HTTPS`: when `true` in production, non-HTTPS requests are redirected to HTTPS (`308`).
 - `HSTS_MAX_AGE_SECONDS`: max-age for `Strict-Transport-Security` response header in production.
+- `SENTRY_DSN`: Sentry project DSN used for backend error reporting.
 - `MONGO_URI`: MongoDB Atlas connection string.
 - `JWT_SECRET`: long random secret used to sign/verify access tokens.
 - `JWT_EXPIRES_IN`: token duration (for example `7d`).
@@ -116,6 +122,9 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 - `JWT_REFRESH_EXPIRES_IN`: refresh token expiry (default `30d`).
 - `REFRESH_TOKEN_COOKIE_NAME`: cookie key used for refresh token storage (`naija_refresh_token` default).
 - `REFRESH_TOKEN_COOKIE_DOMAIN`: optional refresh-cookie domain override for production.
+- `SENTRY_ENVIRONMENT`: sentry environment label (for example `development` or `production`).
+- `SENTRY_TRACES_SAMPLE_RATE`: optional tracing sample rate from `0` to `1`.
+- `SENTRY_CAPTURE_TEST_TOKEN`: shared token used by `POST /api/v1/observability/sentry-test` for safe capture validation.
 - `CORS_ORIGIN`: backward-compatible single-origin key (used when `CORS_ALLOWED_ORIGINS` is not set).
 - `BOT_INGEST_TOKEN`: shared token for internal bot ingestion endpoint (`x-bot-token`).
 - `BOT_REPORT_USER_ID`: user id attributed to bot-created reports.

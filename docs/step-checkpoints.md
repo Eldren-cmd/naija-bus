@@ -1561,6 +1561,46 @@ Engagement Guide applicability check:
 ### Next Tasks
 - Continue Phase 6 in strict order: `6.10` (Sentry integration and capture validation).
 
+### Task 6.10
+- Integrate Sentry backend observability and validate capture flow
+
+Status: complete. Implemented:
+- added backend observability module:
+  - `backend/src/config/observability.ts`
+  - Sentry init based on `SENTRY_DSN`
+  - shared capture/flush helpers
+- integrated Sentry into backend runtime:
+  - startup initialization in `backend/src/server.ts`
+  - process-level exception hooks (`unhandledRejection`, `uncaughtExceptionMonitor`)
+  - automatic capture mirror for JSON responses with status `>=500`
+- added token-gated capture validation endpoint:
+  - `POST /api/v1/observability/sentry-test`
+  - `POST /observability/sentry-test`
+  - requires header `x-sentry-test-token` matching `SENTRY_CAPTURE_TEST_TOKEN`
+  - returns `202` after capture + flush attempt
+- updated environment/docs:
+  - `backend/.env.example`
+  - `README.md`
+
+validation checks passed:
+- `npm --prefix backend run test`
+- `npm --prefix backend run build`
+- `npm --prefix frontend run lint`
+- `npm --prefix frontend run build`
+- evidence documented in:
+  - `docs/phase6-step610-validation.md`
+
+Design Guide applicability check:
+- no direct UI component changes in this task.
+- observability coverage reduces risk of prolonged user-visible failures without diagnosis.
+
+Engagement Guide applicability check:
+- improves operational visibility for engagement-critical backend loops (auth/report/trip/saved routes).
+- enables safer iteration by making production failures easier to detect and triage.
+
+### Next Tasks
+- Continue Phase 6 in strict order: `6.11` (structured server logging + sink integration).
+
 ## Supplemental UX Productization Pass
 
 Status: complete. Implemented:
