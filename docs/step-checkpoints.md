@@ -1404,6 +1404,40 @@ Engagement Guide applicability check:
 ### Next Tasks
 - Continue Phase 6 in strict order: `6.6` (HTTPS/HSTS/cookie security hardening).
 
+### Task 6.6
+- Harden HTTPS transport, HSTS policy, and refresh-cookie security for production
+
+Status: complete. Implemented:
+- backend transport hardening in `backend/src/server.ts`:
+  - added `TRUST_PROXY_HOPS` support and production `trust proxy` configuration
+  - added forwarded-proto aware secure request detection for reverse-proxy deployments
+  - added `ENFORCE_HTTPS` guard with `308` redirect for non-secure production requests
+  - added `Strict-Transport-Security` header support using `HSTS_MAX_AGE_SECONDS`
+- auth refresh-cookie hardening in `backend/src/routes/auth.ts`:
+  - production refresh cookie policy now uses `Secure`, `HttpOnly`, and `SameSite=None`
+  - optional `REFRESH_TOKEN_COOKIE_DOMAIN` support for custom-domain deployments
+  - non-production cookie policy remains `SameSite=Lax`
+- environment/documentation updates:
+  - `backend/.env.example`
+  - `README.md`
+
+validation checks passed:
+- `npm --prefix backend run test`
+- `npm --prefix backend run build`
+- evidence documented in:
+  - `docs/phase6-step66-validation.md`
+
+Design Guide applicability check:
+- no direct visual/UI changes in this task.
+- transport and cookie hardening reduce production auth/session friction on user-facing pages.
+
+Engagement Guide applicability check:
+- protects session continuity for login/report/trip loops in split-domain frontend/backend deployments.
+- strengthens user trust for repeated participation in crowdsourced reporting flows.
+
+### Next Tasks
+- Continue Phase 6 in strict order: `6.7` (CI workflow for lint/test/build on push/PR).
+
 ## Supplemental UX Productization Pass
 
 Status: complete. Implemented:

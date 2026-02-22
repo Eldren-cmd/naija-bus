@@ -118,6 +118,16 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - protects auth/report/trip/realtime engagement paths from unintended cross-origin requests
   - improves trust posture for repeated commuter submissions and session-based flows
 
+### Phase 6 (Task 6.6)
+- production transport and cookie-security hardening completed:
+  - backend now supports proxy-aware secure detection with configurable `TRUST_PROXY_HOPS`
+  - non-secure production requests can be redirected to HTTPS via `ENFORCE_HTTPS`
+  - secure production responses now include HSTS with configurable `HSTS_MAX_AGE_SECONDS`
+  - refresh-token cookie policy now supports production-safe cross-site auth (`Secure`, `HttpOnly`, `SameSite=None`) with optional `REFRESH_TOKEN_COOKIE_DOMAIN`
+- Engagement applicability:
+  - reduces login/session drop-off risk when frontend and backend are deployed on different domains
+  - strengthens trust and continuity for recurring report, trip, and saved-route participation loops
+
 ## Future Compliance Plan
 
 ### Phase 6 and Beyond

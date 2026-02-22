@@ -10,6 +10,8 @@ const authRouter = Router();
 const REFRESH_TOKEN_COOKIE_NAME = process.env.REFRESH_TOKEN_COOKIE_NAME || "naija_refresh_token";
 const REFRESH_COOKIE_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 30;
 const REFRESH_COOKIE_SECURE = process.env.NODE_ENV === "production";
+const REFRESH_COOKIE_SAME_SITE = REFRESH_COOKIE_SECURE ? "none" : "lax";
+const REFRESH_COOKIE_DOMAIN = (process.env.REFRESH_TOKEN_COOKIE_DOMAIN || "").trim();
 
 const sanitizeUser = (user: {
   _id: unknown;
@@ -27,9 +29,10 @@ const setRefreshCookie = (res: Response, refreshToken: string) => {
   res.cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
     httpOnly: true,
     secure: REFRESH_COOKIE_SECURE,
-    sameSite: "lax",
+    sameSite: REFRESH_COOKIE_SAME_SITE,
     path: "/",
     maxAge: REFRESH_COOKIE_MAX_AGE_MS,
+    ...(REFRESH_COOKIE_DOMAIN ? { domain: REFRESH_COOKIE_DOMAIN } : {}),
   });
 };
 

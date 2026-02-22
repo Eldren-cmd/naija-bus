@@ -21,7 +21,7 @@ Cross-guide enforcement (mandatory):
 | 6.3 | complete | Production Atlas cluster `naija-transport-prod` is provisioned and backup policy is active (`Daily Snapshot` every `24 Hours`, `Retention Time: 8 Days`, `Snapshot Time: 03:29 GMT+1`). Snapshot pipeline is scheduled and can also be triggered manually via `Take Snapshot Now`. |
 | 6.4 | complete | Production seed executed against `MONGO_URI_PROD` with `5` routes and `25` stops; live backend route IDs match seeded production IDs; Vercel frontend deployed on `ultima-pi.vercel.app` with SPA rewrite support and route-refresh verification (`/route/:routeId` returns `200`). |
 | 6.5 | complete | Backend now enforces explicit CORS allowlist via `CORS_ALLOWED_ORIGINS` (with legacy fallback `CORS_ORIGIN`), blocks wildcard `*`, and fails fast in production when allowlist is missing. Socket.IO realtime namespace now uses the same allowlist matcher. Render env allowlist set and validated live with allowed and disallowed origins. |
-| 6.6 | missing | Pending: HTTPS/HSTS/cookie security hardening. |
+| 6.6 | complete | Backend now applies production HTTPS redirect + HSTS with proxy-aware secure detection and configurable trust-proxy hops. Refresh-token cookies are now production-safe (`Secure`, `HttpOnly`, `SameSite=None`) with optional domain override for custom-domain deployment patterns. |
 | 6.7 | missing | Pending: CI workflow for lint/test/build on push/PR. |
 | 6.8 | missing | Pending: CD workflow for frontend deploy on `main`. |
 | 6.9 | missing | Pending: CD workflow for backend deploy hook on `main`. |
@@ -64,7 +64,36 @@ Cross-guide compliance:
 - Design Guide: no direct visual changes; production hardening improves reliability of user-facing flows.
 - Engagement Guide: stricter cross-origin controls protect report/trip/auth data paths, improving trust for repeat engagement loops.
 
+## Task 6.6 Completion Note
+
+Status: complete.
+
+Implemented:
+- production transport hardening in `backend/src/server.ts`:
+  - added configurable proxy trust setting via `TRUST_PROXY_HOPS`
+  - added forwarded-proto aware secure-request detection for reverse-proxy hosting
+  - enforced HTTPS redirect (`308`) in production when `ENFORCE_HTTPS` is enabled
+  - added production `Strict-Transport-Security` header with configurable `HSTS_MAX_AGE_SECONDS`
+- refresh-cookie hardening in `backend/src/routes/auth.ts`:
+  - production refresh cookie now uses `Secure` + `HttpOnly` + `SameSite=None`
+  - optional `REFRESH_TOKEN_COOKIE_DOMAIN` override supported for custom domains
+  - non-production behavior remains `SameSite=Lax`
+- env/documentation updates:
+  - `backend/.env.example`
+  - `README.md`
+
+Validation:
+- local quality gates:
+  - `npm --prefix backend run test` passed
+  - `npm --prefix backend run build` passed
+- evidence document:
+  - `docs/phase6-step66-validation.md`
+
+Cross-guide compliance:
+- Design Guide: no direct visual redesign; transport/cookie hardening reduces auth/session failure risk in production UI flows.
+- Engagement Guide: stronger HTTPS + cookie policy improves trust and continuity for repeat login/report/trip engagement loops.
+
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `6.6` next.
+1. Continue with `6.7` next.
 2. Keep phase-6 tasks in strict sequence with step-level validation and compliance notes.

@@ -99,6 +99,9 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 ### Backend Required Keys
 - `PORT`: API port (`5000` for local dev).
 - `NODE_ENV`: runtime mode (`development` for local work).
+- `TRUST_PROXY_HOPS`: proxy hop count used for secure request detection behind Render/Cloudflare (`1` default).
+- `ENFORCE_HTTPS`: when `true` in production, non-HTTPS requests are redirected to HTTPS (`308`).
+- `HSTS_MAX_AGE_SECONDS`: max-age for `Strict-Transport-Security` response header in production.
 - `MONGO_URI`: MongoDB Atlas connection string.
 - `JWT_SECRET`: long random secret used to sign/verify access tokens.
 - `JWT_EXPIRES_IN`: token duration (for example `7d`).
@@ -112,6 +115,7 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 - `JWT_REFRESH_SECRET`: refresh token signing secret (falls back to `JWT_SECRET` if omitted).
 - `JWT_REFRESH_EXPIRES_IN`: refresh token expiry (default `30d`).
 - `REFRESH_TOKEN_COOKIE_NAME`: cookie key used for refresh token storage (`naija_refresh_token` default).
+- `REFRESH_TOKEN_COOKIE_DOMAIN`: optional refresh-cookie domain override for production.
 - `CORS_ORIGIN`: backward-compatible single-origin key (used when `CORS_ALLOWED_ORIGINS` is not set).
 - `BOT_INGEST_TOKEN`: shared token for internal bot ingestion endpoint (`x-bot-token`).
 - `BOT_REPORT_USER_ID`: user id attributed to bot-created reports.

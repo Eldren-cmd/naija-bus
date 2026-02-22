@@ -20,7 +20,7 @@ Status labels:
 | 3 | complete | realtime map/report UX implemented | report loop + bot-ingest baseline implemented | aligned | phase-3 scoped requirements are compliant; deeper automation/reward expansion is tracked for later phases. |
 | 4 | complete | trip UX and replay implemented | retention + gamification baseline implemented | aligned | phase-4 engagement gap now closed with points/streaks/badges/leaderboard surface. |
 | 5 (through 5.14) | complete through 5.14 | major polish updates + mobile responsiveness + loading skeleton + empty-state + global error fallback + E2E guardrails + UAT remediation applied | saved-routes retention loop + mobile usability + loading/empty-state + trust fallback + report loop + UAT engagement acceptance checks completed | aligned | phase-5 closure evidence is recorded in `docs/phase5-step514-validation.md`. |
-| 6 (through 6.4) | complete through 6.4 | deployment prerequisites + live SPA routing reliability baseline confirmed | engagement API loops are reachable on production infra with seeded data baseline | partial | Render backend now matches production-seeded Atlas data, and Vercel hosted frontend serves client routes correctly after refresh; monitoring/security sequence remains. |
+| 6 (through 6.6) | complete through 6.6 | deployment prerequisites + live SPA routing reliability + transport/cookie security baseline confirmed | engagement API loops are reachable on production infra with stronger session/transport protections | partial | Render backend now matches production-seeded Atlas data, CORS allowlist is hardened, and HTTPS/HSTS + secure refresh-cookie policy are implemented; remaining CI/CD, monitoring, and security tasks are still pending. |
 
 ## Compliance Recheck (Previous Phases)
 
@@ -41,7 +41,7 @@ Status labels:
   - airtime/reward automation
   - offline/PWA flow
   - USSD fallback and referral extensions
-- Complete production hardening/deployment sequence from `6.2` onward:
+- Complete production hardening/deployment sequence from `6.7` onward:
   - backend hosting + env configuration
   - production Atlas backups
   - CI/CD, Sentry, logging, uptime, and security audit

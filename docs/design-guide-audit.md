@@ -37,6 +37,9 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Phase 6 task `6.5` backend CORS allowlist hardening completed:
   - explicit allowlist matching now protects HTTP and realtime channels from unintended cross-origin access
   - production startup now fails fast when allowlist is missing, reducing silent misconfiguration risk
+- Phase 6 task `6.6` transport and cookie security hardening completed:
+  - backend now supports production HTTPS redirect + HSTS headers with proxy-aware secure detection
+  - refresh-token cookie policy now uses production-safe settings (`Secure`, `HttpOnly`, `SameSite=None`) for hosted frontend/backend split deployments
 - Productization pass completed for public-first UX:
   - added conversion-focused homepage at `/` with clear hero search, feature highlights, and "How it works" sections
   - Route Finder moved to `/map` to separate marketing surface from operational app surface

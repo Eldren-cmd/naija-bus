@@ -37,9 +37,28 @@ dotenv.config();
 
 export const app = express();
 const port = Number(process.env.PORT || 5000);
+const isProduction = process.env.NODE_ENV === "production";
 const DEV_DEFAULT_CORS_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"] as const;
+const trustProxyHopsRaw = Number(process.env.TRUST_PROXY_HOPS || 1);
+const trustProxyHops =
+  Number.isInteger(trustProxyHopsRaw) && trustProxyHopsRaw > 0 ? trustProxyHopsRaw : 1;
+const enforceHttps = isProduction && process.env.ENFORCE_HTTPS !== "false";
+const hstsMaxAgeRaw = Number(process.env.HSTS_MAX_AGE_SECONDS || 63_072_000);
+const hstsMaxAgeSeconds =
+  Number.isInteger(hstsMaxAgeRaw) && hstsMaxAgeRaw >= 300 ? hstsMaxAgeRaw : 63_072_000;
 
 const normalizeOrigin = (origin: string): string => origin.trim().replace(/\/+$/, "");
+const readForwardedProto = (req: Request): string | null => {
+  const header = req.header("x-forwarded-proto");
+  if (!header) return null;
+  const [proto] = header.split(",");
+  return proto ? proto.trim().toLowerCase() : null;
+};
+
+const isRequestSecure = (req: Request): boolean => {
+  if (req.secure) return true;
+  return readForwardedProto(req) === "https";
+};
 
 const parseCorsOriginList = (value: string | undefined): string[] => {
   if (!value) return [];
@@ -66,6 +85,30 @@ const corsAllowedOrigins = resolveCorsAllowedOrigins();
 if (corsAllowedOrigins.includes("*")) {
   throw new Error("Wildcard CORS origin (*) is not allowed. Use explicit allowlisted origins.");
 }
+
+if (isProduction) {
+  // Render/Cloudflare terminate TLS before forwarding to Node.
+  app.set("trust proxy", trustProxyHops);
+}
+
+app.use((req, res, next) => {
+  if (enforceHttps && !isRequestSecure(req)) {
+    const host = req.header("host");
+    if (!host) {
+      return res.status(400).json({ error: "invalid host header" });
+    }
+    return res.redirect(308, `https://${host}${req.originalUrl}`);
+  }
+
+  if (isProduction && isRequestSecure(req)) {
+    res.setHeader(
+      "Strict-Transport-Security",
+      `max-age=${hstsMaxAgeSeconds}; includeSubDomains; preload`,
+    );
+  }
+
+  return next();
+});
 
 const corsAllowedOriginSet = new Set(corsAllowedOrigins);
 const corsOriginMatcher: CorsOptions["origin"] = (requestOrigin, callback) => {
