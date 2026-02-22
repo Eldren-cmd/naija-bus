@@ -17,7 +17,7 @@ import { MobileBottomNav } from "./components/MobileBottomNav";
 import { Nav } from "./components/Nav";
 import { ReportFarePanel } from "./components/ReportFarePanel";
 import { RouteView } from "./components/RouteView";
-import { SearchInput } from "./components/SearchInput";
+import { SearchBar } from "./components/SearchBar";
 import { SignupPage } from "./components/SignupPage";
 import { ToastStack } from "./components/ToastStack";
 import { TrafficReportModal } from "./components/TrafficReportModal";
@@ -337,186 +337,188 @@ function RouteFinderPage() {
     <>
       <Nav />
       <main className="app-shell">
-      <header className="hero card">
-        <p className="kicker">Beta</p>
-        <h1>Find your route. Know the fare.</h1>
-        <p>
-          Search Lagos routes, inspect ordered stops, and pull a live fare estimate with multiplier breakdown.
-        </p>
-        <p className="brand-note">A VerityWave Solutions product</p>
-      </header>
+        <header className="routefinder-hero">
+          <div className="routefinder-hero-inner">
+            <div className="routefinder-hero-copy">
+              <p className="routefinder-hero-kicker">Lagos Transport Intelligence</p>
+              <h1>Route Finder</h1>
+              <p>Search any Lagos route to see stops, map, and live fare.</p>
+            </div>
+            <SearchBar
+              query={searchInput}
+              loading={routesLoading}
+              onQueryChange={setSearchInput}
+              onSubmit={onSearch}
+            />
+          </div>
+        </header>
 
-      <section className="layout">
-        <aside className="left-panel card">
-          <SearchInput
-            value={searchInput}
-            onChange={setSearchInput}
-            onSubmit={onSearch}
-          />
+        <section className="layout">
+          <aside className="left-panel card">
 
-          {accessToken?.trim() && (
-            <section className="saved-routes-panel">
-              <div className="saved-routes-head">
-                <h3 className="panel-title">Saved Routes</h3>
-              </div>
-              {savedRoutesError && <p className="error-text">{savedRoutesError}</p>}
-              {savedRoutesLoading && (
-                <ul className="saved-route-list skeleton-list" aria-hidden="true">
-                  {[1, 2, 3].map((item) => (
-                    <li key={`saved-route-skeleton-${item}`}>
-                      <div className="skeleton-card skeleton-route-card">
-                        <span className="skeleton-line skeleton-line-lg" />
-                        <span className="skeleton-line skeleton-line-sm" />
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {!savedRoutesLoading && savedRoutes.length === 0 && (
-                <div className="saved-empty-state">
-                  <p className="saved-empty-title">No saved routes yet.</p>
-                  <p className="muted small">
-                    Save the routes you use most so you can open them instantly for fare checks and trip recording.
-                  </p>
-                  <div className="saved-empty-actions">
-                    {selectedRouteSummary && (
+            {accessToken?.trim() && (
+              <section className="saved-routes-panel">
+                <div className="saved-routes-head">
+                  <h3 className="panel-title">Saved Routes</h3>
+                </div>
+                {savedRoutesError && <p className="error-text">{savedRoutesError}</p>}
+                {savedRoutesLoading && (
+                  <ul className="saved-route-list skeleton-list" aria-hidden="true">
+                    {[1, 2, 3].map((item) => (
+                      <li key={`saved-route-skeleton-${item}`}>
+                        <div className="skeleton-card skeleton-route-card">
+                          <span className="skeleton-line skeleton-line-lg" />
+                          <span className="skeleton-line skeleton-line-sm" />
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {!savedRoutesLoading && savedRoutes.length === 0 && (
+                  <div className="saved-empty-state">
+                    <p className="saved-empty-title">No saved routes yet.</p>
+                    <p className="muted small">
+                      Save the routes you use most so you can open them instantly for fare checks and trip recording.
+                    </p>
+                    <div className="saved-empty-actions">
+                      {selectedRouteSummary && (
+                        <button
+                          type="button"
+                          className="estimate-btn"
+                          onClick={() => void onToggleSavedRoute(selectedRouteSummary)}
+                          disabled={savingRouteId === selectedRouteSummary._id}
+                        >
+                          {savingRouteId === selectedRouteSummary._id ? "Saving..." : "Save Selected Route"}
+                        </button>
+                      )}
                       <button
                         type="button"
-                        className="estimate-btn"
-                        onClick={() => void onToggleSavedRoute(selectedRouteSummary)}
-                        disabled={savingRouteId === selectedRouteSummary._id}
+                        className="secondary-btn"
+                        onClick={() => {
+                          setSearchInput("");
+                          setActiveQuery("");
+                          navigate("/map", { replace: true });
+                        }}
                       >
-                        {savingRouteId === selectedRouteSummary._id ? "Saving..." : "Save Selected Route"}
+                        Browse Routes
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {!savedRoutesLoading && savedRoutes.length > 0 && (
+                  <ul className="saved-route-list">
+                    {savedRoutes.map((route) => (
+                      <li key={route._id}>
+                        <button
+                          type="button"
+                          className={route._id === selectedRouteId ? "active" : ""}
+                          onClick={() => onSelectRouteFromList(route._id)}
+                        >
+                          <strong>{route.name}</strong>
+                          <span>
+                            {route.origin} to {route.destination}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            )}
+
+            {routesError && <p className="error-text">{routesError}</p>}
+
+            {routesLoading && (
+              <ul className="route-list skeleton-list" aria-hidden="true">
+                {[1, 2, 3, 4, 5].map((item) => (
+                  <li key={`route-skeleton-${item}`} className="route-list-item">
+                    <div className="skeleton-card skeleton-route-card">
+                      <span className="skeleton-line skeleton-line-lg" />
+                      <span className="skeleton-line skeleton-line-sm" />
+                    </div>
+                    {accessToken?.trim() && <div className="skeleton-pill skeleton-save-btn" />}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {!routesLoading && (
+              <ul className="route-list">
+                {routes.map((route) => (
+                  <li key={route._id} className="route-list-item">
+                    <button
+                      type="button"
+                      className={route._id === selectedRouteId ? "active" : ""}
+                      onClick={() => onSelectRouteFromList(route._id)}
+                    >
+                      <strong>{route.name}</strong>
+                      <span>
+                        {route.origin} to {route.destination}
+                      </span>
+                    </button>
+                    {accessToken?.trim() && (
+                      <button
+                        type="button"
+                        className={`route-save-btn ${savedRouteIds.has(route._id) ? "saved" : ""}`}
+                        onClick={() => void onToggleSavedRoute(route)}
+                        disabled={savingRouteId === route._id}
+                      >
+                        {savingRouteId === route._id
+                          ? "Updating..."
+                          : savedRouteIds.has(route._id)
+                            ? "Saved"
+                            : "Save"}
                       </button>
                     )}
-                    <button
-                      type="button"
-                      className="secondary-btn"
-                      onClick={() => {
-                        setSearchInput("");
-                        setActiveQuery("");
-                        navigate("/map", { replace: true });
-                      }}
-                    >
-                      Browse Routes
-                    </button>
-                  </div>
-                </div>
-              )}
-              {!savedRoutesLoading && savedRoutes.length > 0 && (
-                <ul className="saved-route-list">
-                  {savedRoutes.map((route) => (
-                    <li key={route._id}>
-                      <button
-                        type="button"
-                        className={route._id === selectedRouteId ? "active" : ""}
-                        onClick={() => onSelectRouteFromList(route._id)}
-                      >
-                        <strong>{route.name}</strong>
-                        <span>
-                          {route.origin} to {route.destination}
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          )}
+                  </li>
+                ))}
+              </ul>
+            )}
 
-          {routesError && <p className="error-text">{routesError}</p>}
+            {!routesLoading && !hasSearched && (
+              <p className="muted">Search above to load route results.</p>
+            )}
 
-          {routesLoading && (
-            <ul className="route-list skeleton-list" aria-hidden="true">
-              {[1, 2, 3, 4, 5].map((item) => (
-                <li key={`route-skeleton-${item}`} className="route-list-item">
-                  <div className="skeleton-card skeleton-route-card">
-                    <span className="skeleton-line skeleton-line-lg" />
-                    <span className="skeleton-line skeleton-line-sm" />
-                  </div>
-                  {accessToken?.trim() && <div className="skeleton-pill skeleton-save-btn" />}
-                </li>
-              ))}
-            </ul>
-          )}
+            {!routesLoading && hasSearched && routes.length === 0 && (
+              <p className="muted">No routes matched your search.</p>
+            )}
+          </aside>
 
-          {!routesLoading && (
-            <ul className="route-list">
-              {routes.map((route) => (
-                <li key={route._id} className="route-list-item">
-                  <button
-                    type="button"
-                    className={route._id === selectedRouteId ? "active" : ""}
-                    onClick={() => onSelectRouteFromList(route._id)}
-                  >
-                    <strong>{route.name}</strong>
-                    <span>
-                      {route.origin} to {route.destination}
-                    </span>
-                  </button>
-                  {accessToken?.trim() && (
-                    <button
-                      type="button"
-                      className={`route-save-btn ${savedRouteIds.has(route._id) ? "saved" : ""}`}
-                      onClick={() => void onToggleSavedRoute(route)}
-                      disabled={savingRouteId === route._id}
-                    >
-                      {savingRouteId === route._id
-                        ? "Updating..."
-                        : savedRouteIds.has(route._id)
-                          ? "Saved"
-                          : "Save"}
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {!routesLoading && !hasSearched && (
-            <p className="muted">Search a route above to load route results.</p>
-          )}
-
-          {!routesLoading && hasSearched && routes.length === 0 && (
-            <p className="muted">No routes matched your search.</p>
-          )}
-        </aside>
-
-        <section className="right-panel">
-          <RouteView
-            route={selectedRoute}
-            loading={routeLoading}
-            error={routeError}
-            tripCheckpoints={tripCheckpoints}
-          />
-          <TripRecorder
-            routeId={selectedRouteId}
-            routeName={selectedRoute?.name}
-            authToken={accessToken}
-            onCheckpointsChange={setTripCheckpoints}
-            onToast={notify}
-          />
-          <FareEstimate
-            routeId={selectedRouteId}
-            routeName={selectedRoute?.name}
-            refreshSignal={fareRefreshNonce}
-          />
-          <ReportFarePanel
-            routeId={selectedRouteId}
-            routeName={selectedRoute?.name}
-            authToken={accessToken}
-            onSubmitted={() => setFareRefreshNonce((previous) => previous + 1)}
-            onToast={notify}
-          />
-          <TrafficReportModal
-            routeId={selectedRouteId}
-            routeName={selectedRoute?.name}
-            authToken={accessToken}
-            onToast={notify}
-          />
+          <section className="right-panel">
+            <RouteView
+              route={selectedRoute}
+              loading={routeLoading}
+              error={routeError}
+              tripCheckpoints={tripCheckpoints}
+            />
+            <TripRecorder
+              routeId={selectedRouteId}
+              routeName={selectedRoute?.name}
+              authToken={accessToken}
+              onCheckpointsChange={setTripCheckpoints}
+              onToast={notify}
+            />
+            <FareEstimate
+              routeId={selectedRouteId}
+              routeName={selectedRoute?.name}
+              refreshSignal={fareRefreshNonce}
+            />
+            <ReportFarePanel
+              routeId={selectedRouteId}
+              routeName={selectedRoute?.name}
+              authToken={accessToken}
+              onSubmitted={() => setFareRefreshNonce((previous) => previous + 1)}
+              onToast={notify}
+            />
+            <TrafficReportModal
+              routeId={selectedRouteId}
+              routeName={selectedRoute?.name}
+              authToken={accessToken}
+              onToast={notify}
+            />
+          </section>
         </section>
-      </section>
-      <ToastStack toasts={toasts} onDismiss={dismissToast} />
+        <ToastStack toasts={toasts} onDismiss={dismissToast} />
       </main>
       <MobileBottomNav />
     </>
