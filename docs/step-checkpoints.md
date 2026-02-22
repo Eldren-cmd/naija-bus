@@ -1601,6 +1601,45 @@ Engagement Guide applicability check:
 ### Next Tasks
 - Continue Phase 6 in strict order: `6.11` (structured server logging + sink integration).
 
+### Task 6.11
+- Add structured backend logging and sink-ready integration
+
+Status: complete. Implemented:
+- added structured logger module:
+  - `backend/src/config/logger.ts`
+  - `pino` logger with service metadata, `LOG_LEVEL` support, and secret redaction rules
+- backend request logging integrated:
+  - per-request JSON logs with method/path/statusCode/duration/ip/userAgent
+- backend error logging integrated:
+  - automatic structured log entry for JSON responses returning status `>=500`
+  - structured startup/bot failure logs
+  - auth-route failure logs in `backend/src/routes/auth.ts`
+- sink integration:
+  - logs emit to stdout in JSON format
+  - Render runtime ingests stdout into centralized service log stream
+- documentation/config updates:
+  - `backend/.env.example` (`LOG_LEVEL`)
+  - `README.md`
+
+validation checks passed:
+- `npm --prefix backend run test`
+- `npm --prefix backend run build`
+- `npm --prefix frontend run lint`
+- `npm --prefix frontend run build`
+- evidence documented in:
+  - `docs/phase6-step611-validation.md`
+
+Design Guide applicability check:
+- no direct UI component changes in this task.
+- structured API logs improve incident triage for user-facing reliability issues.
+
+Engagement Guide applicability check:
+- better server diagnostics reduce resolution time for engagement-path regressions.
+- supports stable repeated usage of auth/report/trip/saved-route loops.
+
+### Next Tasks
+- Continue Phase 6 in strict order: `6.12` (Mapbox billing alerts and quota guardrails).
+
 ## Supplemental UX Productization Pass
 
 Status: complete. Implemented:

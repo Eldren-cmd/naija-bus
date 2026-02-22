@@ -164,6 +164,15 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - improves reliability of recurring commuter workflows by reducing time-to-detect backend incidents
   - strengthens trust posture for report/trip/auth flows through faster production issue triage
 
+### Phase 6 (Task 6.11)
+- structured backend logging baseline completed:
+  - request/response lifecycle logging now emits JSON logs
+  - backend failures now emit structured logs with operation/context metadata
+  - logs are sink-ready through stdout ingestion on Render
+- Engagement applicability:
+  - improves operational visibility for recurring engagement flows during production incidents
+  - reduces time-to-recovery for auth/report/trip/saved-route failures
+
 ## Future Compliance Plan
 
 ### Phase 6 and Beyond

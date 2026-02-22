@@ -6,6 +6,7 @@ import { rateLimit } from "express-rate-limit";
 import { createServer } from "http";
 import { isValidObjectId } from "mongoose";
 import { connectToDatabase, ensureCoreIndexes, getDatabaseStatus } from "./config/db";
+import { logger } from "./config/logger";
 import {
   captureServerException,
   flushObservability,
@@ -156,6 +157,31 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+app.use((req, res, next) => {
+  const startedAt = process.hrtime.bigint();
+  const requestIdRaw = req.header("x-request-id");
+  const requestId = requestIdRaw ? requestIdRaw.trim() : undefined;
+
+  res.on("finish", () => {
+    const durationMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000;
+    logger.info(
+      {
+        event: "http_request",
+        method: req.method,
+        path: req.originalUrl || req.path,
+        statusCode: res.statusCode,
+        durationMs: Number(durationMs.toFixed(2)),
+        requestId: requestId || undefined,
+        ip: req.ip,
+        userAgent: req.get("user-agent") || undefined,
+      },
+      "http_request",
+    );
+  });
+
+  next();
+});
+
 const getResponseErrorMessage = (payload: unknown): string => {
   if (
     typeof payload === "object" &&
@@ -172,6 +198,17 @@ app.use((req, res, next) => {
   const originalJson = res.json.bind(res);
   res.json = ((body: unknown) => {
     if (res.statusCode >= 500) {
+      logger.error(
+        {
+          event: "http_error_response",
+          method: req.method,
+          path: req.originalUrl || req.path,
+          statusCode: res.statusCode,
+          errorMessage: getResponseErrorMessage(body),
+          requestId: req.header("x-request-id") || undefined,
+        },
+        "http_error_response",
+      );
       captureServerException(new Error(getResponseErrorMessage(body)), {
         operation: "http_internal_error_response",
         tags: {
@@ -1337,7 +1374,7 @@ const startServer = async (): Promise<void> => {
     const httpServer = createServer(app);
     initRealtimeServer(httpServer, corsAllowedOrigins);
     httpServer.listen(port, () => {
-      console.log(`Backend listening on http://localhost:${port}`);
+      logger.info({ event: "server_started", port }, "server_started");
     });
 
     void startWhatsAppWebBot({
@@ -1356,13 +1393,13 @@ const startServer = async (): Promise<void> => {
         };
       },
     }).catch((botError) => {
+      logger.error({ err: botError, event: "whatsapp_bot_startup_failed" }, "whatsapp_bot_startup_failed");
       captureServerException(botError, { operation: "whatsapp_bot_startup" });
-      console.error("WhatsApp bot startup failed:", botError);
     });
   } catch (error) {
+    logger.fatal({ err: error, event: "backend_startup_failed" }, "backend_startup_failed");
     captureServerException(error, { operation: "backend_startup" });
     void flushObservability(2_000);
-    console.error("Failed to start backend:", error);
     process.exit(1);
   }
 };

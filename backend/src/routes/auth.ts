@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { Request, Response, Router } from "express";
+import { logger } from "../config/logger";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { User } from "../models";
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../lib/auth";
@@ -75,6 +76,7 @@ authRouter.post("/register", async (req: Request, res: Response) => {
 
     return res.status(201).json({ token, accessToken: token, user: sanitizeUser(created) });
   } catch (error) {
+    logger.error({ err: error, operation: "auth_register" }, "auth_register_failed");
     return res.status(500).json({ error: "failed to register user" });
   }
 });
@@ -115,6 +117,7 @@ authRouter.post("/login", async (req: Request, res: Response) => {
 
     return res.status(200).json({ token: accessToken, accessToken, user: sanitizeUser(user) });
   } catch (error) {
+    logger.error({ err: error, operation: "auth_login" }, "auth_login_failed");
     return res.status(500).json({ error: "failed to login user" });
   }
 });
@@ -152,7 +155,8 @@ authRouter.post("/refresh", async (req: Request, res: Response) => {
     setRefreshCookie(res, nextRefreshToken);
 
     return res.status(200).json({ token: accessToken, accessToken, user: sanitizeUser(user) });
-  } catch {
+  } catch (error) {
+    logger.error({ err: error, operation: "auth_refresh" }, "auth_refresh_failed");
     return res.status(500).json({ error: "failed to refresh token" });
   }
 });
@@ -170,6 +174,7 @@ authRouter.get("/me", authMiddleware, async (req: Request, res: Response) => {
 
     return res.status(200).json({ user: sanitizeUser(user) });
   } catch (_error) {
+    logger.error({ err: _error, operation: "auth_me" }, "auth_me_failed");
     return res.status(500).json({ error: "failed to fetch profile" });
   }
 });

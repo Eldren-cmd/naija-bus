@@ -79,6 +79,7 @@ This repository is being built strictly from:
 - [x] Phase 6 / Task 6.8: Frontend CD workflow added for Vercel production deploy on `main`
 - [x] Phase 6 / Task 6.9: Backend CD workflow added to trigger Render deploy hook on `main`
 - [x] Phase 6 / Task 6.10: Sentry backend observability integrated with token-gated capture validation endpoint
+- [x] Phase 6 / Task 6.11: Structured JSON backend logging added with Render sink-ready stdout output
 - [x] UX refresh: public homepage (`/`) added with conversion-first hero flow and Route Finder moved to `/map` (with `/search` alias)
 - [x] UX fix: removed internal "Phase 2 Core MVP" label from user-facing page copy (now subtle `Beta`)
 - [x] UX fix: route list API no longer auto-fires on first page load without explicit user search
@@ -104,6 +105,7 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 ### Backend Required Keys
 - `PORT`: API port (`5000` for local dev).
 - `NODE_ENV`: runtime mode (`development` for local work).
+- `LOG_LEVEL`: backend logger level (`info` default).
 - `TRUST_PROXY_HOPS`: proxy hop count used for secure request detection behind Render/Cloudflare (`1` default).
 - `ENFORCE_HTTPS`: when `true` in production, non-HTTPS requests are redirected to HTTPS (`308`).
 - `HSTS_MAX_AGE_SECONDS`: max-age for `Strict-Transport-Security` response header in production.
@@ -132,6 +134,10 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 - `WHATSAPP_ALLOWED_SENDERS`: comma-separated sender MSISDN allowlist for bot commands.
 - `WHATSAPP_SESSION_PATH`: local session storage path for WhatsApp auth state.
 - `WHATSAPP_PUPPETEER_EXECUTABLE_PATH`: optional local Chrome path when Puppeteer download is skipped.
+
+### Logging Sink
+- Backend logs are emitted as structured JSON to stdout via `pino`.
+- On Render, stdout is automatically ingested into the service log stream (sink) for centralized runtime debugging.
 
 ### Frontend Keys
 - `VITE_API_BASE`: backend base URL used by frontend API calls.

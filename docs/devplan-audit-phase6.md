@@ -26,7 +26,7 @@ Cross-guide enforcement (mandatory):
 | 6.8 | complete | Added GitHub Actions CD workflow for frontend production deploy on `main` (`.github/workflows/deploy-frontend.yml`). Workflow runs frontend lint/build, then deploys to Vercel production using `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`. |
 | 6.9 | complete | Added GitHub Actions backend CD workflow for `main` (`.github/workflows/deploy-backend.yml`). Workflow runs backend test/build gates, then triggers Render deploy hook via `RENDER_DEPLOY_HOOK_URL` secret. |
 | 6.10 | complete | Sentry backend integration added with DSN-based initialization, process-level exception hooks, and token-gated capture validation endpoint (`POST /api/v1/observability/sentry-test`). 500 responses are now mirrored to Sentry with request metadata. |
-| 6.11 | missing | Pending: structured server logging + sink integration. |
+| 6.11 | complete | Added structured backend logging via `pino` with request/response lifecycle logs, `>=500` error response logs, and startup/bot-failure logs. Logs emit as JSON to stdout and are sink-ready for Render log ingestion. |
 | 6.12 | missing | Pending: Mapbox billing alerts and quota guardrails. |
 | 6.13 | missing | Pending: uptime monitoring of `/api/v1/health`. |
 | 6.14 | missing | Pending: production security audit checks. |
@@ -237,7 +237,45 @@ Cross-guide compliance:
 - Design Guide: no direct visual redesign; improved backend observability reduces blind failures that would degrade user-facing UI trust.
 - Engagement Guide: faster incident detection improves stability of repeated engagement loops (auth, reporting, trip logging, saved routes).
 
+## Task 6.11 Completion Note
+
+Status: complete.
+
+Implemented:
+- added structured logging module:
+  - `backend/src/config/logger.ts`
+  - `pino` logger with:
+    - service/environment metadata
+    - configurable `LOG_LEVEL`
+    - token/header redaction for sensitive fields
+- integrated request lifecycle logging:
+  - `backend/src/server.ts`
+  - per-request JSON log entry with method/path/status/duration/ip/userAgent
+- integrated structured backend error logging:
+  - automatic log capture for JSON responses with status `>=500`
+  - startup and bot startup failures logged with structured error payloads
+  - auth-route failures logged in `backend/src/routes/auth.ts`
+- sink integration baseline:
+  - logs stream to stdout in JSON format
+  - Render service log stream ingests stdout as centralized sink
+- configuration/documentation updates:
+  - `backend/.env.example` (`LOG_LEVEL`)
+  - `README.md`
+
+Validation:
+- local quality gates:
+  - `npm --prefix backend run test` passed
+  - `npm --prefix backend run build` passed
+  - `npm --prefix frontend run lint` passed
+  - `npm --prefix frontend run build` passed
+- evidence document:
+  - `docs/phase6-step611-validation.md`
+
+Cross-guide compliance:
+- Design Guide: no direct visual redesign; structured logging reduces time-to-diagnose backend/API issues that impact UI reliability.
+- Engagement Guide: improved backend diagnostics reduces disruption risk for recurring commuter engagement loops.
+
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `6.11` next.
+1. Continue with `6.12` next.
 2. Keep phase-6 tasks in strict sequence with step-level validation and compliance notes.

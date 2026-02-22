@@ -52,6 +52,9 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Phase 6 task `6.10` backend observability baseline completed:
   - Sentry integration now captures backend failure signals with request context
   - token-gated capture endpoint supports controlled production validation of alerting flow
+- Phase 6 task `6.11` structured backend logging baseline completed:
+  - JSON request/error logs now capture method/path/status/duration for API diagnostics
+  - Render sink-ready stdout logging improves production traceability of UI-impacting backend issues
 - Productization pass completed for public-first UX:
   - added conversion-focused homepage at `/` with clear hero search, feature highlights, and "How it works" sections
   - Route Finder moved to `/map` to separate marketing surface from operational app surface
