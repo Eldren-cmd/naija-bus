@@ -1,4 +1,6 @@
 import { Suspense, lazy } from "react";
+import { EmptyState } from "./EmptyState";
+import { PanelCard } from "./PanelCard";
 import type { RouteDetail, TripCheckpoint } from "../types";
 
 const LazyRouteMap = lazy(async () => {
@@ -16,11 +18,13 @@ type RouteViewProps = {
 export function RouteView({ route, loading, error, tripCheckpoints }: RouteViewProps) {
   if (loading) {
     return (
-      <section className="route-view card">
-        <div className="route-head">
-          <h2 className="panel-title">Route View</h2>
-          <span className="skeleton-pill skeleton-pill-sm" aria-hidden="true" />
-        </div>
+      <PanelCard
+        title="Route View"
+        tone="route"
+        iconLabel="RT"
+        className="route-view"
+        headerMeta={<span className="skeleton-pill skeleton-pill-sm" aria-hidden="true" />}
+      >
         <div className="route-subtitle-skeleton" aria-hidden="true">
           <span className="skeleton-line skeleton-line-lg" />
         </div>
@@ -30,7 +34,7 @@ export function RouteView({ route, loading, error, tripCheckpoints }: RouteViewP
           <span className="skeleton-pill" />
         </div>
         <div className="map-placeholder skeleton-block" aria-hidden="true" />
-        <h3 className="panel-title">Stops</h3>
+        <h4 className="panel-section-title">Stops</h4>
         <ol className="stops-list skeleton-list" aria-hidden="true">
           {[1, 2, 3, 4].map((item) => (
             <li key={`route-stop-skeleton-${item}`}>
@@ -42,37 +46,48 @@ export function RouteView({ route, loading, error, tripCheckpoints }: RouteViewP
             </li>
           ))}
         </ol>
-      </section>
+      </PanelCard>
     );
   }
 
   if (error) {
     return (
-      <section className="route-view card">
-        <h2 className="panel-title">Route View</h2>
-        <p className="error-text">{error}</p>
-      </section>
+      <PanelCard title="Route View" tone="route" iconLabel="RT" className="route-view">
+        <EmptyState
+          tone="route"
+          iconLabel="ER"
+          title="Unable to load route details"
+          message={error}
+          className="empty-state-danger"
+        />
+      </PanelCard>
     );
   }
 
   if (!route) {
     return (
-      <section className="route-view card">
-        <h2 className="panel-title">Route View</h2>
-        <p className="muted">Select a route from search results to view stops and fare details.</p>
-      </section>
+      <PanelCard title="Route View" tone="route" iconLabel="RT" className="route-view">
+        <EmptyState
+          tone="route"
+          title="Select a route"
+          message="Pick any route from search results to load the map, ordered stops, and route metadata."
+        />
+      </PanelCard>
     );
   }
 
   return (
-    <section className="route-view card">
+    <PanelCard
+      title="Route View"
+      subtitle={`${route.origin} to ${route.destination}`}
+      tone="route"
+      iconLabel="RT"
+      className="route-view"
+      headerMeta={<span className="type-pill">{route.transportType}</span>}
+    >
       <div className="route-head">
         <h2 className="route-name">{route.name}</h2>
-        <span className="type-pill">{route.transportType}</span>
       </div>
-      <p className="route-subtitle">
-        {route.origin} <span>to</span> {route.destination}
-      </p>
       <div className="route-meta">
         <span>Corridor: {route.corridor || "N/A"}</span>
         <span>Stops: {route.stops.length}</span>
@@ -81,7 +96,7 @@ export function RouteView({ route, loading, error, tripCheckpoints }: RouteViewP
       <Suspense fallback={<div className="map-placeholder skeleton-block" aria-hidden="true" />}>
         <LazyRouteMap route={route} tripCheckpoints={tripCheckpoints} />
       </Suspense>
-      <h3 className="panel-title">Stops</h3>
+      <h4 className="panel-section-title">Stops</h4>
       <ol className="stops-list">
         {route.stops.map((stop) => (
           <li key={stop._id}>
@@ -95,6 +110,6 @@ export function RouteView({ route, loading, error, tripCheckpoints }: RouteViewP
           </li>
         ))}
       </ol>
-    </section>
+    </PanelCard>
   );
 }

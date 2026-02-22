@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { reportFare } from "../lib/api";
+import { EmptyState } from "./EmptyState";
+import { PanelCard } from "./PanelCard";
 import type { ToastTone } from "./ToastStack";
 import type { TrafficLevel } from "../types";
 import type { FormEvent } from "react";
@@ -69,13 +71,30 @@ export function ReportFarePanel({
   };
 
   return (
-    <section className="report-card card">
-      <h3 className="panel-title">Report Fare</h3>
-      <p className="muted">
-        {routeName ? `Submit your latest fare for ${routeName}.` : "Select a route to submit your latest fare."}
-      </p>
+    <PanelCard
+      title="Report Fare"
+      subtitle={routeName ? `Submit your latest fare for ${routeName}.` : "Select a route to submit your latest fare."}
+      tone="report"
+      iconLabel="RP"
+      className="report-card"
+    >
+      {!routeId && (
+        <EmptyState
+          tone="report"
+          compact
+          title="Route not selected"
+          message="Pick a route first to enable fare reporting for this trip corridor."
+        />
+      )}
+
       {!authToken?.trim() && (
-        <p className="muted small">Sign in from `/login` to enable fare report submission.</p>
+        <EmptyState
+          tone="report"
+          compact
+          iconLabel="IN"
+          title="Sign in required"
+          message="Login from /login to submit fare reports and earn contributor points."
+        />
       )}
 
       <form className="report-form" onSubmit={onSubmit}>
@@ -120,6 +139,6 @@ export function ReportFarePanel({
           {submitting ? "Submitting..." : "Submit Fare Report"}
         </button>
       </form>
-    </section>
+    </PanelCard>
   );
 }

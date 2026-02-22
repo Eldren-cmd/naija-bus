@@ -15,7 +15,9 @@ import { FareEstimate } from "./components/FareEstimate";
 import { LoginPage } from "./components/LoginPage";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { Nav } from "./components/Nav";
+import { EmptyState } from "./components/EmptyState";
 import { ReportFarePanel } from "./components/ReportFarePanel";
+import { RouteCardSkeleton } from "./components/RouteCardSkeleton";
 import { RouteView } from "./components/RouteView";
 import { SearchBar } from "./components/SearchBar";
 import { SignupPage } from "./components/SignupPage";
@@ -363,47 +365,40 @@ function RouteFinderPage() {
                 </div>
                 {savedRoutesError && <p className="error-text">{savedRoutesError}</p>}
                 {savedRoutesLoading && (
-                  <ul className="saved-route-list skeleton-list" aria-hidden="true">
-                    {[1, 2, 3].map((item) => (
-                      <li key={`saved-route-skeleton-${item}`}>
-                        <div className="skeleton-card skeleton-route-card">
-                          <span className="skeleton-line skeleton-line-lg" />
-                          <span className="skeleton-line skeleton-line-sm" />
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+                  <RouteCardSkeleton count={3} className="saved-route-list-skeleton" />
                 )}
                 {!savedRoutesLoading && savedRoutes.length === 0 && (
-                  <div className="saved-empty-state">
-                    <p className="saved-empty-title">No saved routes yet.</p>
-                    <p className="muted small">
-                      Save the routes you use most so you can open them instantly for fare checks and trip recording.
-                    </p>
-                    <div className="saved-empty-actions">
-                      {selectedRouteSummary && (
+                  <EmptyState
+                    tone="route"
+                    compact
+                    title="No saved routes yet"
+                    message="Save frequent routes for instant fare checks and trip recording."
+                    action={
+                      <div className="saved-empty-actions">
+                        {selectedRouteSummary && (
+                          <button
+                            type="button"
+                            className="estimate-btn"
+                            onClick={() => void onToggleSavedRoute(selectedRouteSummary)}
+                            disabled={savingRouteId === selectedRouteSummary._id}
+                          >
+                            {savingRouteId === selectedRouteSummary._id ? "Saving..." : "Save Selected Route"}
+                          </button>
+                        )}
                         <button
                           type="button"
-                          className="estimate-btn"
-                          onClick={() => void onToggleSavedRoute(selectedRouteSummary)}
-                          disabled={savingRouteId === selectedRouteSummary._id}
+                          className="secondary-btn"
+                          onClick={() => {
+                            setSearchInput("");
+                            setActiveQuery("");
+                            navigate("/map", { replace: true });
+                          }}
                         >
-                          {savingRouteId === selectedRouteSummary._id ? "Saving..." : "Save Selected Route"}
+                          Browse Routes
                         </button>
-                      )}
-                      <button
-                        type="button"
-                        className="secondary-btn"
-                        onClick={() => {
-                          setSearchInput("");
-                          setActiveQuery("");
-                          navigate("/map", { replace: true });
-                        }}
-                      >
-                        Browse Routes
-                      </button>
-                    </div>
-                  </div>
+                      </div>
+                    }
+                  />
                 )}
                 {!savedRoutesLoading && savedRoutes.length > 0 && (
                   <ul className="saved-route-list">
@@ -429,23 +424,17 @@ function RouteFinderPage() {
             {routesError && <p className="error-text">{routesError}</p>}
 
             {routesLoading && (
-              <ul className="route-list skeleton-list" aria-hidden="true">
-                {[1, 2, 3, 4, 5].map((item) => (
-                  <li key={`route-skeleton-${item}`} className="route-list-item">
-                    <div className="skeleton-card skeleton-route-card">
-                      <span className="skeleton-line skeleton-line-lg" />
-                      <span className="skeleton-line skeleton-line-sm" />
-                    </div>
-                    {accessToken?.trim() && <div className="skeleton-pill skeleton-save-btn" />}
-                  </li>
-                ))}
-              </ul>
+              <RouteCardSkeleton count={5} includeSaveAction={Boolean(accessToken?.trim())} />
             )}
 
             {!routesLoading && (
               <ul className="route-list">
-                {routes.map((route) => (
-                  <li key={route._id} className="route-list-item">
+                {routes.map((route, index) => (
+                  <li
+                    key={route._id}
+                    className="route-list-item route-list-item-stagger"
+                    style={{ animationDelay: `${index * 55}ms` }}
+                  >
                     <button
                       type="button"
                       className={route._id === selectedRouteId ? "active" : ""}
@@ -476,11 +465,22 @@ function RouteFinderPage() {
             )}
 
             {!routesLoading && !hasSearched && (
-              <p className="muted">Search above to load route results.</p>
+              <EmptyState
+                tone="route"
+                compact
+                title="Search to begin"
+                message="Use the search field above to load routes, stops, and live fare estimates."
+              />
             )}
 
             {!routesLoading && hasSearched && routes.length === 0 && (
-              <p className="muted">No routes matched your search.</p>
+              <EmptyState
+                tone="route"
+                compact
+                iconLabel="00"
+                title="No routes found"
+                message="Try another origin, destination, or a shorter keyword like Ojota or Lekki."
+              />
             )}
           </aside>
 

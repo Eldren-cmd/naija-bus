@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getFareEstimate } from "../lib/api";
+import { EmptyState } from "./EmptyState";
+import { PanelCard } from "./PanelCard";
 import type { FareEstimate as FareEstimateData, TrafficLevel } from "../types";
 
 type FareEstimateProps = {
@@ -91,20 +93,24 @@ export function FareEstimate({ routeId, routeName, refreshSignal = 0 }: FareEsti
 
   if (!routeId) {
     return (
-      <section className="fare-card">
-        <h3 className="panel-title">Fare Estimate</h3>
-        <p className="muted">Select a route to load estimated fare details.</p>
-      </section>
+      <PanelCard title="Fare Estimate" tone="fare" iconLabel="NG" className="fare-card">
+        <EmptyState
+          tone="fare"
+          title="Route required for pricing"
+          message="Select a route to calculate an estimated fare with time and traffic multipliers."
+        />
+      </PanelCard>
     );
   }
 
   return (
-    <section className="fare-card">
-      <div className="fare-card-top">
-        <h3 className="panel-title">Fare Estimate</h3>
-        <p className="muted">{routeName || "Selected route"}</p>
-      </div>
-
+    <PanelCard
+      title="Fare Estimate"
+      subtitle={routeName || "Selected route"}
+      tone="fare"
+      iconLabel="NG"
+      className="fare-card"
+    >
       <div className="fare-controls">
         <label>
           Time
@@ -156,6 +162,6 @@ export function FareEstimate({ routeId, routeName, refreshSignal = 0 }: FareEsti
           <p className="muted small">Last updated: {new Date(estimate.computedAt).toLocaleString()}</p>
         </div>
       )}
-    </section>
+    </PanelCard>
   );
 }

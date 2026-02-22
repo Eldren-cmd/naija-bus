@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createTripRecord } from "../lib/api";
+import { EmptyState } from "./EmptyState";
+import { PanelCard } from "./PanelCard";
 import type { TripCheckpoint } from "../types";
 import type { ToastTone } from "./ToastStack";
 
@@ -338,15 +340,25 @@ export function TripRecorder({
   }, [tripStartedAt, tripEndedAt]);
 
   return (
-    <section className="trip-recorder-card card">
-      <h3 className="panel-title">Trip Recorder</h3>
-      <p className="muted">
-        {routeName
+    <PanelCard
+      title="Trip Recorder"
+      subtitle={
+        routeName
           ? `Record your live movement for ${routeName}. Checkpoints are sampled every 5 seconds.`
-          : "Start a trip recording session. Checkpoints are sampled every 5 seconds."}
-      </p>
+          : "Start a trip recording session. Checkpoints are sampled every 5 seconds."
+      }
+      tone="trip"
+      iconLabel="TR"
+      className="trip-recorder-card"
+    >
       {!authToken?.trim() && (
-        <p className="muted small">Sign in from `/login` before uploading recorded trips.</p>
+        <EmptyState
+          tone="trip"
+          compact
+          iconLabel="IN"
+          title="Sign in to upload trip history"
+          message="You can record now, but upload requires login from /login."
+        />
       )}
       <p className="muted small">Location permission: {formatPermissionState(geoPermissionState)}</p>
 
@@ -428,6 +440,6 @@ export function TripRecorder({
           </div>
         </div>
       )}
-    </section>
+    </PanelCard>
   );
 }
