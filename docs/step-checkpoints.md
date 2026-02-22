@@ -1764,6 +1764,50 @@ Engagement Guide applicability check:
 ### Next Tasks
 - Continue Phase 6 in strict order: `6.15` (final production README/demo packaging).
 
+### Task 6.15
+- Final production README/demo packaging
+
+Status: complete. Implemented:
+- added final production handoff/demo runbook:
+  - `docs/final-production-demo-pack.md`
+  - includes:
+    - production endpoint inventory
+    - pre-demo checklist
+    - end-to-end live demo script
+    - expected outcomes and handoff artifact links
+- updated root packaging docs:
+  - `README.md` now includes final production packaging references and handoff pointers
+- updated compliance closure docs:
+  - `docs/devplan-audit-phase6.md`
+  - `docs/design-guide-audit.md`
+  - `docs/engagement-guide-mapping.md`
+  - `docs/cross-phase-compliance-audit.md`
+
+validation checks passed:
+- live production endpoint checks:
+  - `GET https://naijatransport.vercel.app/` -> `200`
+  - `GET https://naijatransport.vercel.app/route/{routeId}` -> `200`
+  - `GET https://naija-bus-backend.onrender.com/api/v1/health` -> `200`
+  - `GET https://naija-bus-backend.onrender.com/api/v1/routes` -> `5` seeded routes
+- local quality gates:
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+- evidence documented in:
+  - `docs/phase6-step615-validation.md`
+
+Design Guide applicability check:
+- final demo packaging preserves intended product journey sequencing (homepage -> route discovery -> map/fare detail -> action flows).
+- handoff runbook keeps production UX presentation consistent and reproducible.
+
+Engagement Guide applicability check:
+- demo script explicitly validates engagement loops (auth, save route, report, trip replay) as handoff acceptance criteria.
+- packaging improves operational continuity for ongoing community-growth and retention demos.
+
+### Next Tasks
+- Phase 6 complete (`6.1` through `6.15`).
+
 ## Supplemental UX Productization Pass
 
 Status: complete. Implemented:

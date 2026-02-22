@@ -65,6 +65,9 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Phase 6 task `6.14` production security audit baseline completed:
   - automated security audit workflow now validates dependency risk floor and runtime security expectations
   - protects shipped UI reliability by reducing unnoticed backend/security regressions before release
+- Phase 6 task `6.15` final packaging completed:
+  - production demo runbook now documents the intended user-facing flow order for consistent walkthroughs
+  - final README packaging links keep deployment/demo references clear for repeat validation and stakeholder demos
 - Productization pass completed for public-first UX:
   - added conversion-focused homepage at `/` with clear hero search, feature highlights, and "How it works" sections
   - Route Finder moved to `/map` to separate marketing surface from operational app surface

@@ -20,7 +20,7 @@ Status labels:
 | 3 | complete | realtime map/report UX implemented | report loop + bot-ingest baseline implemented | aligned | phase-3 scoped requirements are compliant; deeper automation/reward expansion is tracked for later phases. |
 | 4 | complete | trip UX and replay implemented | retention + gamification baseline implemented | aligned | phase-4 engagement gap now closed with points/streaks/badges/leaderboard surface. |
 | 5 (through 5.14) | complete through 5.14 | major polish updates + mobile responsiveness + loading skeleton + empty-state + global error fallback + E2E guardrails + UAT remediation applied | saved-routes retention loop + mobile usability + loading/empty-state + trust fallback + report loop + UAT engagement acceptance checks completed | aligned | phase-5 closure evidence is recorded in `docs/phase5-step514-validation.md`. |
-| 6 (through 6.14) | complete through 6.14 | deployment prerequisites + live SPA routing reliability + transport/cookie security + CI/CD + backend observability/logging + Mapbox guardrails + uptime monitoring + security audit checks confirmed | engagement API loops are reachable on production infra with stronger session/transport protections, release guardrails, improved incident visibility, map usage controls, uptime oversight, and automated security validation | partial | Render backend matches production-seeded Atlas data; CORS/HTTPS hardening, CI/CD, Sentry, structured logging, Mapbox billing/quota guardrails, uptime monitoring, and production security audit checks are complete; final packaging task remains pending. |
+| 6 (through 6.15) | complete through 6.15 | deployment prerequisites + live SPA routing reliability + transport/cookie security + CI/CD + backend observability/logging + Mapbox guardrails + uptime monitoring + security audit checks + final packaging confirmed | engagement API loops are reachable on production infra with stronger session/transport protections, release guardrails, improved incident visibility, map usage controls, uptime oversight, automated security validation, and demo-ready handoff packaging | aligned | Phase 6 production hardening and packaging is complete, with demo runbook and validation evidence in place for stakeholder handoff. |
 
 ## Compliance Recheck (Previous Phases)
 
@@ -41,8 +41,7 @@ Status labels:
   - airtime/reward automation
   - offline/PWA flow
   - USSD fallback and referral extensions
-- Complete remaining production phase closure:
-  - final production README/demo packaging (`6.15`)
+- Continue post-phase roadmap execution beyond Phase 6 closure.
 
 ## Enforcement
 

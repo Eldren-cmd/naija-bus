@@ -83,6 +83,7 @@ This repository is being built strictly from:
 - [x] Phase 6 / Task 6.12: Mapbox billing/quota guardrails added (public-token enforcement, Lagos bounds + zoom caps, billing-alert runbook)
 - [x] Phase 6 / Task 6.13: Uptime monitoring added for `/api/v1/health` (GitHub scheduled monitor + UptimeRobot runbook)
 - [x] Phase 6 / Task 6.14: Production security audit checks added (dependency audit, repo hygiene checks, runtime smoke checks)
+- [x] Phase 6 / Task 6.15: Final production README/demo packaging completed (handoff runbook + demo script + validation pack)
 - [x] UX refresh: public homepage (`/`) added with conversion-first hero flow and Route Finder moved to `/map` (with `/search` alias)
 - [x] UX fix: removed internal "Phase 2 Core MVP" label from user-facing page copy (now subtle `Beta`)
 - [x] UX fix: route list API no longer auto-fires on first page load without explicit user search
@@ -185,6 +186,23 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
      - protected endpoints reject unauthenticated requests
 3. Optional override secret:
    - `BACKEND_BASE_URL` (if backend host changes)
+
+### Final Production Packaging (Phase 6.15)
+1. Final demo/handoff runbook:
+   - `docs/final-production-demo-pack.md`
+2. Validation evidence:
+   - `docs/phase6-step615-validation.md`
+3. Live production targets:
+   - frontend: `https://naijatransport.vercel.app`
+   - backend: `https://naija-bus-backend.onrender.com`
+   - backend health: `https://naija-bus-backend.onrender.com/api/v1/health`
+4. Final demo script covers:
+   - homepage conversion flow
+   - route search and route detail load
+   - fare estimate update flow
+   - report submission and realtime map context
+   - trip recording/upload and MyTrips replay
+   - auth + saved-route retention behavior
 
 ## Seed Data (Phase 1 Task 1.10)
 - Dataset file: `seed/initialRoutes.json` (5 Lagos corridors).

@@ -30,7 +30,7 @@ Cross-guide enforcement (mandatory):
 | 6.12 | complete | Added frontend Mapbox quota guardrails (public-token enforcement + Lagos bounds/zoom caps), plus billing-alert/token-restriction runbook and validation evidence. |
 | 6.13 | complete | Added scheduled uptime checks for `/api/v1/health` (10-minute cadence) with documented UptimeRobot setup and live endpoint verification evidence. |
 | 6.14 | complete | Added production security audit workflow with dependency, repository hygiene, and runtime security smoke checks plus live verification evidence. |
-| 6.15 | missing | Pending: final production README/demo packaging. |
+| 6.15 | complete | Final production handoff packaged with README closure, live demo runbook, and validation evidence for deployed frontend/backend flows. |
 
 ## Task 6.5 Completion Note
 
@@ -385,7 +385,42 @@ Cross-guide compliance:
 - Design Guide: no direct visual redesign; security audit checks reduce production incident risk that would impact user-facing reliability.
 - Engagement Guide: better security posture protects sustained participation in report/trip/saved-route loops and improves trust continuity.
 
+## Task 6.15 Completion Note
+
+Status: complete.
+
+Implemented:
+- finalized production handoff packaging:
+  - added `docs/final-production-demo-pack.md`
+  - documented live production endpoints and pre-demo checks
+  - documented end-to-end demo script covering homepage, routes, fare, report, trip, and retention flows
+- updated root documentation for final production closure:
+  - `README.md` now includes final production packaging section and handoff references
+- finalized phase/compliance closure updates:
+  - `docs/step-checkpoints.md`
+  - `docs/design-guide-audit.md`
+  - `docs/engagement-guide-mapping.md`
+  - `docs/cross-phase-compliance-audit.md`
+
+Validation:
+- live production checks:
+  - frontend root `GET https://naijatransport.vercel.app/` -> `200`
+  - frontend route deep-link `GET https://naijatransport.vercel.app/route/{routeId}` -> `200`
+  - backend health `GET https://naija-bus-backend.onrender.com/api/v1/health` -> `200` (`database=connected`)
+  - backend routes `GET https://naija-bus-backend.onrender.com/api/v1/routes` -> `5` seeded routes
+- local quality gates:
+  - `npm --prefix backend run test` passed
+  - `npm --prefix backend run build` passed
+  - `npm --prefix frontend run lint` passed
+  - `npm --prefix frontend run build` passed
+- evidence document:
+  - `docs/phase6-step615-validation.md`
+
+Cross-guide compliance:
+- Design Guide: final demo packaging preserves intended UX narrative by validating production-ready route/map/fare surfaces in the correct user journey sequence.
+- Engagement Guide: demo script explicitly validates retention loops (login, saved routes, reports, trip replay), ensuring engagement behavior is demonstrable at handoff.
+
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `6.15` next.
-2. Keep phase-6 tasks in strict sequence with step-level validation and compliance notes.
+1. Phase 6 is complete (`6.1` through `6.15`).
+2. Continue with next-phase planning while preserving step-level validation and cross-guide compliance notes.
