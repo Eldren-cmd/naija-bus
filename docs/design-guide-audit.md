@@ -62,6 +62,9 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Phase 6 task `6.13` uptime monitoring baseline completed:
   - scheduled health checks now monitor `/api/v1/health` every 10 minutes
   - monitoring reduces prolonged backend outage windows that would degrade map/search/fare page reliability
+- Phase 6 task `6.14` production security audit baseline completed:
+  - automated security audit workflow now validates dependency risk floor and runtime security expectations
+  - protects shipped UI reliability by reducing unnoticed backend/security regressions before release
 - Productization pass completed for public-first UX:
   - added conversion-focused homepage at `/` with clear hero search, feature highlights, and "How it works" sections
   - Route Finder moved to `/map` to separate marketing surface from operational app surface

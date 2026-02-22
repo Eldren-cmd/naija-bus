@@ -34,18 +34,17 @@ Files verified:
 - `README.md` and `frontend/README.md`
   - added Mapbox billing alert + URL-restriction runbook
 
-## Mapbox Billing Alert Checklist
+## Mapbox Billing/Usage Checklist
 
 Operational checklist documented and ready for dashboard application:
 - Token type policy: frontend uses only public `pk...` token.
 - Token URL restrictions:
   - `http://localhost:5173/*`
   - `https://naijatransport.vercel.app/*` (or active production domain)
-- Billing alert thresholds:
-  - 50%
-  - 75%
-  - 90%
-  - 100%
+- Usage oversight:
+  - monitor token-level statistics and invoices
+  - apply staged usage alerts when available on account plan
+  - otherwise use external budget alerts with regular usage review
 
 ## Notes
 

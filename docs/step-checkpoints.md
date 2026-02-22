@@ -1717,6 +1717,53 @@ Engagement Guide applicability check:
 ### Next Tasks
 - Continue Phase 6 in strict order: `6.14` (production security audit checks).
 
+### Task 6.14
+- Add production security audit checks
+
+Status: complete. Implemented:
+- added security-audit workflow:
+  - `.github/workflows/security-audit.yml`
+  - triggers on `push`, `pull_request`, weekly schedule, and manual dispatch
+- dependency audit checks:
+  - backend: `npm audit --omit=dev --audit-level=critical`
+  - frontend: `npm audit --omit=dev --audit-level=critical`
+- repository hygiene checks:
+  - fail workflow if tracked `.env` files are found
+  - fail workflow if tracked key/cert artifacts are found (`.pem`, `.key`, `.p12`, `.crt`)
+- runtime security smoke checks (non-PR):
+  - verifies health endpoint status and payload
+  - verifies HSTS header is present
+  - verifies CORS allowlist behavior for allowed vs disallowed origin
+  - verifies unauthenticated access is rejected on protected endpoints
+- updated security runbook docs:
+  - `README.md`
+
+validation checks passed:
+- live runtime verification against production backend:
+  - `GET /api/v1/health` -> `200` with `status=ok` and `database=connected`
+  - `OPTIONS /api/v1/routes` with allowed origin -> includes `access-control-allow-origin`
+  - `OPTIONS /api/v1/routes` with disallowed origin -> no allow-origin header
+  - `POST /api/v1/observability/sentry-test` without token -> `401`
+  - `POST /api/v1/auth/refresh` without cookie -> `401`
+- local quality gates:
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+- evidence documented in:
+  - `docs/phase6-step614-validation.md`
+
+Design Guide applicability check:
+- no direct UI changes in this task.
+- security automation lowers probability of backend incidents affecting map/search/fare UI reliability.
+
+Engagement Guide applicability check:
+- stronger security posture and runtime checks protect trust continuity for recurring report/trip/saved-route usage.
+- early detection of security misconfiguration reduces engagement-loop disruption risk.
+
+### Next Tasks
+- Continue Phase 6 in strict order: `6.15` (final production README/demo packaging).
+
 ## Supplemental UX Productization Pass
 
 Status: complete. Implemented:

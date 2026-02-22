@@ -82,6 +82,7 @@ This repository is being built strictly from:
 - [x] Phase 6 / Task 6.11: Structured JSON backend logging added with Render sink-ready stdout output
 - [x] Phase 6 / Task 6.12: Mapbox billing/quota guardrails added (public-token enforcement, Lagos bounds + zoom caps, billing-alert runbook)
 - [x] Phase 6 / Task 6.13: Uptime monitoring added for `/api/v1/health` (GitHub scheduled monitor + UptimeRobot runbook)
+- [x] Phase 6 / Task 6.14: Production security audit checks added (dependency audit, repo hygiene checks, runtime smoke checks)
 - [x] UX refresh: public homepage (`/`) added with conversion-first hero flow and Route Finder moved to `/map` (with `/search` alias)
 - [x] UX fix: removed internal "Phase 2 Core MVP" label from user-facing page copy (now subtle `Beta`)
 - [x] UX fix: route list API no longer auto-fires on first page load without explicit user search
@@ -150,11 +151,10 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 2. Restrict token URLs in Mapbox token settings to:
    - `http://localhost:5173/*`
    - `https://naijatransport.vercel.app/*` (or your active production domain)
-3. Configure Mapbox billing alerts from account settings (recommended thresholds):
-   - 50% monthly usage
-   - 75% monthly usage
-   - 90% monthly usage
-   - 100% monthly usage
+3. Configure Mapbox billing/usage monitoring from account settings:
+   - use token-level statistics/invoice tracking
+   - if usage-alert controls are available on your plan, set staged thresholds
+   - otherwise rely on external budget alerts plus regular usage review
 4. Keep map views constrained to Lagos defaults and zoom bounds (implemented in frontend code) to reduce accidental high tile usage from off-corridor panning.
 
 ### Uptime Monitoring (Phase 6.13)
@@ -171,6 +171,20 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
    - create HTTPS monitor for `/api/v1/health`
    - set interval to 10 minutes
    - this keeps free-tier Render service warm and reduces first-request cold starts
+
+### Production Security Audit Checks (Phase 6.14)
+1. Security audit workflow:
+   - `.github/workflows/security-audit.yml`
+2. Automated checks include:
+   - dependency audit for backend/frontend production deps (`npm audit --omit=dev --audit-level=critical`)
+   - repo hygiene checks to block tracked `.env` and key/certificate artifacts
+   - runtime smoke checks against live backend:
+     - health endpoint returns `200` + `status=ok` + `database=connected`
+     - HSTS header present
+     - CORS allowlist allows expected origin and rejects disallowed origin
+     - protected endpoints reject unauthenticated requests
+3. Optional override secret:
+   - `BACKEND_BASE_URL` (if backend host changes)
 
 ## Seed Data (Phase 1 Task 1.10)
 - Dataset file: `seed/initialRoutes.json` (5 Lagos corridors).

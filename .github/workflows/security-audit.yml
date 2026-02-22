@@ -1,0 +1,140 @@
+name: security-audit
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    - cron: "30 3 * * 1"
+  workflow_dispatch:
+
+jobs:
+  dependency-audit:
+    name: Dependency Audit (Critical)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install backend dependencies
+        run: npm --prefix backend ci
+
+      - name: Backend npm audit (prod deps, critical only)
+        run: npm --prefix backend audit --omit=dev --audit-level=critical
+
+      - name: Install frontend dependencies
+        run: npm --prefix frontend ci
+
+      - name: Frontend npm audit (prod deps, critical only)
+        run: npm --prefix frontend audit --omit=dev --audit-level=critical
+
+  repo-hygiene:
+    name: Repo Hygiene Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure no raw .env files are tracked
+        run: |
+          set -euo pipefail
+          TRACKED_ENV_FILES="$(git ls-files | grep -E '(^|/)\.env$' || true)"
+          if [ -n "$TRACKED_ENV_FILES" ]; then
+            echo "Tracked .env files detected:"
+            echo "$TRACKED_ENV_FILES"
+            exit 1
+          fi
+          echo "No tracked .env files found."
+
+      - name: Ensure key/cert artifacts are not tracked
+        run: |
+          set -euo pipefail
+          TRACKED_KEY_FILES="$(git ls-files | grep -E '\.(pem|key|p12|crt)$' || true)"
+          if [ -n "$TRACKED_KEY_FILES" ]; then
+            echo "Tracked key/cert files detected:"
+            echo "$TRACKED_KEY_FILES"
+            exit 1
+          fi
+          echo "No tracked key/cert artifacts found."
+
+  runtime-smoke:
+    name: Runtime Security Smoke Checks
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    env:
+      BACKEND_BASE_URL: ${{ secrets.BACKEND_BASE_URL }}
+      ALLOWED_ORIGIN: https://naijatransport.vercel.app
+      DISALLOWED_ORIGIN: https://security-audit.invalid
+    steps:
+      - name: Resolve backend base URL
+        id: resolve-base
+        run: |
+          if [ -n "$BACKEND_BASE_URL" ]; then
+            echo "base=$BACKEND_BASE_URL" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=https://naija-bus-backend.onrender.com" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate health endpoint + HSTS
+        env:
+          BASE_URL: ${{ steps.resolve-base.outputs.base }}
+        run: |
+          set -euo pipefail
+          HEADERS="$(mktemp)"
+          BODY="$(mktemp)"
+          HTTP_CODE="$(curl --silent --show-error --location --dump-header "$HEADERS" --output "$BODY" --write-out "%{http_code}" "$BASE_URL/api/v1/health")"
+          test "$HTTP_CODE" = "200"
+          grep -qi 'strict-transport-security:' "$HEADERS"
+          grep -q '"status":"ok"' "$BODY"
+          grep -q '"database":"connected"' "$BODY"
+
+      - name: Validate CORS allowlist behavior
+        env:
+          BASE_URL: ${{ steps.resolve-base.outputs.base }}
+        run: |
+          set -euo pipefail
+          ALLOWED_HEADERS="$(mktemp)"
+          DISALLOWED_HEADERS="$(mktemp)"
+
+          curl --silent --show-error --request OPTIONS \
+            --header "Origin: $ALLOWED_ORIGIN" \
+            --header "Access-Control-Request-Method: GET" \
+            --dump-header "$ALLOWED_HEADERS" \
+            --output /dev/null \
+            "$BASE_URL/api/v1/routes"
+
+          grep -qi "access-control-allow-origin: $ALLOWED_ORIGIN" "$ALLOWED_HEADERS"
+
+          curl --silent --show-error --request OPTIONS \
+            --header "Origin: $DISALLOWED_ORIGIN" \
+            --header "Access-Control-Request-Method: GET" \
+            --dump-header "$DISALLOWED_HEADERS" \
+            --output /dev/null \
+            "$BASE_URL/api/v1/routes"
+
+          if grep -qi 'access-control-allow-origin:' "$DISALLOWED_HEADERS"; then
+            echo "Disallowed origin unexpectedly received CORS allow-origin header."
+            cat "$DISALLOWED_HEADERS"
+            exit 1
+          fi
+
+      - name: Validate token/cookie protected endpoints reject unauthenticated calls
+        env:
+          BASE_URL: ${{ steps.resolve-base.outputs.base }}
+        run: |
+          set -euo pipefail
+          SENT_HTTP="$(curl --silent --show-error --request POST --output /tmp/sentry-body.txt --write-out "%{http_code}" "$BASE_URL/api/v1/observability/sentry-test")"
+          test "$SENT_HTTP" = "401"
+
+          REFRESH_HTTP="$(curl --silent --show-error --request POST --output /tmp/refresh-body.txt --write-out "%{http_code}" "$BASE_URL/api/v1/auth/refresh")"
+          test "$REFRESH_HTTP" = "401"

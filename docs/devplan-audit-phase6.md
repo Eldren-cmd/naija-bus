@@ -29,7 +29,7 @@ Cross-guide enforcement (mandatory):
 | 6.11 | complete | Added structured backend logging via `pino` with request/response lifecycle logs, `>=500` error response logs, and startup/bot-failure logs. Logs emit as JSON to stdout and are sink-ready for Render log ingestion. |
 | 6.12 | complete | Added frontend Mapbox quota guardrails (public-token enforcement + Lagos bounds/zoom caps), plus billing-alert/token-restriction runbook and validation evidence. |
 | 6.13 | complete | Added scheduled uptime checks for `/api/v1/health` (10-minute cadence) with documented UptimeRobot setup and live endpoint verification evidence. |
-| 6.14 | missing | Pending: production security audit checks. |
+| 6.14 | complete | Added production security audit workflow with dependency, repository hygiene, and runtime security smoke checks plus live verification evidence. |
 | 6.15 | missing | Pending: final production README/demo packaging. |
 
 ## Task 6.5 Completion Note
@@ -340,7 +340,52 @@ Cross-guide compliance:
 - Design Guide: no direct UI redesign; uptime checks reduce backend unavailability windows that degrade map/search/fare UX reliability.
 - Engagement Guide: continuous health monitoring protects repeat commuter engagement loops by reducing downtime for reports, trips, and saved-route flows.
 
+## Task 6.14 Completion Note
+
+Status: complete.
+
+Implemented:
+- added production security audit workflow:
+  - `.github/workflows/security-audit.yml`
+  - trigger coverage:
+    - `push` on `main`
+    - `pull_request`
+    - weekly schedule
+    - manual dispatch
+- dependency security checks:
+  - backend/frontend production dependency audit (`npm audit --omit=dev --audit-level=critical`)
+- repository hygiene checks:
+  - blocks tracked raw `.env` files
+  - blocks tracked key/certificate artifacts (`.pem`, `.key`, `.p12`, `.crt`)
+- runtime security smoke checks (non-PR runs):
+  - validates `/api/v1/health` returns `200` with expected payload
+  - validates HSTS header presence
+  - validates CORS allowlist behavior (allowed origin passes, disallowed origin blocked)
+  - validates protected endpoints reject unauthenticated requests:
+    - `POST /api/v1/observability/sentry-test` -> `401`
+    - `POST /api/v1/auth/refresh` -> `401`
+- documentation updates:
+  - `README.md`
+
+Validation:
+- live checks executed against production backend:
+  - `GET /api/v1/health` -> `200` (`status=ok`, `database=connected`)
+  - `OPTIONS /api/v1/routes` with allowed origin returns allow-origin header
+  - `OPTIONS /api/v1/routes` with disallowed origin omits allow-origin header
+  - unauthenticated protected endpoint probes return `401` as expected
+- local quality gates:
+  - `npm --prefix backend run test` passed
+  - `npm --prefix backend run build` passed
+  - `npm --prefix frontend run lint` passed
+  - `npm --prefix frontend run build` passed
+- evidence document:
+  - `docs/phase6-step614-validation.md`
+
+Cross-guide compliance:
+- Design Guide: no direct visual redesign; security audit checks reduce production incident risk that would impact user-facing reliability.
+- Engagement Guide: better security posture protects sustained participation in report/trip/saved-route loops and improves trust continuity.
+
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `6.14` next.
+1. Continue with `6.15` next.
 2. Keep phase-6 tasks in strict sequence with step-level validation and compliance notes.
