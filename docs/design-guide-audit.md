@@ -34,6 +34,11 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Phase 6 task `6.4` production seed + hosted SPA reliability completed:
   - Vercel build/output config now serves the frontend app correctly from monorepo root
   - SPA route refresh rewrite now preserves route-detail page access after direct URL reloads
+- Productization pass completed for public-first UX:
+  - added conversion-focused homepage at `/` with clear hero search, feature highlights, and "How it works" sections
+  - Route Finder moved to `/map` to separate marketing surface from operational app surface
+  - removed internal phase-language labels from user-facing pages and replaced with product-safe copy
+  - updated browser metadata (`title`, `description`) and favicon branding for production polish
 
 ## High-Impact Gaps To Implement Next
 

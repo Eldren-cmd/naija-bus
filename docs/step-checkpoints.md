@@ -1366,3 +1366,32 @@ validation checks passed:
 
 ### Next Tasks
 - Continue Phase 6 in strict order: `6.5` (production CORS allowlist hardening).
+
+## Supplemental UX Productization Pass
+
+Status: complete. Implemented:
+- added a conversion-focused homepage at `/`:
+  - minimal nav
+  - hero search
+  - feature highlights
+  - 3-step "How it works"
+  - branded footer
+- moved Route Finder workflow to `/map` (and `/search` alias) while preserving `/route/:routeId`.
+- removed internal phase labels from user-facing pages and replaced with product-safe copy (`Beta`, `Account`, `Admin`, `Trip History`).
+- route list/search loading behavior hardened:
+  - no route query call on first `/map` load until user submits a search query.
+- production brand polish updates:
+  - title updated to `Naija Transport — Lagos Route & Fare Finder`
+  - meta description added for search/preview quality
+  - custom favicon added (`frontend/public/favicon.svg`)
+- deployment/domain polish:
+  - production deployment updated
+  - readable alias assigned: `https://naijatransport.vercel.app`
+
+Design Guide applicability check:
+- improved visual hierarchy and first-screen clarity for public visitors before entering core app flow.
+- strengthened palette presence with brand-orange emphasis on hero, CTA, and interactive elements.
+
+Engagement Guide applicability check:
+- lower-friction first-use flow improves top-of-funnel conversion into route search and subsequent report/trip loops.
+- removing startup error noise improves trust and repeat usage probability.

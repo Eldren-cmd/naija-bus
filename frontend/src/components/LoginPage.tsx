@@ -18,7 +18,7 @@ export function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const redirectPath = (location.state as RedirectState | null)?.from || "/";
+  const redirectPath = (location.state as RedirectState | null)?.from || "/map";
   if (isAuthenticated) {
     return <Navigate to={redirectPath} replace />;
   }
@@ -51,7 +51,7 @@ export function LoginPage() {
   return (
     <main className="app-shell">
       <section className="login-shell card">
-        <p className="kicker">Phase 5 Auth</p>
+        <p className="kicker">Account</p>
         <h1>Login</h1>
         <p className="muted">
           Sign in to continue. Access token stays in memory and refresh token is set via secure httpOnly cookie.
@@ -94,7 +94,7 @@ export function LoginPage() {
           </Link>
           .
         </p>
-        <Link to="/" className="top-nav-link login-back-link">
+        <Link to="/map" className="top-nav-link login-back-link">
           Back to Route Finder
         </Link>
       </section>

@@ -316,10 +316,10 @@ export function AdminPanel() {
     return (
       <main className="app-shell">
         <section className="admin-shell card">
-          <p className="kicker">Phase 5 Admin</p>
+          <p className="kicker">Admin</p>
           <h1>Admin Panel</h1>
           <p className="error-text">Admin access is required for this page.</p>
-          <Link to="/" className="top-nav-link login-back-link">
+          <Link to="/map" className="top-nav-link login-back-link">
             Back to Route Finder
           </Link>
         </section>
@@ -330,7 +330,7 @@ export function AdminPanel() {
   return (
     <main className="app-shell">
       <section className="admin-shell card">
-        <p className="kicker">Phase 5 Admin</p>
+        <p className="kicker">Admin</p>
         <h1>Route Management</h1>
         <p className="muted">Create, edit, or delete routes directly without Postman.</p>
 

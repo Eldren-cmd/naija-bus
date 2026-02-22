@@ -1,6 +1,15 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactElement } from "react";
-import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useAuth } from "./auth/AuthContext";
 import { FareEstimate } from "./components/FareEstimate";
 import { LoginPage } from "./components/LoginPage";
@@ -31,6 +40,7 @@ import type {
   TripRecordResponse,
 } from "./types";
 import type { ToastItem, ToastTone } from "./components/ToastStack";
+import { Home } from "./pages/Home";
 import "./App.css";
 
 const formatDistance = (meters: number): string => {
@@ -73,7 +83,7 @@ function PrimaryNav({ active }: { active: "routes" | "my-trips" | "admin" }) {
 
   return (
     <nav className="top-nav">
-      <Link to="/" className={`top-nav-link ${active === "routes" ? "active" : ""}`}>
+      <Link to="/map" className={`top-nav-link ${active === "routes" ? "active" : ""}`}>
         Route Finder
       </Link>
       <Link to="/my-trips" className={`top-nav-link ${active === "my-trips" ? "active" : ""}`}>
@@ -125,7 +135,7 @@ function AdminRoute({ children }: { children: ReactElement }) {
   }
 
   if (user?.role !== "admin") {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/map" replace />;
   }
 
   return children;
@@ -133,11 +143,14 @@ function AdminRoute({ children }: { children: ReactElement }) {
 
 function RouteFinderPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { routeId } = useParams<{ routeId: string }>();
   const { accessToken } = useAuth();
+  const initialQuery = (searchParams.get("q") ?? "").trim();
 
-  const [searchInput, setSearchInput] = useState("");
-  const [activeQuery, setActiveQuery] = useState("");
+  const [searchInput, setSearchInput] = useState(initialQuery);
+  const [activeQuery, setActiveQuery] = useState(initialQuery);
+  const [hasSearched, setHasSearched] = useState(Boolean(initialQuery));
   const [routes, setRoutes] = useState<RouteSummary[]>([]);
   const [routesLoading, setRoutesLoading] = useState(false);
   const [routesError, setRoutesError] = useState<string | null>(null);
@@ -174,9 +187,22 @@ function RouteFinderPage() {
   }, [routeId]);
 
   useEffect(() => {
+    const urlQuery = (searchParams.get("q") ?? "").trim();
+    setSearchInput(urlQuery);
+    setActiveQuery(urlQuery);
+    setHasSearched(Boolean(urlQuery));
+  }, [searchParams]);
+
+  useEffect(() => {
     let cancelled = false;
 
     const loadRoutes = async () => {
+      if (!hasSearched) {
+        setRoutes([]);
+        setRoutesError(null);
+        setRoutesLoading(false);
+        return;
+      }
       setRoutesLoading(true);
       setRoutesError(null);
       try {
@@ -206,7 +232,7 @@ function RouteFinderPage() {
     return () => {
       cancelled = true;
     };
-  }, [activeQuery]);
+  }, [activeQuery, hasSearched]);
 
   useEffect(() => {
     let cancelled = false;
@@ -274,26 +300,33 @@ function RouteFinderPage() {
     if (!routeId) return;
     if (!selectedRouteId) return;
     if (routeId === selectedRouteId) return;
-    navigate(`/route/${selectedRouteId}`, { replace: true });
-  }, [navigate, routeId, selectedRouteId]);
+    const querySuffix = activeQuery ? `?q=${encodeURIComponent(activeQuery)}` : "";
+    navigate(`/route/${selectedRouteId}${querySuffix}`, { replace: true });
+  }, [activeQuery, navigate, routeId, selectedRouteId]);
 
   const onSearch = (query: string) => {
-    setActiveQuery(query);
-    if (!query.trim()) {
-      navigate("/", { replace: true });
-    }
+    const normalizedQuery = query.trim();
+    if (!normalizedQuery) return;
+    setHasSearched(true);
+    setActiveQuery(normalizedQuery);
+    const nextPath = `/map?q=${encodeURIComponent(normalizedQuery)}`;
+    navigate(nextPath, { replace: true });
   };
 
   const onSelectRouteFromSearch = (routeId: string, nextQuery: string) => {
+    const normalizedQuery = nextQuery.trim();
     setSearchInput(nextQuery);
-    setActiveQuery(nextQuery.trim());
+    setHasSearched(true);
+    setActiveQuery(normalizedQuery);
     setSelectedRouteId(routeId);
-    navigate(`/route/${routeId}`);
+    const querySuffix = normalizedQuery ? `?q=${encodeURIComponent(normalizedQuery)}` : "";
+    navigate(`/route/${routeId}${querySuffix}`);
   };
 
   const onSelectRouteFromList = (routeId: string) => {
     setSelectedRouteId(routeId);
-    navigate(`/route/${routeId}`);
+    const querySuffix = activeQuery ? `?q=${encodeURIComponent(activeQuery)}` : "";
+    navigate(`/route/${routeId}${querySuffix}`);
   };
 
   const onToggleSavedRoute = async (route: RouteSummary) => {
@@ -348,7 +381,7 @@ function RouteFinderPage() {
   return (
     <main className="app-shell">
       <header className="hero card">
-        <p className="kicker">Phase 2 Core MVP</p>
+        <p className="kicker">Beta</p>
         <h1>Find your route. Know the fare.</h1>
         <p>
           Search Lagos routes, inspect ordered stops, and pull a live fare estimate with multiplier breakdown.
@@ -407,7 +440,7 @@ function RouteFinderPage() {
                       onClick={() => {
                         setSearchInput("");
                         setActiveQuery("");
-                        navigate("/", { replace: true });
+                        navigate("/map", { replace: true });
                       }}
                     >
                       Browse Routes
@@ -485,7 +518,13 @@ function RouteFinderPage() {
             </ul>
           )}
 
-          {!routesLoading && routes.length === 0 && <p className="muted">No routes matched your search.</p>}
+          {!routesLoading && !hasSearched && (
+            <p className="muted">Search a route above to load route results.</p>
+          )}
+
+          {!routesLoading && hasSearched && routes.length === 0 && (
+            <p className="muted">No routes matched your search.</p>
+          )}
         </aside>
 
         <section className="right-panel">
@@ -596,7 +635,7 @@ function MyTripsPage() {
   return (
     <main className="app-shell">
       <header className="hero card">
-        <p className="kicker">Phase 4 Trip History</p>
+        <p className="kicker">Trip History</p>
         <h1>My Recorded Trips</h1>
         <p>Review uploaded trips with distance and duration history for route learning insights.</p>
         <p className="brand-note">A VerityWave Solutions product</p>
@@ -811,7 +850,9 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
-      <Route path="/" element={<RouteFinderPage />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/map" element={<RouteFinderPage />} />
+      <Route path="/search" element={<RouteFinderPage />} />
       <Route path="/route/:routeId" element={<RouteFinderPage />} />
       <Route
         path="/my-trips"

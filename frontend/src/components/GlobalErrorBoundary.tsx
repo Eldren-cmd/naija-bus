@@ -39,7 +39,7 @@ export class GlobalErrorBoundary extends Component<
   };
 
   private handleGoHome = () => {
-    window.location.assign("/");
+    window.location.assign("/map");
   };
 
   private handleReload = () => {

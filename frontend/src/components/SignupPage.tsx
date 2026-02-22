@@ -16,7 +16,7 @@ export function SignupPage() {
   const [error, setError] = useState<string | null>(null);
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/map" replace />;
   }
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -46,7 +46,7 @@ export function SignupPage() {
         password,
       });
       applyLogin(response);
-      navigate("/", { replace: true });
+      navigate("/map", { replace: true });
     } catch (requestError) {
       const message = requestError instanceof Error ? requestError.message : "Signup failed";
       setError(message);
@@ -58,7 +58,7 @@ export function SignupPage() {
   return (
     <main className="app-shell">
       <section className="login-shell card">
-        <p className="kicker">Phase 5 Auth</p>
+        <p className="kicker">Account</p>
         <h1>Signup</h1>
         <p className="muted">Create your account. Registration auto-signs you in after success.</p>
 

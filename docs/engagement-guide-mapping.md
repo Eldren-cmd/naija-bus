@@ -90,6 +90,10 @@ Reference: `NaijaTransport_EngagementGuide.docx`
 - production seed/live verification setup completed:
   - production seed data is inserted and available in live backend routes API
   - hosted frontend routing refresh no longer drops users on 404 for client paths
+- product onboarding funnel improvements completed:
+  - new `/` homepage now emphasizes first action conversion (route search) with low-friction quick-route entry points
+  - Route Finder moved to `/map`, reducing cognitive load for first-time visitors while preserving full engagement surfaces post-entry
+  - route discovery API load now waits for explicit user search input on `/map`, preventing noisy startup failure states
 - Engagement applicability for 6.1-6.4:
   - no direct new engagement feature logic shipped in these tasks
   - existing engagement loops (reporting/saved-routes/trips) are connected to deployed backend infrastructure
