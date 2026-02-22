@@ -97,6 +97,21 @@ const fareReportSchema = z.object({
   source: z.enum(FARE_REPORT_SOURCES).optional(),
 });
 
+const quickReportBootstrapQuerySchema = z.object({
+  token: z.string({ error: "token query is required" }).trim().min(1, "token query is required"),
+});
+
+const quickFareReportSchema = z.object({
+  token: z.string({ error: "token is required" }).trim().min(1, "token is required"),
+  routeId: z
+    .string()
+    .trim()
+    .refine((value) => isValidObjectId(value), "routeId is required and must be a valid id"),
+  reportedFare: z.number().finite().gt(0, "reportedFare must be a positive number"),
+  trafficLevel: z.enum(TRAFFIC_LEVELS).optional(),
+  notes: z.string().optional(),
+});
+
 const pointSchema = z
   .object({
     type: z.literal("Point"),
@@ -216,6 +231,26 @@ export const validateIncidentReportBody = (
   if (!isObject(body)) return fail("request body must be an object");
 
   const parsed = incidentReportSchema.safeParse(body);
+  if (!parsed.success) return fail(getFirstIssueMessage(parsed.error));
+  return { success: true, data: parsed.data };
+};
+
+export const validateQuickReportBootstrapQuery = (
+  query: unknown,
+): ValidationResult<z.infer<typeof quickReportBootstrapQuerySchema>> => {
+  if (!isObject(query)) return fail("request query must be an object");
+
+  const parsed = quickReportBootstrapQuerySchema.safeParse(query);
+  if (!parsed.success) return fail(getFirstIssueMessage(parsed.error));
+  return { success: true, data: parsed.data };
+};
+
+export const validateQuickFareReportBody = (
+  body: unknown,
+): ValidationResult<z.infer<typeof quickFareReportSchema>> => {
+  if (!isObject(body)) return fail("request body must be an object");
+
+  const parsed = quickFareReportSchema.safeParse(body);
   if (!parsed.success) return fail(getFirstIssueMessage(parsed.error));
   return { success: true, data: parsed.data };
 };

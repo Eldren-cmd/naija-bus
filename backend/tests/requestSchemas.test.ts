@@ -2,6 +2,8 @@ import {
   validateFareReportBody,
   validateIncidentReportBody,
   validateLoginBody,
+  validateQuickFareReportBody,
+  validateQuickReportBootstrapQuery,
   validateRegisterBody,
   validateRouteCreateBody,
   validateRouteUpdateBody,
@@ -100,6 +102,48 @@ describe("request schema validation (zod)", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error).toBe("email and password are required");
+    }
+  });
+
+  it("validates quick report bootstrap query payload", () => {
+    const result = validateQuickReportBootstrapQuery({
+      token: "conductor-token-123",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects quick report bootstrap query when token is missing", () => {
+    const result = validateQuickReportBootstrapQuery({});
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toBe("token query is required");
+    }
+  });
+
+  it("validates quick fare report payload", () => {
+    const result = validateQuickFareReportBody({
+      token: "conductor-token-123",
+      routeId: "699935ccba2963016871bba6",
+      reportedFare: 500,
+      trafficLevel: "high",
+      notes: "rush hour at Ojodu",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects quick fare report payload when routeId is invalid", () => {
+    const result = validateQuickFareReportBody({
+      token: "conductor-token-123",
+      routeId: "bad-id",
+      reportedFare: 500,
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toBe("routeId is required and must be a valid id");
     }
   });
 });

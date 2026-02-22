@@ -34,6 +34,8 @@ import type { BotContext, BotIngestResult, BotReportPayload } from "./types/bot"
 import {
   validateFareReportBody,
   validateIncidentReportBody,
+  validateQuickFareReportBody,
+  validateQuickReportBootstrapQuery,
   validateRouteCreateBody,
   validateStopCreateBody,
   validateRouteUpdateBody,
@@ -504,6 +506,112 @@ const readBotToken = (req: Request): string => {
 type IncidentCreateResult =
   | { success: true; created: unknown }
   | { success: false; status: number; error: string };
+
+type QuickConductorContext = {
+  userId: string;
+  fullName: string;
+  assignedRouteIds: string[];
+};
+
+type QuickAssignedRouteSummary = {
+  routeId: string;
+  name: string;
+  origin: string;
+  destination: string;
+  corridor: string;
+  transportType: TransportType;
+  baseFare: number;
+};
+
+const normalizeChampionRouteIds = (value: unknown): string[] => {
+  if (!Array.isArray(value)) return [];
+
+  const uniqueIds = new Set<string>();
+  for (const routeRef of value) {
+    const routeId = String(routeRef).trim();
+    if (isValidObjectId(routeId)) {
+      uniqueIds.add(routeId);
+    }
+  }
+
+  return [...uniqueIds];
+};
+
+const resolveQuickConductorContext = async (tokenRaw: string): Promise<QuickConductorContext | null> => {
+  const token = tokenRaw.trim();
+  if (!token) return null;
+
+  const conductor = (await User.findOne({
+    conductorToken: token,
+    role: "conductor",
+    isActive: true,
+  })
+    .select("_id fullName championRoutes")
+    .lean()) as {
+    _id: unknown;
+    fullName?: unknown;
+    championRoutes?: unknown;
+  } | null;
+
+  if (!conductor) return null;
+
+  const userId = String(conductor._id);
+  if (!isValidObjectId(userId)) return null;
+
+  const fullName =
+    typeof conductor.fullName === "string" && conductor.fullName.trim()
+      ? conductor.fullName.trim()
+      : "Conductor";
+
+  return {
+    userId,
+    fullName,
+    assignedRouteIds: normalizeChampionRouteIds(conductor.championRoutes),
+  };
+};
+
+const buildQuickAssignedRouteSummaries = async (
+  assignedRouteIds: string[],
+): Promise<QuickAssignedRouteSummary[]> => {
+  if (assignedRouteIds.length === 0) return [];
+
+  const rawRoutes = (await Route.find({
+    _id: { $in: assignedRouteIds },
+    isActive: true,
+  })
+    .select("_id name origin destination corridor transportType baseFare")
+    .lean()) as unknown[];
+
+  const byId = new Map<string, QuickAssignedRouteSummary>();
+
+  for (const rawRoute of rawRoutes) {
+    if (!isObject(rawRoute)) continue;
+
+    const routeId = String(rawRoute._id || "").trim();
+    const name = typeof rawRoute.name === "string" ? rawRoute.name.trim() : "";
+    const origin = typeof rawRoute.origin === "string" ? rawRoute.origin.trim() : "";
+    const destination =
+      typeof rawRoute.destination === "string" ? rawRoute.destination.trim() : "";
+
+    if (!isValidObjectId(routeId) || !name || !origin || !destination) {
+      continue;
+    }
+
+    byId.set(routeId, {
+      routeId,
+      name,
+      origin,
+      destination,
+      corridor: typeof rawRoute.corridor === "string" ? rawRoute.corridor : "",
+      transportType: isTransportType(rawRoute.transportType) ? rawRoute.transportType : "danfo",
+      baseFare: Number.isFinite(rawRoute.baseFare) ? Number(rawRoute.baseFare) : 0,
+    });
+  }
+
+  return assignedRouteIds
+    .map((routeId) => byId.get(routeId))
+    .filter((route): route is QuickAssignedRouteSummary => route !== undefined);
+};
 
 const getRoutesHandler = async (req: Request, res: Response) => {
   try {
@@ -1049,6 +1157,89 @@ const createFareReportHandler = async (req: Request, res: Response) => {
 
 app.post("/api/v1/fare/report", authMiddleware, createFareReportHandler);
 app.post("/fare/report", authMiddleware, createFareReportHandler);
+
+const getQuickReportBootstrapHandler = async (req: Request, res: Response) => {
+  try {
+    const validated = validateQuickReportBootstrapQuery(req.query);
+    if (!validated.success) {
+      return res.status(400).json({ error: validated.error });
+    }
+
+    const conductor = await resolveQuickConductorContext(validated.data.token);
+    if (!conductor) {
+      return res.status(401).json({ error: "invalid conductor token" });
+    }
+
+    const assignedRoutes = await buildQuickAssignedRouteSummaries(conductor.assignedRouteIds);
+
+    return res.status(200).json({
+      conductor: {
+        userId: conductor.userId,
+        fullName: conductor.fullName,
+      },
+      assignedRoutes,
+    });
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to bootstrap quick report" });
+  }
+};
+
+const createQuickFareReportHandler = async (req: Request, res: Response) => {
+  try {
+    const validated = validateQuickFareReportBody(req.body);
+    if (!validated.success) {
+      return res.status(400).json({ error: validated.error });
+    }
+
+    const conductor = await resolveQuickConductorContext(validated.data.token);
+    if (!conductor) {
+      return res.status(401).json({ error: "invalid conductor token" });
+    }
+
+    const routeId = validated.data.routeId;
+    if (!conductor.assignedRouteIds.includes(routeId)) {
+      return res.status(403).json({ error: "route is not assigned to this conductor" });
+    }
+
+    const route = await Route.findOne({ _id: routeId, isActive: true }).select("_id").lean();
+    if (!route) {
+      return res.status(404).json({ error: "route not found" });
+    }
+
+    const created = await Fare.create({
+      routeId,
+      amount: Number(validated.data.reportedFare),
+      source: "user_report" as const,
+      trafficLevel: validated.data.trafficLevel || ("medium" as const),
+      reportedBy: conductor.userId,
+      notes: typeof validated.data.notes === "string" ? validated.data.notes.trim() : "",
+    });
+
+    emitFareReported({
+      id: String(created._id),
+      routeId: String(created.routeId),
+      amount: created.amount,
+      trafficLevel: created.trafficLevel,
+      reportedBy: String(created.reportedBy),
+      createdAt: created.createdAt,
+    });
+
+    await awardReportEngagement({
+      userId: conductor.userId,
+      source: "fare_report",
+      occurredAt: created.createdAt,
+    });
+
+    return res.status(201).json(created);
+  } catch (_error) {
+    return res.status(500).json({ error: "failed to save quick fare report" });
+  }
+};
+
+app.get("/api/v1/reports/quick/bootstrap", getQuickReportBootstrapHandler);
+app.get("/reports/quick/bootstrap", getQuickReportBootstrapHandler);
+app.post("/api/v1/reports/quick", createQuickFareReportHandler);
+app.post("/reports/quick", createQuickFareReportHandler);
 
 const getReportsByBboxHandler = async (req: Request, res: Response) => {
   try {
