@@ -94,6 +94,13 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - new `/` homepage now emphasizes first action conversion (route search) with low-friction quick-route entry points
   - Route Finder moved to `/map`, reducing cognitive load for first-time visitors while preserving full engagement surfaces post-entry
   - route discovery API load now waits for explicit user search input on `/map`, preventing noisy startup failure states
+- auth and trust UX hardening completed:
+  - login/signup pages now present a branded, high-trust visual shell instead of plain forms
+  - clearer field affordances and loading/error states reduce form abandonment risk on first auth attempt
+  - technical implementation jargon removed from account copy to keep commuter-facing language clear
+- route-search noise reduction completed:
+  - removed auto-search side effects from typeahead path so backend wake delays do not surface as startup errors
+  - route discovery remains explicit via submit action, preserving user control and reducing false-failure perceptions
 - Engagement applicability for 6.1-6.4:
   - no direct new engagement feature logic shipped in these tasks
   - existing engagement loops (reporting/saved-routes/trips) are connected to deployed backend infrastructure

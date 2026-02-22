@@ -1395,3 +1395,34 @@ Design Guide applicability check:
 Engagement Guide applicability check:
 - lower-friction first-use flow improves top-of-funnel conversion into route search and subsequent report/trip loops.
 - removing startup error noise improves trust and repeat usage probability.
+
+## Supplemental Auth + Search UX Hardening Pass
+
+Status: complete. Implemented:
+- redesigned login and signup pages with branded high-contrast shell and structured card hierarchy:
+  - `frontend/src/components/LoginPage.tsx`
+  - `frontend/src/components/SignupPage.tsx`
+- removed internal implementation-only account copy from user-facing auth pages.
+- added stronger field affordances for auth:
+  - explicit visible borders
+  - focus styles
+  - password show/hide controls
+  - inline password strength + confirm-match feedback
+  - submit loading states with spinner
+- route-search trigger hardening:
+  - removed typeahead API side-effect from `frontend/src/components/SearchInput.tsx`
+  - route fetch remains explicit through form submit path
+- brand action polish:
+  - route-search submit button updated to orange brand treatment in `frontend/src/App.css`
+
+Design Guide applicability check:
+- auth surfaces now align with brand contrast, hierarchy, and interaction feedback expectations.
+- route-search primary action now carries clear visual priority tied to brand palette.
+
+Engagement Guide applicability check:
+- reduced first-use confusion and trust friction on auth entry surfaces.
+- startup error noise reduced by avoiding auto-search API behavior before user submit.
+
+validation checks passed:
+- `npm --prefix frontend run lint`
+- `npm --prefix frontend run build`

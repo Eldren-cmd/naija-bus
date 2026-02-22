@@ -39,6 +39,12 @@ Reference: `NaijaTransport_DesignGuide.docx`
   - Route Finder moved to `/map` to separate marketing surface from operational app surface
   - removed internal phase-language labels from user-facing pages and replaced with product-safe copy
   - updated browser metadata (`title`, `description`) and favicon branding for production polish
+- Auth and route-search UX hardening pass completed:
+  - login/signup pages now use branded high-contrast shell + structured card hierarchy
+  - auth inputs now have explicit visible borders, focus states, and loading feedback
+  - removed internal implementation copy from account pages
+  - route search now triggers by explicit submit only (no typeahead API side-effect on mount/value change)
+  - route search action button now uses brand-orange styling for visual identity continuity
 
 ## High-Impact Gaps To Implement Next
 

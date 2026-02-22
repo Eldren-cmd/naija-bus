@@ -313,16 +313,6 @@ function RouteFinderPage() {
     navigate(nextPath, { replace: true });
   };
 
-  const onSelectRouteFromSearch = (routeId: string, nextQuery: string) => {
-    const normalizedQuery = nextQuery.trim();
-    setSearchInput(nextQuery);
-    setHasSearched(true);
-    setActiveQuery(normalizedQuery);
-    setSelectedRouteId(routeId);
-    const querySuffix = normalizedQuery ? `?q=${encodeURIComponent(normalizedQuery)}` : "";
-    navigate(`/route/${routeId}${querySuffix}`);
-  };
-
   const onSelectRouteFromList = (routeId: string) => {
     setSelectedRouteId(routeId);
     const querySuffix = activeQuery ? `?q=${encodeURIComponent(activeQuery)}` : "";
@@ -396,7 +386,6 @@ function RouteFinderPage() {
             value={searchInput}
             onChange={setSearchInput}
             onSubmit={onSearch}
-            onSelectRoute={onSelectRouteFromSearch}
           />
 
           {accessToken?.trim() && (
