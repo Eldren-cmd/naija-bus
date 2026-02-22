@@ -2,19 +2,25 @@ import { useEffect, useMemo, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import type { FeatureCollection, LineString } from "geojson";
 import type { TripRecordResponse } from "../types";
+import {
+  HAS_VALID_MAPBOX_TOKEN,
+  LAGOS_CENTER,
+  LAGOS_MAX_BOUNDS,
+  MAPBOX_STYLE,
+  MAPBOX_TOKEN,
+  MAPBOX_TOKEN_HELP,
+  MAP_MAX_ZOOM,
+  MAP_MIN_ZOOM,
+} from "../config/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 type MyTripMapProps = {
   trip: TripRecordResponse | null;
 };
 
-const MAP_STYLE = "mapbox://styles/mapbox/navigation-night-v1";
 const TRIP_SOURCE_ID = "mytrip-source";
 const TRIP_LAYER_ID = "mytrip-layer";
-const MAPBOX_TOKEN = (import.meta.env.VITE_MAPBOX_KEY || "").trim();
-const HAS_VALID_TOKEN =
-  MAPBOX_TOKEN.length > 0 && !MAPBOX_TOKEN.includes("replace_with_mapbox_token");
-const LAGOS_CENTER: [number, number] = [3.3792, 6.5244];
+const TRIP_FIT_MAX_ZOOM = 14.5;
 const EMPTY_FEATURES: FeatureCollection<LineString> = { type: "FeatureCollection", features: [] };
 
 const toTripGeoJson = (trip: TripRecordResponse): FeatureCollection<LineString> => {
@@ -44,14 +50,20 @@ export function MyTripMap({ trip }: MyTripMapProps) {
   const hasRenderableTrip = Boolean(trip && trip.checkpoints.length >= 2);
 
   useEffect(() => {
-    if (!HAS_VALID_TOKEN || !mapContainerRef.current || mapRef.current) return;
+    if (!HAS_VALID_MAPBOX_TOKEN || !mapContainerRef.current || mapRef.current) return;
 
     mapboxgl.accessToken = MAPBOX_TOKEN;
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: MAP_STYLE,
+      style: MAPBOX_STYLE,
       center: LAGOS_CENTER,
       zoom: 10.5,
+      minZoom: MAP_MIN_ZOOM,
+      maxZoom: MAP_MAX_ZOOM,
+      maxBounds: LAGOS_MAX_BOUNDS,
+      renderWorldCopies: false,
+      pitchWithRotate: false,
+      dragRotate: false,
     });
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
     mapRef.current = map;
@@ -97,7 +109,7 @@ export function MyTripMap({ trip }: MyTripMapProps) {
         (memo, coordinate) => memo.extend(coordinate),
         new mapboxgl.LngLatBounds(first, first),
       );
-      map.fitBounds(bounds, { padding: 44, duration: 650, maxZoom: 15 });
+      map.fitBounds(bounds, { padding: 44, duration: 650, maxZoom: TRIP_FIT_MAX_ZOOM });
     };
 
     if (map.isStyleLoaded()) {
@@ -107,11 +119,11 @@ export function MyTripMap({ trip }: MyTripMapProps) {
     }
   }, [tripGeoJson, trip, hasRenderableTrip]);
 
-  if (!HAS_VALID_TOKEN) {
+  if (!HAS_VALID_MAPBOX_TOKEN) {
     return (
       <div className="map-placeholder map-warning">
         <p>Map preview unavailable</p>
-        <small>Set `VITE_MAPBOX_KEY` in `frontend/.env` to render selected trip map replay.</small>
+        <small>{MAPBOX_TOKEN_HELP}</small>
       </div>
     );
   }

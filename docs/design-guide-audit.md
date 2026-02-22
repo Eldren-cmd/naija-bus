@@ -55,6 +55,10 @@ Reference: `NaijaTransport_DesignGuide.docx`
 - Phase 6 task `6.11` structured backend logging baseline completed:
   - JSON request/error logs now capture method/path/status/duration for API diagnostics
   - Render sink-ready stdout logging improves production traceability of UI-impacting backend issues
+- Phase 6 task `6.12` Mapbox quota guardrails completed:
+  - RouteView and MyTrips maps now share Lagos bounds + zoom caps to keep map interaction focused
+  - frontend map fallback now rejects secret token patterns and requires public `pk...` runtime tokens
+  - map surfaces disable world-copy behavior to prevent unnecessary off-region tile exploration
 - Productization pass completed for public-first UX:
   - added conversion-focused homepage at `/` with clear hero search, feature highlights, and "How it works" sections
   - Route Finder moved to `/map` to separate marketing surface from operational app surface

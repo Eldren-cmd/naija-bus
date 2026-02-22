@@ -1640,6 +1640,44 @@ Engagement Guide applicability check:
 ### Next Tasks
 - Continue Phase 6 in strict order: `6.12` (Mapbox billing alerts and quota guardrails).
 
+### Task 6.12
+- Add Mapbox billing-alert runbook and frontend quota guardrails
+
+Status: complete. Implemented:
+- added shared frontend Mapbox guardrail config:
+  - `frontend/src/config/mapbox.ts`
+  - validates public token usage (`pk...`) for browser runtime
+  - centralizes Lagos center/bounds and map zoom caps
+- applied guardrails to RouteView map:
+  - `frontend/src/components/RouteMap.tsx`
+  - enforced `maxBounds`, `minZoom`, `maxZoom`, and world-wrap guardrails
+  - improved missing/invalid-token fallback messaging
+- applied same guardrails to MyTrips replay map:
+  - `frontend/src/components/MyTripMap.tsx`
+- environment/docs updates:
+  - `frontend/.env.example` now shows public-token format
+  - `frontend/README.md` mapbox token policy + guardrail notes
+  - root `README.md` now includes Mapbox billing alert and URL-restriction runbook
+
+validation checks passed:
+- `npm --prefix backend run test`
+- `npm --prefix backend run build`
+- `npm --prefix frontend run lint`
+- `npm --prefix frontend run build`
+- evidence documented in:
+  - `docs/phase6-step612-validation.md`
+
+Design Guide applicability check:
+- map visuals stay aligned while map interaction is constrained to Lagos corridor defaults, reducing noisy off-region behavior.
+- shared guardrail config keeps RouteView/MyTrips map behavior consistent.
+
+Engagement Guide applicability check:
+- map reliability and cost-control guardrails support stable long-term access to route/report/trip engagement loops.
+- public-token enforcement lowers risk of exposed secret token misuse disrupting live commuter usage.
+
+### Next Tasks
+- Continue Phase 6 in strict order: `6.13` (uptime monitoring for `/api/v1/health`).
+
 ## Supplemental UX Productization Pass
 
 Status: complete. Implemented:

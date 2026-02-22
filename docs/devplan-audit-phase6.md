@@ -27,7 +27,7 @@ Cross-guide enforcement (mandatory):
 | 6.9 | complete | Added GitHub Actions backend CD workflow for `main` (`.github/workflows/deploy-backend.yml`). Workflow runs backend test/build gates, then triggers Render deploy hook via `RENDER_DEPLOY_HOOK_URL` secret. |
 | 6.10 | complete | Sentry backend integration added with DSN-based initialization, process-level exception hooks, and token-gated capture validation endpoint (`POST /api/v1/observability/sentry-test`). 500 responses are now mirrored to Sentry with request metadata. |
 | 6.11 | complete | Added structured backend logging via `pino` with request/response lifecycle logs, `>=500` error response logs, and startup/bot-failure logs. Logs emit as JSON to stdout and are sink-ready for Render log ingestion. |
-| 6.12 | missing | Pending: Mapbox billing alerts and quota guardrails. |
+| 6.12 | complete | Added frontend Mapbox quota guardrails (public-token enforcement + Lagos bounds/zoom caps), plus billing-alert/token-restriction runbook and validation evidence. |
 | 6.13 | missing | Pending: uptime monitoring of `/api/v1/health`. |
 | 6.14 | missing | Pending: production security audit checks. |
 | 6.15 | missing | Pending: final production README/demo packaging. |
@@ -275,7 +275,41 @@ Cross-guide compliance:
 - Design Guide: no direct visual redesign; structured logging reduces time-to-diagnose backend/API issues that impact UI reliability.
 - Engagement Guide: improved backend diagnostics reduces disruption risk for recurring commuter engagement loops.
 
+## Task 6.12 Completion Note
+
+Status: complete.
+
+Implemented:
+- frontend Mapbox guardrail config module:
+  - `frontend/src/config/mapbox.ts`
+  - enforces public-token policy (`pk...`) for browser runtime
+  - centralizes Lagos map bounds + zoom caps used across map surfaces
+- RouteView map guardrails:
+  - `frontend/src/components/RouteMap.tsx`
+  - applies `maxBounds`, `minZoom`, `maxZoom`, and world-wrap guardrails
+  - uses centralized guardrail config and safer invalid-token fallback copy
+- MyTrips replay map guardrails:
+  - `frontend/src/components/MyTripMap.tsx`
+  - applies the same bounds/zoom guardrails for parity and cost control
+- environment/docs updates:
+  - `frontend/.env.example` (public token format)
+  - `frontend/README.md`
+  - `README.md` (billing-alert and token-restriction runbook)
+
+Validation:
+- local quality gates:
+  - `npm --prefix backend run test` passed
+  - `npm --prefix backend run build` passed
+  - `npm --prefix frontend run lint` passed
+  - `npm --prefix frontend run build` passed
+- evidence document:
+  - `docs/phase6-step612-validation.md`
+
+Cross-guide compliance:
+- Design Guide: map styling remains aligned while map interaction scope is constrained to Lagos corridor bounds, reducing unintended UX drift and excessive tile fetches.
+- Engagement Guide: keeping map availability stable and affordable supports sustained commuter usage across route search, report, and trip replay loops.
+
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `6.12` next.
+1. Continue with `6.13` next.
 2. Keep phase-6 tasks in strict sequence with step-level validation and compliance notes.

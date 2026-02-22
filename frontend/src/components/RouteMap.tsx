@@ -3,6 +3,16 @@ import mapboxgl from "mapbox-gl";
 import type { FeatureCollection, LineString, Point } from "geojson";
 import { io, type Socket } from "socket.io-client";
 import { getReportsByBbox } from "../lib/api";
+import {
+  HAS_VALID_MAPBOX_TOKEN,
+  LAGOS_CENTER,
+  LAGOS_MAX_BOUNDS,
+  MAPBOX_STYLE,
+  MAPBOX_TOKEN,
+  MAPBOX_TOKEN_HELP,
+  MAP_MAX_ZOOM,
+  MAP_MIN_ZOOM,
+} from "../config/mapbox";
 import type {
   Bbox,
   ReportSeverity,
@@ -18,7 +28,6 @@ type RouteMapProps = {
   tripCheckpoints: TripCheckpoint[];
 };
 
-const MAP_STYLE = "mapbox://styles/mapbox/navigation-night-v1";
 const ROUTE_SOURCE_ID = "route-line-source";
 const ROUTE_GLOW_LAYER_ID = "route-line-glow-layer";
 const ROUTE_LAYER_ID = "route-line-layer";
@@ -27,10 +36,7 @@ const REPORT_SOURCE_ID = "route-report-source";
 const REPORT_LAYER_ID = "route-report-layer";
 const TRIP_SOURCE_ID = "trip-live-source";
 const TRIP_LAYER_ID = "trip-live-layer";
-const LAGOS_CENTER: [number, number] = [3.3792, 6.5244];
-const MAPBOX_TOKEN = (import.meta.env.VITE_MAPBOX_KEY || "").trim();
-const HAS_VALID_TOKEN =
-  MAPBOX_TOKEN.length > 0 && !MAPBOX_TOKEN.includes("replace_with_mapbox_token");
+const ROUTE_FIT_MAX_ZOOM = 14;
 const API_BASE = (import.meta.env.VITE_API_BASE || "http://localhost:5000").replace(/\/+$/, "");
 const SOCKET_BASE = (() => {
   try {
@@ -232,14 +238,20 @@ export function RouteMap({ route, tripCheckpoints }: RouteMapProps) {
   const reportData = useMemo(() => toReportFeatureCollection(reports), [reports]);
 
   useEffect(() => {
-    if (!HAS_VALID_TOKEN || !mapContainerRef.current || mapRef.current) return;
+    if (!HAS_VALID_MAPBOX_TOKEN || !mapContainerRef.current || mapRef.current) return;
 
     mapboxgl.accessToken = MAPBOX_TOKEN;
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: MAP_STYLE,
+      style: MAPBOX_STYLE,
       center: LAGOS_CENTER,
       zoom: 11.5,
+      minZoom: MAP_MIN_ZOOM,
+      maxZoom: MAP_MAX_ZOOM,
+      maxBounds: LAGOS_MAX_BOUNDS,
+      renderWorldCopies: false,
+      pitchWithRotate: false,
+      dragRotate: false,
     });
 
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
@@ -284,7 +296,7 @@ export function RouteMap({ route, tripCheckpoints }: RouteMapProps) {
   }, [routeBbox]);
 
   useEffect(() => {
-    if (!HAS_VALID_TOKEN || !mapRef.current) return;
+    if (!HAS_VALID_MAPBOX_TOKEN || !mapRef.current) return;
     const map = mapRef.current;
 
     const draw = () => {
@@ -341,7 +353,7 @@ export function RouteMap({ route, tripCheckpoints }: RouteMapProps) {
         (memo, coord) => memo.extend(coord),
         new mapboxgl.LngLatBounds(firstPoint, firstPoint),
       );
-      map.fitBounds(bounds, { padding: 44, duration: 700, maxZoom: 14 });
+      map.fitBounds(bounds, { padding: 44, duration: 700, maxZoom: ROUTE_FIT_MAX_ZOOM });
     };
 
     if (map.isStyleLoaded()) {
@@ -352,7 +364,7 @@ export function RouteMap({ route, tripCheckpoints }: RouteMapProps) {
   }, [routeLineData, route, stopData]);
 
   useEffect(() => {
-    if (!HAS_VALID_TOKEN || !mapRef.current) return;
+    if (!HAS_VALID_MAPBOX_TOKEN || !mapRef.current) return;
     const map = mapRef.current;
 
     const drawReports = () => {
@@ -407,7 +419,7 @@ export function RouteMap({ route, tripCheckpoints }: RouteMapProps) {
   }, [reportData]);
 
   useEffect(() => {
-    if (!HAS_VALID_TOKEN || !mapRef.current) return;
+    if (!HAS_VALID_MAPBOX_TOKEN || !mapRef.current) return;
     const map = mapRef.current;
 
     const drawTripLine = () => {
@@ -442,7 +454,7 @@ export function RouteMap({ route, tripCheckpoints }: RouteMapProps) {
   }, [tripLineData]);
 
   useEffect(() => {
-    if (!routeBbox || !HAS_VALID_TOKEN) {
+    if (!routeBbox || !HAS_VALID_MAPBOX_TOKEN) {
       setRealtimeStatus("disconnected");
       return;
     }
@@ -489,13 +501,11 @@ export function RouteMap({ route, tripCheckpoints }: RouteMapProps) {
     };
   }, [route._id, routeBbox, routeBboxKey]);
 
-  if (!HAS_VALID_TOKEN) {
+  if (!HAS_VALID_MAPBOX_TOKEN) {
     return (
       <div className="map-placeholder map-warning">
         <p>Map preview unavailable</p>
-        <small>
-          Set `VITE_MAPBOX_KEY` in `frontend/.env` to render the live map polyline.
-        </small>
+        <small>{MAPBOX_TOKEN_HELP}</small>
       </div>
     );
   }

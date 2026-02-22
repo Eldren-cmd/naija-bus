@@ -80,6 +80,7 @@ This repository is being built strictly from:
 - [x] Phase 6 / Task 6.9: Backend CD workflow added to trigger Render deploy hook on `main`
 - [x] Phase 6 / Task 6.10: Sentry backend observability integrated with token-gated capture validation endpoint
 - [x] Phase 6 / Task 6.11: Structured JSON backend logging added with Render sink-ready stdout output
+- [x] Phase 6 / Task 6.12: Mapbox billing/quota guardrails added (public-token enforcement, Lagos bounds + zoom caps, billing-alert runbook)
 - [x] UX refresh: public homepage (`/`) added with conversion-first hero flow and Route Finder moved to `/map` (with `/search` alias)
 - [x] UX fix: removed internal "Phase 2 Core MVP" label from user-facing page copy (now subtle `Beta`)
 - [x] UX fix: route list API no longer auto-fires on first page load without explicit user search
@@ -141,7 +142,19 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 
 ### Frontend Keys
 - `VITE_API_BASE`: backend base URL used by frontend API calls.
-- `VITE_MAPBOX_KEY`: Mapbox token (required from Phase 2 map work onward).
+- `VITE_MAPBOX_KEY`: public Mapbox token (`pk...`) used by frontend map surfaces.
+
+### Mapbox Billing Guardrails (Phase 6.12)
+1. Use a public browser token only (`pk...`) for `VITE_MAPBOX_KEY`; never use `sk...` in frontend env.
+2. Restrict token URLs in Mapbox token settings to:
+   - `http://localhost:5173/*`
+   - `https://naijatransport.vercel.app/*` (or your active production domain)
+3. Configure Mapbox billing alerts from account settings (recommended thresholds):
+   - 50% monthly usage
+   - 75% monthly usage
+   - 90% monthly usage
+   - 100% monthly usage
+4. Keep map views constrained to Lagos defaults and zoom bounds (implemented in frontend code) to reduce accidental high tile usage from off-corridor panning.
 
 ## Seed Data (Phase 1 Task 1.10)
 - Dataset file: `seed/initialRoutes.json` (5 Lagos corridors).

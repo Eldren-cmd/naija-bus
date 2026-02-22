@@ -46,14 +46,22 @@ React + TypeScript + Vite frontend for Naija Transport.
   - hosted frontend env vars configured (`VITE_MAPBOX_KEY`, `VITE_API_BASE`)
 - Phase 6 Task 6.2 backend hosting completed:
   - hosted frontend API base now points to live Render backend (`https://naija-bus-backend.onrender.com`)
+- Phase 6 Task 6.12 Mapbox guardrails completed:
+  - frontend only accepts public Mapbox tokens (`pk...`) and rejects secret-token usage in UI fallback
+  - map render scope is constrained to Lagos bounds with zoom caps to reduce accidental tile over-consumption
+  - both RouteView and MyTrips replay maps now share the same map guardrail configuration
 
 ## Environment
 Create `frontend/.env` with:
 
 ```
 VITE_API_BASE=http://localhost:5000
-VITE_MAPBOX_KEY=replace_with_mapbox_token_when_phase2_starts
+VITE_MAPBOX_KEY=pk.replace_with_public_mapbox_token
 ```
+
+Mapbox key rule:
+- Use only a public key (`pk...`) in frontend env.
+- Do not use secret keys (`sk...`) in `frontend/.env` or browser-delivered code.
 
 ## Commands
 - `npm run dev`

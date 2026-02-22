@@ -173,6 +173,15 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - improves operational visibility for recurring engagement flows during production incidents
   - reduces time-to-recovery for auth/report/trip/saved-route failures
 
+### Phase 6 (Task 6.12)
+- Mapbox billing/quota guardrails completed:
+  - frontend now enforces public-token usage (`pk...`) for browser map rendering
+  - RouteView and MyTrips map surfaces now share Lagos bounds and zoom caps
+  - billing-alert + token-restriction runbook documented for operational follow-through
+- Engagement applicability:
+  - helps keep map-based engagement features economically stable over time
+  - reduces risk of map outages/abuse that would disrupt route search, report visibility, and trip replay loops
+
 ## Future Compliance Plan
 
 ### Phase 6 and Beyond
