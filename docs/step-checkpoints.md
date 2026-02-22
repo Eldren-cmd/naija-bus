@@ -1678,6 +1678,45 @@ Engagement Guide applicability check:
 ### Next Tasks
 - Continue Phase 6 in strict order: `6.13` (uptime monitoring for `/api/v1/health`).
 
+### Task 6.13
+- Add uptime monitoring for `GET /api/v1/health`
+
+Status: complete. Implemented:
+- added scheduled backend uptime check workflow:
+  - `.github/workflows/uptime-health-check.yml`
+  - cadence: every 10 minutes
+  - checks backend health endpoint payload for:
+    - `"status":"ok"`
+    - `"database":"connected"`
+  - supports optional `BACKEND_HEALTH_URL` GitHub secret override
+- added operational docs/runbook:
+  - `README.md` uptime section now documents:
+    - health endpoint URL
+    - workflow cadence and behavior
+    - UptimeRobot monitor setup guidance for keep-warm behavior
+
+validation checks passed:
+- live endpoint check:
+  - `curl -i https://naija-bus-backend.onrender.com/api/v1/health` -> `200`, DB `connected`
+- local quality gates:
+  - `npm --prefix backend run test`
+  - `npm --prefix backend run build`
+  - `npm --prefix frontend run lint`
+  - `npm --prefix frontend run build`
+- evidence documented in:
+  - `docs/phase6-step613-validation.md`
+
+Design Guide applicability check:
+- no direct UI changes for this task.
+- uptime monitoring lowers user-facing reliability issues by catching API outages earlier.
+
+Engagement Guide applicability check:
+- helps preserve continuity of report/trip/saved-route engagement loops by reducing backend downtime risk.
+- supports free-tier keep-warm strategy for faster first-response experience.
+
+### Next Tasks
+- Continue Phase 6 in strict order: `6.14` (production security audit checks).
+
 ## Supplemental UX Productization Pass
 
 Status: complete. Implemented:

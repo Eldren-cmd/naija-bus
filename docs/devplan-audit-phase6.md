@@ -28,7 +28,7 @@ Cross-guide enforcement (mandatory):
 | 6.10 | complete | Sentry backend integration added with DSN-based initialization, process-level exception hooks, and token-gated capture validation endpoint (`POST /api/v1/observability/sentry-test`). 500 responses are now mirrored to Sentry with request metadata. |
 | 6.11 | complete | Added structured backend logging via `pino` with request/response lifecycle logs, `>=500` error response logs, and startup/bot-failure logs. Logs emit as JSON to stdout and are sink-ready for Render log ingestion. |
 | 6.12 | complete | Added frontend Mapbox quota guardrails (public-token enforcement + Lagos bounds/zoom caps), plus billing-alert/token-restriction runbook and validation evidence. |
-| 6.13 | missing | Pending: uptime monitoring of `/api/v1/health`. |
+| 6.13 | complete | Added scheduled uptime checks for `/api/v1/health` (10-minute cadence) with documented UptimeRobot setup and live endpoint verification evidence. |
 | 6.14 | missing | Pending: production security audit checks. |
 | 6.15 | missing | Pending: final production README/demo packaging. |
 
@@ -309,7 +309,38 @@ Cross-guide compliance:
 - Design Guide: map styling remains aligned while map interaction scope is constrained to Lagos corridor bounds, reducing unintended UX drift and excessive tile fetches.
 - Engagement Guide: keeping map availability stable and affordable supports sustained commuter usage across route search, report, and trip replay loops.
 
+## Task 6.13 Completion Note
+
+Status: complete.
+
+Implemented:
+- added scheduled uptime monitor workflow:
+  - `.github/workflows/uptime-health-check.yml`
+  - trigger cadence: every 10 minutes
+  - monitor target: `/api/v1/health`
+  - validates expected health payload (`status=ok`, `database=connected`)
+  - supports optional URL override through GitHub secret `BACKEND_HEALTH_URL`
+- documentation/runbook updates:
+  - `README.md` now includes uptime monitoring setup and operational guidance
+  - UptimeRobot setup guidance retained as external keep-warm monitor path
+
+Validation:
+- live endpoint check:
+  - `curl -i https://naija-bus-backend.onrender.com/api/v1/health`
+  - returned `HTTP/1.1 200 OK` with `{"status":"ok","service":"backend","database":"connected"}`
+- local quality gates:
+  - `npm --prefix backend run test` passed
+  - `npm --prefix backend run build` passed
+  - `npm --prefix frontend run lint` passed
+  - `npm --prefix frontend run build` passed
+- evidence document:
+  - `docs/phase6-step613-validation.md`
+
+Cross-guide compliance:
+- Design Guide: no direct UI redesign; uptime checks reduce backend unavailability windows that degrade map/search/fare UX reliability.
+- Engagement Guide: continuous health monitoring protects repeat commuter engagement loops by reducing downtime for reports, trips, and saved-route flows.
+
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `6.13` next.
+1. Continue with `6.14` next.
 2. Keep phase-6 tasks in strict sequence with step-level validation and compliance notes.

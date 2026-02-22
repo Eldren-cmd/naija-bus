@@ -1,0 +1,32 @@
+name: uptime-health-check
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  check-backend-health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve health endpoint URL
+        id: resolve-url
+        env:
+          BACKEND_HEALTH_URL: ${{ secrets.BACKEND_HEALTH_URL }}
+        run: |
+          if [ -n "$BACKEND_HEALTH_URL" ]; then
+            echo "url=$BACKEND_HEALTH_URL" >> "$GITHUB_OUTPUT"
+          else
+            echo "url=https://naija-bus-backend.onrender.com/api/v1/health" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Ping backend health endpoint
+        env:
+          HEALTH_URL: ${{ steps.resolve-url.outputs.url }}
+        run: |
+          set -euo pipefail
+          echo "Checking $HEALTH_URL"
+          RESPONSE="$(curl --silent --show-error --fail --max-time 25 "$HEALTH_URL")"
+          echo "response=$RESPONSE"
+          echo "$RESPONSE" | grep -q '"status":"ok"'
+          echo "$RESPONSE" | grep -q '"database":"connected"'

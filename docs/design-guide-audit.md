@@ -59,6 +59,9 @@ Reference: `NaijaTransport_DesignGuide.docx`
   - RouteView and MyTrips maps now share Lagos bounds + zoom caps to keep map interaction focused
   - frontend map fallback now rejects secret token patterns and requires public `pk...` runtime tokens
   - map surfaces disable world-copy behavior to prevent unnecessary off-region tile exploration
+- Phase 6 task `6.13` uptime monitoring baseline completed:
+  - scheduled health checks now monitor `/api/v1/health` every 10 minutes
+  - monitoring reduces prolonged backend outage windows that would degrade map/search/fare page reliability
 - Productization pass completed for public-first UX:
   - added conversion-focused homepage at `/` with clear hero search, feature highlights, and "How it works" sections
   - Route Finder moved to `/map` to separate marketing surface from operational app surface

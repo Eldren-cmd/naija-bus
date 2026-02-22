@@ -182,6 +182,14 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - helps keep map-based engagement features economically stable over time
   - reduces risk of map outages/abuse that would disrupt route search, report visibility, and trip replay loops
 
+### Phase 6 (Task 6.13)
+- uptime monitoring baseline completed:
+  - `/api/v1/health` is now monitored on a 10-minute cadence by scheduled automation
+  - keep-warm guidance for UptimeRobot is documented for free-tier Render stability
+- Engagement applicability:
+  - lowers downtime risk for recurring commuter actions (search/report/trip/saved routes)
+  - improves consistency of realtime report participation by reducing cold-start/outage disruptions
+
 ## Future Compliance Plan
 
 ### Phase 6 and Beyond

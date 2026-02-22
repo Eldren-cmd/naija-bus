@@ -81,6 +81,7 @@ This repository is being built strictly from:
 - [x] Phase 6 / Task 6.10: Sentry backend observability integrated with token-gated capture validation endpoint
 - [x] Phase 6 / Task 6.11: Structured JSON backend logging added with Render sink-ready stdout output
 - [x] Phase 6 / Task 6.12: Mapbox billing/quota guardrails added (public-token enforcement, Lagos bounds + zoom caps, billing-alert runbook)
+- [x] Phase 6 / Task 6.13: Uptime monitoring added for `/api/v1/health` (GitHub scheduled monitor + UptimeRobot runbook)
 - [x] UX refresh: public homepage (`/`) added with conversion-first hero flow and Route Finder moved to `/map` (with `/search` alias)
 - [x] UX fix: removed internal "Phase 2 Core MVP" label from user-facing page copy (now subtle `Beta`)
 - [x] UX fix: route list API no longer auto-fires on first page load without explicit user search
@@ -155,6 +156,21 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
    - 90% monthly usage
    - 100% monthly usage
 4. Keep map views constrained to Lagos defaults and zoom bounds (implemented in frontend code) to reduce accidental high tile usage from off-corridor panning.
+
+### Uptime Monitoring (Phase 6.13)
+1. Health endpoint: `https://naija-bus-backend.onrender.com/api/v1/health`
+2. GitHub Actions scheduled uptime check:
+   - workflow: `.github/workflows/uptime-health-check.yml`
+   - cadence: every 10 minutes
+   - validates response contains:
+     - `"status":"ok"`
+     - `"database":"connected"`
+3. Optional GitHub secret override:
+   - `BACKEND_HEALTH_URL` (if backend URL changes)
+4. UptimeRobot runbook:
+   - create HTTPS monitor for `/api/v1/health`
+   - set interval to 10 minutes
+   - this keeps free-tier Render service warm and reduces first-request cold starts
 
 ## Seed Data (Phase 1 Task 1.10)
 - Dataset file: `seed/initialRoutes.json` (5 Lagos corridors).
