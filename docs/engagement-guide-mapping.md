@@ -206,6 +206,22 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - improves consistency of stakeholder/user demos for report, trip, and saved-route retention loops
   - reduces handoff ambiguity, helping maintain engagement continuity post-build
 
+### Strict UIUX Steps 096-099
+- Step 096 engagement backend extension completed:
+  - conductor-only quick-report bootstrap endpoint is live
+  - quick fare submission now enforces assigned-route scope (`championRoutes`)
+  - aliases are active for versioned and legacy paths, reducing integration breakage risk
+- Step 097 engagement frontend extension completed:
+  - `/quick-report` mobile-first conductor workflow now supports rapid fare submissions
+  - token bootstrap, assigned-route selection, and submission feedback states are implemented
+- Step 098 conversion alignment completed:
+  - homepage hierarchy now drives faster route-search entry
+  - improved first-touch onboarding supports engagement funnel from discovery into reporting flows
+- Step 099 regression/compliance reinforcement completed:
+  - Playwright coverage now includes quick-report path and updated auth/report flows
+  - backend quick-report alias coverage expanded in integration tests
+  - compliance docs refreshed to reflect strict implementation state
+
 ## Future Compliance Plan
 
 ### Phase 6 and Beyond

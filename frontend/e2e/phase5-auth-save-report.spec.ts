@@ -263,10 +263,10 @@ async function mockApi(page: Page) {
 
 async function loginViaUi(page: Page) {
   await page.goto("/login");
-  await page.getByLabel("Email").fill("rider@example.com");
+  await page.getByLabel("Email address").fill("rider@example.com");
   await page.getByLabel("Password").fill("password123");
   await page.getByRole("button", { name: "Sign In" }).click();
-  await expect(page.getByText("Signed in: Test Rider")).toBeVisible();
+  await expect(page).toHaveURL(/\/map/);
 }
 
 test.beforeEach(async ({ page }) => {
@@ -275,9 +275,8 @@ test.beforeEach(async ({ page }) => {
 
 test("Phase 5 auth login flow redirects into Route Finder", async ({ page }) => {
   await loginViaUi(page);
-  await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByRole("heading", { name: /Find your route/i })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Search" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Route Finder/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Find Route" })).toBeVisible();
 });
 
 test("Phase 5 saved-route flow saves selected route and updates panel", async ({ page }) => {

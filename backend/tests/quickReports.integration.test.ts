@@ -131,6 +131,36 @@ describe("quick report endpoints", () => {
     ]);
   });
 
+  it("supports bootstrap alias route /reports/quick/bootstrap", async () => {
+    mockConductorLookup({
+      _id: CONDUCTOR_ID,
+      fullName: "Ojota Conductor",
+      championRoutes: [ASSIGNED_ROUTE_ID],
+    });
+
+    const lean = jest.fn().mockResolvedValue([
+      {
+        _id: ASSIGNED_ROUTE_ID,
+        name: "Ojota -> CMS",
+        origin: "Ojota",
+        destination: "CMS",
+        corridor: "Ikorodu Road",
+        transportType: "danfo",
+        baseFare: 300,
+      },
+    ]);
+    const select = jest.fn().mockReturnValue({ lean });
+    (Route.find as unknown as jest.Mock).mockReturnValue({ select });
+
+    const response = await request(app).get(
+      `/reports/quick/bootstrap?token=${VALID_CONDUCTOR_TOKEN}`,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.conductor.userId).toBe(CONDUCTOR_ID);
+    expect(response.body.assignedRoutes).toHaveLength(1);
+  });
+
   it("returns 403 when submitting quick fare report for unassigned route", async () => {
     mockConductorLookup({
       _id: CONDUCTOR_ID,
@@ -192,5 +222,39 @@ describe("quick report endpoints", () => {
     });
     expect(emitFareReported).toHaveBeenCalledTimes(1);
     expect(response.body.routeId).toBe(ASSIGNED_ROUTE_ID);
+  });
+
+  it("supports quick submit alias route /reports/quick", async () => {
+    mockConductorLookup({
+      _id: CONDUCTOR_ID,
+      fullName: "Ojota Conductor",
+      championRoutes: [ASSIGNED_ROUTE_ID],
+    });
+
+    const routeLean = jest.fn().mockResolvedValue({ _id: ASSIGNED_ROUTE_ID });
+    const routeSelect = jest.fn().mockReturnValue({ lean: routeLean });
+    (Route.findOne as unknown as jest.Mock).mockReturnValue({ select: routeSelect });
+
+    (Fare.create as unknown as jest.Mock).mockResolvedValue({
+      _id: "quick-fare-2",
+      routeId: ASSIGNED_ROUTE_ID,
+      amount: 450,
+      source: "user_report",
+      trafficLevel: "medium",
+      reportedBy: CONDUCTOR_ID,
+      notes: "",
+      createdAt: new Date("2026-02-22T10:01:00.000Z"),
+    });
+
+    const response = await request(app).post("/reports/quick").send({
+      token: VALID_CONDUCTOR_TOKEN,
+      routeId: ASSIGNED_ROUTE_ID,
+      reportedFare: 450,
+      trafficLevel: "medium",
+    });
+
+    expect(response.status).toBe(201);
+    expect(response.body.routeId).toBe(ASSIGNED_ROUTE_ID);
+    expect(Fare.create).toHaveBeenCalledTimes(1);
   });
 });

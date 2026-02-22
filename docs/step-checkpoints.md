@@ -1507,6 +1507,100 @@ Status: complete. Implemented:
 validation checks passed:
 - `npm --prefix frontend run lint`
 - `npm --prefix frontend run build`
+
+## UIUX Strict Overhaul (Steps 096-099)
+
+### Step 096
+- Implement QuickReport backend endpoints with strict conductor and route-scope enforcement.
+
+Status: complete. Implemented:
+- added validation schemas in `backend/src/validation/requestSchemas.ts`:
+  - `validateQuickReportBootstrapQuery`
+  - `validateQuickFareReportBody`
+- added backend quick-report handlers in `backend/src/server.ts`:
+  - `GET /api/v1/reports/quick/bootstrap`
+  - `GET /reports/quick/bootstrap` (alias)
+  - `POST /api/v1/reports/quick`
+  - `POST /reports/quick` (alias)
+- policy enforcement:
+  - conductor-token lookup is restricted to active users with `role="conductor"`
+  - submission is limited to `championRoutes` assigned to that conductor
+  - unassigned route submission returns `403`
+- backend tests:
+  - `backend/tests/quickReports.integration.test.ts`
+  - additional schema coverage in `backend/tests/requestSchemas.test.ts`
+
+validation checks passed:
+- `npm --prefix backend run test`
+- `npm --prefix backend run build`
+- `npm --prefix frontend run lint`
+- `npm --prefix frontend run build`
+
+### Step 097
+- Implement QuickReport frontend page and connect it end-to-end with backend quick-report APIs.
+
+Status: complete. Implemented:
+- added page `frontend/src/pages/QuickReport.tsx` with:
+  - token bootstrap flow
+  - assigned route selection
+  - quick fare submission
+  - success/error/empty fallback states
+- added frontend API client methods in `frontend/src/lib/api.ts`:
+  - `getQuickReportBootstrap`
+  - `submitQuickFareReport`
+- added quick-report types in `frontend/src/types.ts`
+- wired route in `frontend/src/App.tsx`:
+  - `/quick-report`
+- added dedicated styling in `frontend/src/App.css`
+
+validation checks passed:
+- `npm --prefix frontend run lint`
+- `npm --prefix frontend run build`
+- `npm --prefix backend run test`
+- `npm --prefix backend run build`
+
+### Step 098
+- Final homepage alignment per guide (conversion-first hierarchy and polished section flow).
+
+Status: complete. Implemented:
+- updated `frontend/src/pages/Home.tsx`:
+  - stronger hero hierarchy
+  - dedicated route-search card
+  - trust-pill reinforcement
+  - clearer feature and how-it-works framing
+  - CTA priority shifted to route search
+- refined homepage visuals in `frontend/src/App.css`:
+  - hierarchy, spacing, and responsive layout improvements
+
+validation checks passed:
+- `npm --prefix frontend run lint`
+- `npm --prefix frontend run build`
+- `npm --prefix backend run test`
+- `npm --prefix backend run build`
+
+### Step 099
+- Refresh regression coverage and compliance docs for strict UIUX and quick-report delivery.
+
+Status: complete. Implemented:
+- updated existing Playwright spec for current UI structure:
+  - `frontend/e2e/phase5-auth-save-report.spec.ts`
+- added quick-report Playwright coverage:
+  - `frontend/e2e/phase5-quick-report.spec.ts`
+- expanded backend quick-report integration coverage for alias routes:
+  - `backend/tests/quickReports.integration.test.ts`
+- refreshed compliance docs:
+  - `docs/design-guide-audit.md`
+  - `docs/engagement-guide-mapping.md`
+  - `docs/step-checkpoints.md`
+  - `docs/cross-phase-compliance-audit.md`
+
+validation checks passed:
+- `npm --prefix frontend run lint`
+- `npm --prefix frontend run build`
+- `npm --prefix backend run test`
+- `npm --prefix backend run build`
+- `npm --prefix frontend run test:e2e:list`
+- `npm --prefix frontend run test:e2e -- --grep "QuickReport" --project=chromium --reporter=list`
 - `npm --prefix backend run test`
 - `npm --prefix backend run build`
 - evidence documented in:
