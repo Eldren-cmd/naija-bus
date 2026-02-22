@@ -1092,6 +1092,10 @@
   max-width: 1180px;
   margin: 0 auto;
   padding: 1.1rem 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
 }
 
 .auth-brand {
@@ -1103,6 +1107,27 @@
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.08rem;
+}
+
+.auth-head-link {
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  background: rgba(255, 255, 255, 0.08);
+  color: #d5dee8;
+  border-radius: 999px;
+  padding: 0.36rem 0.72rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    background-color 180ms ease;
+}
+
+.auth-head-link:hover {
+  border-color: rgba(255, 255, 255, 0.46);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .auth-brand-mark {
@@ -1174,6 +1199,42 @@
   line-height: 1.5;
 }
 
+.auth-benefits {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.auth-benefits li {
+  border: 1px solid #ead9c6;
+  border-radius: 0.72rem;
+  background: #fffaf3;
+  color: #30475f;
+  padding: 0.45rem 0.56rem;
+  font-size: 0.79rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.42rem;
+  align-items: start;
+}
+
+.auth-benefits li span:first-child {
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 999px;
+  border: 1px solid #efc79d;
+  background: #fff0df;
+  color: #a14f00;
+  font-size: 0.64rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
 .auth-alert {
   border-radius: 0.85rem;
   padding: 0.62rem 0.72rem;
@@ -1216,6 +1277,12 @@
   font-size: 0.8rem;
   font-weight: 700;
   color: #162a3f;
+}
+
+.auth-help-copy {
+  color: #8392a3;
+  font-size: 0.73rem;
+  font-weight: 600;
 }
 
 .auth-help-link {
@@ -2996,6 +3063,11 @@
     padding: 0.9rem 0.8rem 0;
   }
 
+  .auth-head-link {
+    font-size: 0.72rem;
+    padding: 0.34rem 0.62rem;
+  }
+
   .auth-main {
     min-height: calc(100vh - 56px);
     padding: 0.8rem 0.8rem 1.4rem;
@@ -3008,6 +3080,10 @@
 
   .auth-card-head h1 {
     font-size: 1.45rem;
+  }
+
+  .auth-benefits li {
+    font-size: 0.76rem;
   }
 
   .home-hero {
@@ -3103,8 +3179,17 @@
 }
 
 @media (max-width: 560px) {
+  .auth-header {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
   .auth-brand {
     font-size: 0.98rem;
+  }
+
+  .auth-head-link {
+    margin-left: auto;
   }
 
   .auth-card {

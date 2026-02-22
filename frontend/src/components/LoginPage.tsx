@@ -18,6 +18,11 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const commuterHighlights = [
+    "Submit fare reports in seconds",
+    "Save your daily routes for quick access",
+    "Record trips and build your commuter score",
+  ];
 
   const redirectPath = (location.state as RedirectState | null)?.from || "/map";
   if (isAuthenticated) {
@@ -58,6 +63,9 @@ export function LoginPage() {
           </span>
           <span>Naija Transport</span>
         </Link>
+        <Link to="/signup" className="auth-head-link">
+          Create account
+        </Link>
       </header>
 
       <main className="auth-main">
@@ -70,6 +78,15 @@ export function LoginPage() {
               <h1>Welcome back</h1>
               <p>Sign in to report fares and track your trips.</p>
             </div>
+
+            <ul className="auth-benefits" aria-label="Account benefits">
+              {commuterHighlights.map((item) => (
+                <li key={item}>
+                  <span aria-hidden="true">+</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
 
             {error && (
               <div className="auth-alert auth-alert-error" role="alert">
@@ -89,6 +106,7 @@ export function LoginPage() {
                     className="auth-input"
                     type="email"
                     autoComplete="email"
+                    required
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="you@example.com"
@@ -98,15 +116,7 @@ export function LoginPage() {
 
               <div className="auth-field-top">
                 <span>Password</span>
-                <button
-                  type="button"
-                  className="auth-help-link"
-                  onClick={() => {
-                    /* placeholder until reset flow is added */
-                  }}
-                >
-                  Forgot password?
-                </button>
+                <span className="auth-help-copy">Password reset coming soon</span>
               </div>
               <label className="auth-field auth-field-password">
                 <div className="auth-input-wrap">
@@ -117,6 +127,7 @@ export function LoginPage() {
                     className="auth-input"
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
+                    required
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     placeholder="Your password"
@@ -151,7 +162,7 @@ export function LoginPage() {
             </p>
           </section>
 
-          <p className="auth-trust-line">Your data is secure. We never share your information.</p>
+          <p className="auth-trust-line">Your data is secure. We never share personal info with third parties.</p>
         </div>
       </main>
     </div>

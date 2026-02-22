@@ -15,6 +15,11 @@ export function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const commuterHighlights = [
+    "Earn credibility with verified reports",
+    "Access saved routes across devices",
+    "Help make Lagos fares more transparent",
+  ];
 
   if (isAuthenticated) {
     return <Navigate to="/map" replace />;
@@ -69,6 +74,9 @@ export function SignupPage() {
           </span>
           <span>Naija Transport</span>
         </Link>
+        <Link to="/login" className="auth-head-link">
+          Sign in
+        </Link>
       </header>
 
       <main className="auth-main">
@@ -81,6 +89,15 @@ export function SignupPage() {
               <h1>Join Naija Transport</h1>
               <p>Help fellow commuters by reporting fares on your route.</p>
             </div>
+
+            <ul className="auth-benefits" aria-label="Why create an account">
+              {commuterHighlights.map((item) => (
+                <li key={item}>
+                  <span aria-hidden="true">+</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
 
             {error && (
               <div className="auth-alert auth-alert-error" role="alert">
@@ -100,6 +117,7 @@ export function SignupPage() {
                     className="auth-input"
                     type="text"
                     autoComplete="name"
+                    required
                     value={fullName}
                     onChange={(event) => setFullName(event.target.value)}
                     placeholder="Gabriel Adenrele"
@@ -117,6 +135,7 @@ export function SignupPage() {
                     className="auth-input"
                     type="email"
                     autoComplete="email"
+                    required
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="you@example.com"
@@ -134,6 +153,8 @@ export function SignupPage() {
                     className="auth-input"
                     type={showPassword ? "text" : "password"}
                     autoComplete="new-password"
+                    required
+                    minLength={8}
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     placeholder="At least 8 characters"
@@ -166,6 +187,8 @@ export function SignupPage() {
                     className="auth-input"
                     type={showPassword ? "text" : "password"}
                     autoComplete="new-password"
+                    required
+                    minLength={8}
                     value={confirmPassword}
                     onChange={(event) => setConfirmPassword(event.target.value)}
                     placeholder="Repeat password"
