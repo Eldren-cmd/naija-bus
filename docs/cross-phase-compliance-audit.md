@@ -20,7 +20,7 @@ Status labels:
 | 3 | complete | realtime map/report UX implemented | report loop + bot-ingest baseline implemented | aligned | phase-3 scoped requirements are compliant; deeper automation/reward expansion is tracked for later phases. |
 | 4 | complete | trip UX and replay implemented | retention + gamification baseline implemented | aligned | phase-4 engagement gap now closed with points/streaks/badges/leaderboard surface. |
 | 5 (through 5.14) | complete through 5.14 | major polish updates + mobile responsiveness + loading skeleton + empty-state + global error fallback + E2E guardrails + UAT remediation applied | saved-routes retention loop + mobile usability + loading/empty-state + trust fallback + report loop + UAT engagement acceptance checks completed | aligned | phase-5 closure evidence is recorded in `docs/phase5-step514-validation.md`. |
-| 6 (through 6.2) | complete through 6.2 | deployment prerequisites initialized and backend service exposed publicly | deployment prerequisites initialized and engagement API loops now publicly reachable | partial | Render backend is live and wired to frontend envs; production DB hardening/monitoring/security sequence remains. |
+| 6 (through 6.3) | complete through 6.3 | deployment prerequisites initialized and backup reliability baseline confirmed | deployment prerequisites initialized and engagement API loops now publicly reachable with backup coverage | partial | Render backend is live, frontend envs target live API, and Atlas backup policy is active for production cluster; monitoring/security sequence remains. |
 
 ## Compliance Recheck (Previous Phases)
 

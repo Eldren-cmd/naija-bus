@@ -1276,3 +1276,44 @@ validation checks passed:
 
 ### Next Tasks
 - Continue Phase 6 in strict order: `6.3` (production Atlas cluster + backups).
+
+### Task 6.3
+- Create production Atlas cluster and enable automated backups
+
+Status: complete. Implemented:
+- provisioned production Atlas cluster:
+  - cluster: `naija-transport-prod`
+  - plan class: `FLEX`
+- validated backup snapshot screen for production cluster:
+  - backup tab: `Snapshots`
+  - first scheduled snapshot visible (`Next estimated snapshot: 02/23/26 - 03:29 AM`)
+  - current snapshot count confirmed as expected during initial setup (`0` before first run)
+- validated backup policy configuration:
+  - frequency unit: `Daily Snapshot`
+  - interval: every `24 Hours`
+  - retention: `8 Days`
+  - snapshot time: `03:29 GMT+1`
+  - expected retained snapshots: approximately `8`
+- manual fallback path confirmed:
+  - `Take Snapshot Now` is available for immediate snapshot creation when needed
+
+Design Guide applicability check:
+- no direct UI component changes in this step.
+- production data durability setup reduces risk of user-facing data loss in deployed route/fare/report experiences.
+
+Engagement Guide applicability check:
+- no direct feature-loop logic changed in this task.
+- report/trip/saved-route engagement data now has production backup coverage, supporting retention and trust for repeat users.
+
+validation checks passed:
+- Atlas `Backup -> Snapshots` screen verified for `naija-transport-prod`
+- Atlas `Backup -> Backup Policy` settings verified:
+  - `Daily Snapshot`
+  - `24 Hours`
+  - `8 Days`
+  - `03:29 GMT+1`
+- evidence documented in:
+  - `docs/phase6-step63-validation.md`
+
+### Next Tasks
+- Continue Phase 6 in strict order: `6.4` (seed production DB and verify on live frontend).

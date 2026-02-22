@@ -78,15 +78,19 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - verified report loop remains intact after UX/performance changes
   - applied lazy-load/perf fix to reduce first-load friction on engagement surfaces
 
-### Phase 6 (through Task 6.2)
+### Phase 6 (through Task 6.3)
 - Deployment prerequisite setup completed:
   - Vercel project linked to repo
   - frontend environment keys configured on hosted project
   - Render backend service provisioned and reachable publicly
   - frontend hosted API base now points to live backend URL
-- Engagement applicability for 6.1/6.2:
+- production backup reliability setup completed:
+  - Atlas production cluster `naija-transport-prod` is active
+  - backup policy verified (`Daily Snapshot`, `24 Hours`, `8 Days`, `03:29 GMT+1`)
+- Engagement applicability for 6.1-6.3:
   - no direct new engagement feature logic shipped in these tasks
-  - existing engagement loops (reporting/saved-routes/trips) are now connected to deployed backend infrastructure
+  - existing engagement loops (reporting/saved-routes/trips) are connected to deployed backend infrastructure
+  - engagement data durability baseline is now in place through production backups
 - Deferred to later in phase 6:
   - uptime keep-warm monitoring for free-tier cold starts (`6.13`)
 

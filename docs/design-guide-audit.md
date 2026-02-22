@@ -29,6 +29,8 @@ Reference: `NaijaTransport_DesignGuide.docx`
   - hosted frontend env configuration now includes map key for production map rendering parity
 - Phase 6 task `6.2` backend deployment completed:
   - live backend endpoint now supports design-level flows in non-local environments (route detail, fare estimate, reporting surfaces)
+- Phase 6 task `6.3` production backup baseline completed:
+  - Atlas backup policy for production data is active, supporting reliability of user-facing route/fare/report history surfaces
 
 ## High-Impact Gaps To Implement Next
 
