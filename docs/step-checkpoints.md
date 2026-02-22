@@ -1228,3 +1228,51 @@ deferred note:
 
 ### Next Tasks
 - Continue Phase 6 in strict order: `6.2` (backend hosting service + backend env vars).
+
+### Task 6.2
+- Create Render/Railway backend service; set all backend env vars
+
+Status: complete. Implemented:
+- created Render web service:
+  - name: `naija-bus-backend`
+  - id: `srv-d6d5r0vfte5s73d66880`
+  - URL: `https://naija-bus-backend.onrender.com`
+  - repo: `https://github.com/Eldren-cmd/naija-bus`
+  - root directory: `backend`
+- configured backend runtime/deploy settings on Render:
+  - build command: `npm install --include=dev && npm run build`
+  - start command: `npm run start`
+  - health path: `/api/v1/health`
+- set backend environment variables from local backend config with production-safe overrides:
+  - `PORT=10000`
+  - `NODE_ENV=production`
+  - `MONGO_URI`, `JWT_SECRET`, auth/rate-limit/bot keys
+  - `CORS_ORIGIN` set to Vercel domain
+- updated Vercel frontend env so hosted app targets live backend:
+  - `VITE_API_BASE=https://naija-bus-backend.onrender.com`
+  - applied to `production`, `preview`, and `development`
+- deployment incident fixes completed during 6.2:
+  - initial build failed because dev dependencies were excluded in install
+  - fixed by updating Render build command to include dev dependencies
+  - runtime initially failed due Atlas network access
+  - resolved after Atlas network access update and redeploy
+
+Design Guide applicability check:
+- no direct UI component changes in this step.
+- production API availability now supports design-intended live map/fare/report interactions outside localhost.
+
+Engagement Guide applicability check:
+- no new engagement feature added directly in this task.
+- engagement loops from prior phases are now reachable via public backend endpoint.
+- free-tier cold-start latency is tracked as an operational risk and will be handled in `6.13` uptime monitoring (can be executed earlier operationally without marking `6.13` complete).
+
+validation checks passed:
+- Render service created and visible via API listing.
+- Render service deploy status reached `live`.
+- `GET https://naija-bus-backend.onrender.com/api/v1/health` returns:
+  - `status: ok`
+  - `database: connected`
+- `vercel env ls` confirms `VITE_API_BASE` and `VITE_MAPBOX_KEY` present in all environments.
+
+### Next Tasks
+- Continue Phase 6 in strict order: `6.3` (production Atlas cluster + backups).

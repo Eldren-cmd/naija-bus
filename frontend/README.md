@@ -42,6 +42,8 @@ React + TypeScript + Vite frontend for Naija Transport.
 - Phase 6 Task 6.1 deployment prep completed:
   - Vercel project linked to this repo
   - hosted frontend env vars configured (`VITE_MAPBOX_KEY`, `VITE_API_BASE`)
+- Phase 6 Task 6.2 backend hosting completed:
+  - hosted frontend API base now points to live Render backend (`https://naija-bus-backend.onrender.com`)
 
 ## Environment
 Create `frontend/.env` with:

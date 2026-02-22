@@ -27,6 +27,8 @@ Reference: `NaijaTransport_DesignGuide.docx`
   - Vite build now uses manual chunk splitting to reduce initial app payload
 - Phase 6 task `6.1` deployment prep completed:
   - hosted frontend env configuration now includes map key for production map rendering parity
+- Phase 6 task `6.2` backend deployment completed:
+  - live backend endpoint now supports design-level flows in non-local environments (route detail, fare estimate, reporting surfaces)
 
 ## High-Impact Gaps To Implement Next
 

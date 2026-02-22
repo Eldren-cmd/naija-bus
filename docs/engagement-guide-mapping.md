@@ -78,15 +78,17 @@ Reference: `NaijaTransport_EngagementGuide.docx`
   - verified report loop remains intact after UX/performance changes
   - applied lazy-load/perf fix to reduce first-load friction on engagement surfaces
 
-### Phase 6 (through Task 6.1)
+### Phase 6 (through Task 6.2)
 - Deployment prerequisite setup completed:
   - Vercel project linked to repo
   - frontend environment keys configured on hosted project
-- Engagement applicability for 6.1:
-  - no direct feature-level engagement change in this task
-  - enables production delivery path for engagement loops already built in phases 3–5
-- Deferred to next step (`6.2`):
-  - replace temporary `VITE_API_BASE` placeholder with real backend public URL after backend hosting is provisioned
+  - Render backend service provisioned and reachable publicly
+  - frontend hosted API base now points to live backend URL
+- Engagement applicability for 6.1/6.2:
+  - no direct new engagement feature logic shipped in these tasks
+  - existing engagement loops (reporting/saved-routes/trips) are now connected to deployed backend infrastructure
+- Deferred to later in phase 6:
+  - uptime keep-warm monitoring for free-tier cold starts (`6.13`)
 
 ## Future Compliance Plan
 

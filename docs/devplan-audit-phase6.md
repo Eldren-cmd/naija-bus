@@ -17,7 +17,7 @@ Cross-guide enforcement (mandatory):
 | Task | Status | Notes |
 | --- | --- | --- |
 | 6.1 | complete | Vercel project linked to GitHub repo and frontend env vars added on Vercel (`VITE_MAPBOX_KEY`, `VITE_API_BASE`) for `production`, `preview`, and `development`. `VITE_API_BASE` is temporarily set to `https://replace-with-backend-url.example.com` and will be updated in `6.2` once backend URL is provisioned. |
-| 6.2 | missing | Pending: create Render/Railway backend service and set backend env vars. |
+| 6.2 | complete | Render web service created (`naija-bus-backend`) and linked to private repo with `backend/` root; backend env vars set; Vercel `VITE_API_BASE` updated to Render URL; public health endpoint now returns `{\"status\":\"ok\",\"database\":\"connected\"}`. |
 | 6.3 | missing | Pending: production Atlas cluster + automated backups. |
 | 6.4 | missing | Pending: seed production DB and verify on live frontend. |
 | 6.5 | missing | Pending: production CORS allowlist hardening. |
@@ -34,5 +34,5 @@ Cross-guide enforcement (mandatory):
 
 ## Recovery Order (Strict DevPlan Alignment)
 
-1. Continue with `6.2` next.
+1. Continue with `6.3` next.
 2. Keep phase-6 tasks in strict sequence with step-level validation and compliance notes.
