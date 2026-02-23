@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { createTripRecord } from "../lib/api";
 import { EmptyState } from "./EmptyState";
 import { PanelCard } from "./PanelCard";
@@ -351,114 +352,121 @@ export function TripRecorder({
     return Math.max(0, Math.round((endValue - startValue) / 1000));
   }, [tripStartedAt, tripEndedAt]);
 
-  return (
-    <PanelCard
-      title="Trip Recorder"
-      subtitle={
-        routeName
-          ? `Record your live movement for ${routeName}. Checkpoints are sampled every 5 seconds.`
-          : "Start a trip recording session. Checkpoints are sampled every 5 seconds."
-      }
-      tone="trip"
-      iconLabel="TR"
-      className="trip-recorder-card"
-    >
-      {!authGuard.canAct && (
-        <EmptyState
-          tone="trip"
-          compact
-          iconLabel="IN"
-          title="Sign in to upload trip history"
-          message="You can record now, but upload requires login from /login."
-        />
-      )}
-      <p className="muted small">Location permission: {formatPermissionState(geoPermissionState)}</p>
+  const tripPreviewModal =
+    isPreviewOpen && typeof document !== "undefined"
+      ? createPortal(
+          <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Trip preview modal">
+            <div className="modal-card trip-preview-modal">
+              <div className="modal-head trip-preview-head">
+                <h3 className="panel-title">Trip Preview</h3>
+                <button type="button" className="modal-close-btn" onClick={() => setIsPreviewOpen(false)}>
+                  Close
+                </button>
+              </div>
 
-      {(permissionDenied || geoPermissionState === "denied") && (
-        <div className="trip-permission-warning">
-          <p>
-            Location permission is blocked for this site. Enable location in your browser settings and retry.
-          </p>
-          <button type="button" className="secondary-btn" onClick={startRecording} disabled={isRecording}>
-            Retry Location Access
+              <div className="trip-preview-body">
+                <div className="trip-preview-meta">
+                  <span>Route: {routeName || "Unspecified route"}</span>
+                  <span>Points: {checkpoints.length}</span>
+                  <span>Distance: {formatDistance(previewDistanceMeters)}</span>
+                  <span>Duration: {formatDuration(previewDurationSeconds)}</span>
+                </div>
+
+                <div className="trip-preview-canvas">
+                  {previewPolylinePoints ? (
+                    <svg viewBox={`0 0 ${PREVIEW_WIDTH} ${PREVIEW_HEIGHT}`} aria-label="Trip path preview">
+                      <rect x="0" y="0" width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} rx="12" />
+                      <polyline points={previewPolylinePoints} />
+                    </svg>
+                  ) : (
+                    <p className="muted">Trip path preview requires at least 2 checkpoints.</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="modal-actions trip-preview-actions">
+                <button type="button" className="secondary-btn" onClick={() => setIsPreviewOpen(false)}>
+                  Cancel
+                </button>
+                <button type="button" className="estimate-btn" onClick={() => void uploadTrip()} disabled={uploading}>
+                  {uploading
+                    ? "Uploading..."
+                    : authGuard.getActionLabel({
+                        authenticated: "Upload Trip",
+                        unauthenticated: "Login to Upload",
+                      })}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )
+      : null;
+
+  return (
+    <>
+      <PanelCard
+        title="Trip Recorder"
+        subtitle={
+          routeName
+            ? `Record your live movement for ${routeName}. Checkpoints are sampled every 5 seconds.`
+            : "Start a trip recording session. Checkpoints are sampled every 5 seconds."
+        }
+        tone="trip"
+        iconLabel="TR"
+        className="trip-recorder-card"
+      >
+        {!authGuard.canAct && (
+          <EmptyState
+            tone="trip"
+            compact
+            iconLabel="IN"
+            title="Sign in to upload trip history"
+            message="You can record now, but upload requires login from /login."
+          />
+        )}
+        <p className="muted small">Location permission: {formatPermissionState(geoPermissionState)}</p>
+
+        {(permissionDenied || geoPermissionState === "denied") && (
+          <div className="trip-permission-warning">
+            <p>
+              Location permission is blocked for this site. Enable location in your browser settings and retry.
+            </p>
+            <button type="button" className="secondary-btn" onClick={startRecording} disabled={isRecording}>
+              Retry Location Access
+            </button>
+          </div>
+        )}
+
+        <div className="trip-recorder-actions">
+          <button type="button" className="estimate-btn" onClick={startRecording} disabled={isRecording}>
+            {isRecording ? "Recording..." : "Start Recording"}
+          </button>
+          <button type="button" className="secondary-btn" onClick={() => stopRecording()} disabled={!isRecording}>
+            Stop & Preview
           </button>
         </div>
-      )}
 
-      <div className="trip-recorder-actions">
-        <button type="button" className="estimate-btn" onClick={startRecording} disabled={isRecording}>
-          {isRecording ? "Recording..." : "Start Recording"}
-        </button>
-        <button type="button" className="secondary-btn" onClick={() => stopRecording()} disabled={!isRecording}>
-          Stop & Preview
-        </button>
-      </div>
+        <p className="muted trip-recorder-meta">Checkpoints captured: {checkpoints.length}</p>
 
-      <p className="muted trip-recorder-meta">Checkpoints captured: {checkpoints.length}</p>
-
-      {latestCheckpoint && (
-        <div className="trip-recorder-latest">
-          <p>
-            Latest: {latestCheckpoint.coords.coordinates[1].toFixed(6)},{" "}
-            {latestCheckpoint.coords.coordinates[0].toFixed(6)}
-          </p>
-          <small>
-            {formatRecordedAt(latestCheckpoint.recordedAt)}
-            {typeof latestCheckpoint.accuracyMeters === "number"
-              ? ` | +/-${Math.round(latestCheckpoint.accuracyMeters)}m`
-              : ""}
-          </small>
-        </div>
-      )}
-
-      {error && <p className="error-text">{error}</p>}
-
-      {isPreviewOpen && (
-        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Trip preview modal">
-          <div className="modal-card trip-preview-modal">
-            <div className="modal-head trip-preview-head">
-              <h3 className="panel-title">Trip Preview</h3>
-              <button type="button" className="modal-close-btn" onClick={() => setIsPreviewOpen(false)}>
-                Close
-              </button>
-            </div>
-
-            <div className="trip-preview-body">
-              <div className="trip-preview-meta">
-                <span>Route: {routeName || "Unspecified route"}</span>
-                <span>Points: {checkpoints.length}</span>
-                <span>Distance: {formatDistance(previewDistanceMeters)}</span>
-                <span>Duration: {formatDuration(previewDurationSeconds)}</span>
-              </div>
-
-              <div className="trip-preview-canvas">
-                {previewPolylinePoints ? (
-                  <svg viewBox={`0 0 ${PREVIEW_WIDTH} ${PREVIEW_HEIGHT}`} aria-label="Trip path preview">
-                    <rect x="0" y="0" width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} rx="12" />
-                    <polyline points={previewPolylinePoints} />
-                  </svg>
-                ) : (
-                  <p className="muted">Trip path preview requires at least 2 checkpoints.</p>
-                )}
-              </div>
-            </div>
-
-            <div className="modal-actions trip-preview-actions">
-              <button type="button" className="secondary-btn" onClick={() => setIsPreviewOpen(false)}>
-                Cancel
-              </button>
-              <button type="button" className="estimate-btn" onClick={() => void uploadTrip()} disabled={uploading}>
-                {uploading
-                  ? "Uploading..."
-                  : authGuard.getActionLabel({
-                      authenticated: "Upload Trip",
-                      unauthenticated: "Login to Upload",
-                    })}
-              </button>
-            </div>
+        {latestCheckpoint && (
+          <div className="trip-recorder-latest">
+            <p>
+              Latest: {latestCheckpoint.coords.coordinates[1].toFixed(6)},{" "}
+              {latestCheckpoint.coords.coordinates[0].toFixed(6)}
+            </p>
+            <small>
+              {formatRecordedAt(latestCheckpoint.recordedAt)}
+              {typeof latestCheckpoint.accuracyMeters === "number"
+                ? ` | +/-${Math.round(latestCheckpoint.accuracyMeters)}m`
+                : ""}
+            </small>
           </div>
-        </div>
-      )}
-    </PanelCard>
+        )}
+
+        {error && <p className="error-text">{error}</p>}
+      </PanelCard>
+      {tripPreviewModal}
+    </>
   );
 }

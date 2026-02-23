@@ -2728,6 +2728,7 @@
   padding: 1rem;
   border: 1px solid #d9c8b4;
   background: linear-gradient(165deg, #fff 0%, #f7fbff 100%);
+  overflow: visible;
 }
 
 .trip-recorder-actions {
