@@ -50,4 +50,19 @@ jobs:
         run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
 
       - name: Deploy to Vercel production
-        run: vercel deploy --prod --yes --token="$VERCEL_TOKEN"
+        id: deploy_vercel
+        run: |
+          DEPLOYMENT_OUTPUT=$(vercel deploy --prod --yes --token="$VERCEL_TOKEN")
+          DEPLOYMENT_URL=$(echo "$DEPLOYMENT_OUTPUT" | tail -n 1 | tr -d '\r')
+
+          if [ -z "$DEPLOYMENT_URL" ]; then
+            echo "Failed to resolve Vercel deployment URL from deploy output."
+            echo "$DEPLOYMENT_OUTPUT"
+            exit 1
+          fi
+
+          echo "$DEPLOYMENT_OUTPUT"
+          echo "deployment_url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Update naijatransport alias
+        run: vercel alias set "${{ steps.deploy_vercel.outputs.deployment_url }}" naijatransport.vercel.app --token="$VERCEL_TOKEN"
