@@ -2824,6 +2824,42 @@
   stroke-linejoin: round;
 }
 
+.trip-preview-modal {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  padding: 0;
+  overflow: hidden;
+}
+
+.trip-preview-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 0.9rem 0.95rem 0.65rem;
+  border-bottom: 1px solid #e4d1ba;
+  background: #fffdfa;
+}
+
+.trip-preview-head .panel-title {
+  margin: 0;
+}
+
+.trip-preview-body {
+  overflow-y: auto;
+  padding: 0.85rem 0.95rem;
+  overscroll-behavior: contain;
+}
+
+.trip-preview-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 0.72rem 0.95rem calc(0.72rem + env(safe-area-inset-bottom, 12px));
+  border-top: 1px solid #e4d1ba;
+  background: #fffdfa;
+}
+
 .trip-token-field {
   display: grid;
   gap: 0.35rem;
@@ -3638,6 +3674,16 @@
   .modal-card {
     padding: 0.85rem;
     max-height: calc(100dvh - 1.6rem);
+  }
+
+  .trip-preview-modal {
+    max-height: calc(100dvh - 1rem);
+    padding: 0;
+  }
+
+  .trip-preview-head {
+    flex-direction: row;
+    align-items: center;
   }
 
   .modal-head {

@@ -189,6 +189,15 @@ export function TripRecorder({
     };
   }, []);
 
+  useEffect(() => {
+    if (!isPreviewOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isPreviewOpen]);
+
   const stopRecording = (options: StopRecordingOptions = {}) => {
     if (watchIdRef.current !== null) {
       window.navigator.geolocation.clearWatch(watchIdRef.current);
@@ -406,33 +415,35 @@ export function TripRecorder({
 
       {isPreviewOpen && (
         <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="Trip preview modal">
-          <div className="modal-card">
-            <div className="modal-head">
+          <div className="modal-card trip-preview-modal">
+            <div className="modal-head trip-preview-head">
               <h3 className="panel-title">Trip Preview</h3>
               <button type="button" className="modal-close-btn" onClick={() => setIsPreviewOpen(false)}>
                 Close
               </button>
             </div>
 
-            <div className="trip-preview-meta">
-              <span>Route: {routeName || "Unspecified route"}</span>
-              <span>Points: {checkpoints.length}</span>
-              <span>Distance: {formatDistance(previewDistanceMeters)}</span>
-              <span>Duration: {formatDuration(previewDurationSeconds)}</span>
+            <div className="trip-preview-body">
+              <div className="trip-preview-meta">
+                <span>Route: {routeName || "Unspecified route"}</span>
+                <span>Points: {checkpoints.length}</span>
+                <span>Distance: {formatDistance(previewDistanceMeters)}</span>
+                <span>Duration: {formatDuration(previewDurationSeconds)}</span>
+              </div>
+
+              <div className="trip-preview-canvas">
+                {previewPolylinePoints ? (
+                  <svg viewBox={`0 0 ${PREVIEW_WIDTH} ${PREVIEW_HEIGHT}`} aria-label="Trip path preview">
+                    <rect x="0" y="0" width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} rx="12" />
+                    <polyline points={previewPolylinePoints} />
+                  </svg>
+                ) : (
+                  <p className="muted">Trip path preview requires at least 2 checkpoints.</p>
+                )}
+              </div>
             </div>
 
-            <div className="trip-preview-canvas">
-              {previewPolylinePoints ? (
-                <svg viewBox={`0 0 ${PREVIEW_WIDTH} ${PREVIEW_HEIGHT}`} aria-label="Trip path preview">
-                  <rect x="0" y="0" width={PREVIEW_WIDTH} height={PREVIEW_HEIGHT} rx="12" />
-                  <polyline points={previewPolylinePoints} />
-                </svg>
-              ) : (
-                <p className="muted">Trip path preview requires at least 2 checkpoints.</p>
-              )}
-            </div>
-
-            <div className="modal-actions">
+            <div className="modal-actions trip-preview-actions">
               <button type="button" className="secondary-btn" onClick={() => setIsPreviewOpen(false)}>
                 Cancel
               </button>
