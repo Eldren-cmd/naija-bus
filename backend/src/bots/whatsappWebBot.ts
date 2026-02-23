@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import qrcode from "qrcode-terminal";
 import { Client, LocalAuth, type Message } from "whatsapp-web.js";
 import type { BotContext, BotIngestResult, BotReportPayload } from "../types/bot";
@@ -24,6 +25,29 @@ const parseAllowlist = (raw: string | undefined): Set<string> =>
       .filter(Boolean)
       .map((item) => item.replace(/^\+/, "")),
   );
+
+const resolvePuppeteerExecutablePath = (rawPath: string | undefined): string | undefined => {
+  const trimmedPath = (rawPath || "").trim();
+  if (!trimmedPath) {
+    return undefined;
+  }
+
+  // Prevent mismatched env values such as Windows paths on Linux hosts.
+  const isWindowsStylePath = /^[A-Za-z]:\\/.test(trimmedPath);
+  if (isWindowsStylePath && process.platform !== "win32") {
+    console.warn(
+      `[whatsapp-bot] Ignoring WHATSAPP_PUPPETEER_EXECUTABLE_PATH on ${process.platform}: ${trimmedPath}`,
+    );
+    return undefined;
+  }
+
+  if (!existsSync(trimmedPath)) {
+    console.warn(`[whatsapp-bot] Chrome executable not found at: ${trimmedPath}. Falling back to default.`);
+    return undefined;
+  }
+
+  return trimmedPath;
+};
 
 type ParseResult =
   | { kind: "ignore" }
@@ -112,7 +136,7 @@ export const startWhatsAppWebBot = async ({ onReport }: StartBotOptions): Promis
 
   const allowlist = parseAllowlist(process.env.WHATSAPP_ALLOWED_SENDERS);
   const sessionPath = (process.env.WHATSAPP_SESSION_PATH || ".wwebjs_auth").trim();
-  const executablePath = (process.env.WHATSAPP_PUPPETEER_EXECUTABLE_PATH || "").trim();
+  const executablePath = resolvePuppeteerExecutablePath(process.env.WHATSAPP_PUPPETEER_EXECUTABLE_PATH);
 
   const client = new Client({
     authStrategy: new LocalAuth({ dataPath: sessionPath }),
