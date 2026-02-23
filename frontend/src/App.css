@@ -2801,12 +2801,12 @@
   border-radius: 0.9rem;
   background: #f2f9ff;
   padding: 0.5rem;
-  margin-bottom: 0.7rem;
+  margin-bottom: 0;
 }
 
 .trip-preview-canvas svg {
   width: 100%;
-  height: 220px;
+  height: clamp(180px, 30vh, 260px);
   display: block;
 }
 
@@ -2825,6 +2825,8 @@
 }
 
 .trip-preview-modal {
+  width: min(860px, calc(100vw - 2.5rem));
+  max-height: calc(100dvh - 2.5rem);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   padding: 0;
@@ -2854,6 +2856,7 @@
   position: sticky;
   bottom: 0;
   z-index: 2;
+  justify-content: flex-end;
   margin: 0;
   padding: 0.72rem 0.95rem calc(0.72rem + env(safe-area-inset-bottom, 12px));
   border-top: 1px solid #e4d1ba;
@@ -3521,6 +3524,11 @@
     flex-direction: column-reverse;
   }
 
+  .trip-preview-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
   .trip-recorder-actions {
     flex-direction: column;
   }
@@ -3679,11 +3687,17 @@
   .trip-preview-modal {
     max-height: calc(100dvh - 1rem);
     padding: 0;
+    width: min(860px, calc(100vw - 1rem));
   }
 
   .trip-preview-head {
     flex-direction: row;
     align-items: center;
+  }
+
+  .trip-preview-actions {
+    flex-direction: column-reverse;
+    flex-wrap: nowrap;
   }
 
   .modal-head {
