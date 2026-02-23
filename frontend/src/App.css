@@ -2865,7 +2865,7 @@
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1200;
+  z-index: 1400;
   background: rgba(13, 27, 42, 0.58);
   display: grid;
   place-items: center;
@@ -3636,6 +3636,7 @@
 
   .modal-card {
     padding: 0.85rem;
+    max-height: calc(100dvh - 1.6rem);
   }
 
   .modal-head {
