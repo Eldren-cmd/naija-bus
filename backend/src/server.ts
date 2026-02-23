@@ -1558,6 +1558,24 @@ app.get("/engagement/me", authMiddleware, getMyEngagementHandler);
 app.get("/api/v1/engagement/leaderboard", authMiddleware, getEngagementLeaderboardHandler);
 app.get("/engagement/leaderboard", authMiddleware, getEngagementLeaderboardHandler);
 
+const readErrorMessage = (value: unknown): string => {
+  if (value instanceof Error) {
+    return value.message || "";
+  }
+  if (typeof value === "string") {
+    return value;
+  }
+  return "";
+};
+
+const isExpectedWhatsAppBotDependencyError = (value: unknown): boolean => {
+  const message = readErrorMessage(value).toLowerCase();
+  return (
+    message.includes("could not find chrome") ||
+    message.includes("browser was not found at the configured executablepath")
+  );
+};
+
 const startServer = async (): Promise<void> => {
   try {
     await connectToDatabase();
@@ -1584,6 +1602,18 @@ const startServer = async (): Promise<void> => {
         };
       },
     }).catch((botError) => {
+      if (isExpectedWhatsAppBotDependencyError(botError)) {
+        logger.warn(
+          {
+            err: botError,
+            event: "whatsapp_bot_browser_missing",
+            hint: "Install Chrome with `npm run puppeteer:install` and redeploy.",
+          },
+          "whatsapp_bot_browser_missing",
+        );
+        return;
+      }
+
       logger.error({ err: botError, event: "whatsapp_bot_startup_failed" }, "whatsapp_bot_startup_failed");
       captureServerException(botError, { operation: "whatsapp_bot_startup" });
     });

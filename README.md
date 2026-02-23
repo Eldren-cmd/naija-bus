@@ -138,6 +138,7 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 - `WHATSAPP_ALLOWED_SENDERS`: comma-separated sender MSISDN allowlist for bot commands.
 - `WHATSAPP_SESSION_PATH`: local session storage path for WhatsApp auth state.
 - `WHATSAPP_PUPPETEER_EXECUTABLE_PATH`: optional local Chrome path when Puppeteer download is skipped.
+- `PUPPETEER_CACHE_DIR`: optional cache location for downloaded browser binaries (use app-local path on Render).
 
 ### Logging Sink
 - Backend logs are emitted as structured JSON to stdout via `pino`.
