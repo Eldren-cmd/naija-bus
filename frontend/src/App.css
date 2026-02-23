@@ -3587,6 +3587,7 @@
 
   .app-shell {
     padding: 0.8rem;
+    padding-bottom: calc(6.25rem + env(safe-area-inset-bottom, 16px));
   }
 
   .hero h1 {
