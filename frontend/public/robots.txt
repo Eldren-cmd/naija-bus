@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /quick-report
+Disallow: /my-trips
+Disallow: /trips
+Disallow: /login
+
+Sitemap: https://naijatransport.vercel.app/sitemap.xml

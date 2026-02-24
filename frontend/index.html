@@ -2,33 +2,96 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Naija Transport — Live Lagos Danfo Fares & Route Finder</title>
     <meta
       name="description"
-      content="Find danfo fares and live traffic reports for Lagos routes. Crowdsourced by commuters, for commuters."
+      content="Find live danfo, BRT and keke fares for Lagos routes. Ojota to CMS, Lekki to VI, Yaba to Ikeja and more. Crowdsourced by Lagos commuters in real time. Free."
     />
+    <meta
+      name="keywords"
+      content="Lagos danfo fare, Lagos bus routes, Ojota CMS fare, Lekki VI transport, Lagos commuter app, danfo price, Lagos BRT fare"
+    />
+    <link rel="canonical" href="https://naijatransport.vercel.app/" />
+    <meta name="geo.region" content="NG-LA" />
+    <meta name="geo.placename" content="Lagos, Nigeria" />
+    <meta name="geo.position" content="6.5244;3.3792" />
+    <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#FF6B00" />
-    <meta property="og:title" content="Naija Transport — Lagos Route & Fare Finder" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://naijatransport.vercel.app/" />
+    <meta property="og:title" content="Naija Transport — Live Lagos Danfo Fares" />
     <meta
       property="og:description"
-      content="Find danfo fares and live traffic reports for Lagos routes. Crowdsourced by commuters, for commuters."
+      content="Check live danfo fares for any Lagos route. Crowdsourced by commuters, updated daily. Free."
     />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="/favicon.svg" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Naija Transport — Lagos Route & Fare Finder" />
+    <meta property="og:image" content="https://naijatransport.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_NG" />
+    <meta property="og:site_name" content="Naija Transport" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@NaijaTransport" />
+    <meta name="twitter:title" content="Naija Transport — Live Lagos Danfo Fares" />
     <meta
       name="twitter:description"
-      content="Find danfo fares and live traffic reports for Lagos routes. Crowdsourced by commuters, for commuters."
+      content="Check live danfo fares for any Lagos route. Crowdsourced by Lagos commuters. Free."
     />
-    <link rel="preconnect" href="https://api.fontshare.com" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-    <title>Naija Transport — Lagos Route & Fare Finder</title>
+    <meta name="twitter:image" content="https://naijatransport.vercel.app/og-image.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Naija Transport",
+        "description": "Live Lagos danfo fares and route finder. Crowdsourced by commuters.",
+        "url": "https://naijatransport.vercel.app",
+        "applicationCategory": "TransportationApplication",
+        "operatingSystem": "Web, Android, iOS",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "NGN" },
+        "areaServed": {
+          "@type": "City",
+          "name": "Lagos",
+          "containedInPlace": { "@type": "Country", "name": "Nigeria" }
+        }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How much is danfo from Ojota to CMS?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Approximately ₦300–₦400 depending on traffic. Check Naija Transport for live crowdsourced fares updated daily."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How much is bus from Lekki to Victoria Island?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Danfo from Lekki to VI typically costs ₦200–₦350. Naija Transport tracks live fares reported by daily commuters."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is Naija Transport free to use?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Naija Transport is completely free. Search any Lagos route and see live fare estimates."
+            }
+          }
+        ]
+      }
+    </script>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%9A%8C%3C/text%3E%3C/svg%3E"
+    />
   </head>
   <body>
     <div id="root"></div>
