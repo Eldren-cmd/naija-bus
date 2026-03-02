@@ -7,10 +7,10 @@ const IS_PUBLIC_TOKEN = RAW_MAPBOX_TOKEN.startsWith("pk.");
 export const MAPBOX_TOKEN = RAW_MAPBOX_TOKEN;
 export const HAS_VALID_MAPBOX_TOKEN = !IS_PLACEHOLDER && IS_PUBLIC_TOKEN;
 export const MAPBOX_TOKEN_HELP = !RAW_MAPBOX_TOKEN
-  ? "Set `VITE_MAPBOX_KEY` in `frontend/.env` to render map previews."
+  ? "Set `VITE_MAPBOX_KEY` in `.env.local` to render map previews."
   : !IS_PUBLIC_TOKEN
     ? "Use a public Mapbox token (`pk...`) in frontend; never place secret `sk...` tokens in client code."
-    : "Set `VITE_MAPBOX_KEY` in `frontend/.env` to render map previews.";
+    : "Set `VITE_MAPBOX_KEY` in `.env.local` to render map previews.";
 
 export const MAPBOX_STYLE = "mapbox://styles/mapbox/navigation-night-v1";
 export const LAGOS_CENTER: [number, number] = [3.3792, 6.5244];

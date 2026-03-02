@@ -5,7 +5,15 @@ const path = require("path");
 const mongoose = require(path.resolve(__dirname, "../backend/node_modules/mongoose"));
 const dotenv = require(path.resolve(__dirname, "../backend/node_modules/dotenv"));
 
-dotenv.config({ path: path.resolve(__dirname, "../backend/.env") });
+const envFiles = [
+  path.resolve(__dirname, "../.env.local"),
+  path.resolve(__dirname, "../backend/.env.local"),
+  path.resolve(__dirname, "../backend/.env"),
+];
+
+envFiles.forEach((envPath) => {
+  dotenv.config({ path: envPath, override: false });
+});
 
 const routeSchema = new mongoose.Schema(
   {
@@ -126,7 +134,7 @@ const run = async () => {
 
   const mongoUri = process.env.MONGO_URI;
   if (!mongoUri) {
-    throw new Error("MONGO_URI is not set in backend/.env");
+    throw new Error("MONGO_URI is not set in .env.local");
   }
 
   await mongoose.connect(mongoUri);

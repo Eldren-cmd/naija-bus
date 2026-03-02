@@ -102,8 +102,8 @@ This repository is being built strictly from:
 The project uses a **private** GitHub repository at `origin` with `main` pushed.
 
 ## Environment Setup
-1. Copy `backend/.env.example` to `backend/.env`.
-2. Copy `frontend/.env.example` to `frontend/.env` when frontend API/map integration begins.
+1. Copy `.env.example` to `.env.local` at the repo root.
+2. Fill `.env.local` with real values for local development only.
 3. Never commit real secrets.
 
 ### Backend Required Keys
@@ -149,7 +149,7 @@ The project uses a **private** GitHub repository at `origin` with `main` pushed.
 - `VITE_MAPBOX_KEY`: public Mapbox token (`pk...`) used by frontend map surfaces.
 
 ### Mapbox Billing Guardrails (Phase 6.12)
-1. Use a public browser token only (`pk...`) for `VITE_MAPBOX_KEY`; never use `sk...` in frontend env.
+1. Use a public browser token only (`pk...`) for `VITE_MAPBOX_KEY`; never use `sk...` in client-accessible env.
 2. Restrict token URLs in Mapbox token settings to:
    - `http://localhost:5173/*`
    - `https://naijatransport.vercel.app/*` (or your active production domain)

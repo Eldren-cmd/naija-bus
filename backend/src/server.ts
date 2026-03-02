@@ -5,6 +5,7 @@ import express, { Request, Response } from "express";
 import { rateLimit } from "express-rate-limit";
 import { createServer } from "http";
 import { isValidObjectId } from "mongoose";
+import path from "path";
 import { connectToDatabase, ensureCoreIndexes, getDatabaseStatus } from "./config/db";
 import { logger } from "./config/logger";
 import {
@@ -42,7 +43,16 @@ import {
   validateTripCreateBody,
 } from "./validation/requestSchemas";
 
-dotenv.config();
+const ENV_FILES = [
+  path.resolve(__dirname, "../../.env.local"),
+  path.resolve(__dirname, "../.env.local"),
+  path.resolve(__dirname, "../.env"),
+];
+
+ENV_FILES.forEach((envPath) => {
+  dotenv.config({ path: envPath, override: false });
+});
+
 initObservability();
 
 export const app = express();

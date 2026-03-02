@@ -52,7 +52,7 @@ React + TypeScript + Vite frontend for Naija Transport.
   - both RouteView and MyTrips replay maps now share the same map guardrail configuration
 
 ## Environment
-Create `frontend/.env` with:
+Create `.env.local` at repo root with:
 
 ```
 VITE_API_BASE=http://localhost:5000
@@ -61,7 +61,7 @@ VITE_MAPBOX_KEY=pk.replace_with_public_mapbox_token
 
 Mapbox key rule:
 - Use only a public key (`pk...`) in frontend env.
-- Do not use secret keys (`sk...`) in `frontend/.env` or browser-delivered code.
+- Do not use secret keys (`sk...`) in `.env.local` or browser-delivered code.
 
 ## Commands
 - `npm run dev`
